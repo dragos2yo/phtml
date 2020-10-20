@@ -74,10 +74,13 @@ echo $objPhtml->obtenerContenido('for');
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
-$start = 0;
-$longitud = sizeof($arrUsuario);
-for($i = $start; $i < $longitud; $i++) {
-    echo $arrUsuario[$i] . '<br>';
+$arr = array('primero', 'segundo');
+$max = count($arr);
+$init = 0;
+$asc = 2;
+for($asc == 1 ? $i = $init : $i = $max -1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+    echo $arr[$i] . '<br>';
 }
+
 
 ?>

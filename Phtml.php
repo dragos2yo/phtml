@@ -638,6 +638,8 @@ class Phtml
         $cadContenido = $this->_obtenerHTML($objForeach);
         $mixedVar = $this->_importarVariable($cadNombreVariable);
         $objFrag = null;
+
+        
         $cadContenidoProcesado = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $clave => $valor) {
@@ -691,8 +693,8 @@ class Phtml
         $objFrag = null;
 
         // procesar bucle for
-        /* if(is_array($mixedVar)) {
-        } */
+        if(is_array($mixedVar)) {
+        }
 
         if ($this->_bolEliminarComentario) {
             $this->_eliminarComentarios($objFor);
