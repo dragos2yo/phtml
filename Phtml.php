@@ -566,9 +566,15 @@ class Phtml
      * Compila los TAG switch - case - default
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <switch var="variable">
+     *      <!-- Este comentario se eliminara -->
      *      <case cond="condicion">
      *          contenido si se cumple la condicion
      *      </case>
+     *      <!-- Este comentario se eliminara -->
+     *      <case cond="condicion">
+     *          contenido si se cumple la condicion
+     *      </case>
+     *      <!-- Este comentario se eliminara -->
      *      <default>
      *          contenido si falla la condicion
      *      </default>
@@ -613,7 +619,7 @@ class Phtml
 
     /**
      * Compila el TAG foreach
-     * <!-- 
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <foreach var="variable" key="key" value="value" id="id">
      *      contenido del bucle foreach
      *      acceso variables variable.key OR id.variable.key
