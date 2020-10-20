@@ -50,7 +50,8 @@ class usuario {
         return($this->edad);
     }
 }
-$objPhtml->agregarVariable('objUsuario', new usuario());
+$objUsuario = new usuario();
+$objPhtml->agregarVariable('objUsuario', $objUsuario);
 
 /* // ejemplo de depurar un tag if-elseif-else
 $objPhtml->agregarArchivo('plantillas/if-elseif-else.phtml', 'if');
@@ -71,4 +72,8 @@ echo $objPhtml->obtenerContenido('for') . '<br>';
 /* // ejemplo de depurar un tag while
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
- */?>
+ */
+foreach($arrUsuario as $clave => $valor) {
+    echo $valor . "<br>";
+} 
+?>

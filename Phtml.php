@@ -564,6 +564,7 @@ class Phtml
 
     /**
      * Compila los TAG switch - case - default
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <switch var="variable">
      *      <case cond="condicion">
      *          contenido si se cumple la condicion
@@ -612,25 +613,38 @@ class Phtml
 
     /**
      * Compila el TAG foreach
-     * <foreach var="variable" key="key" value="value">
+     * <!-- 
+     * <foreach var="variable" key="key" value="value" id="id">
      *      contenido del bucle foreach
-     *      acceso variables variable.key
-     *                       variable.value
-     *                       this.key
-     *                       this.value
+     *      acceso variables variable.key OR id.variable.key
+     *                       key OR id.key
+     *                       value OR id.value
      * </forach>
      */
     private function _compilar_foreach()
     {
         $objDom = $this->_obtenerObjDOM($this->_cadContenido);
         $objForeach = $objDom->getElementsByTagName('foreach')->item(0);
-        $variable = $this->_importarVariable($objForeach->getAttribute('var'));
+        $cadNombreVariable = $objForeach->getAttribute('var');
         $cadNombreClave = $objForeach->getAttribute('key')   != '' ? $objForeach->getAttribute('key') : 'key';
         $cadNombreValor = $objForeach->getAttribute('value') != '' ? $objForeach->getAttribute('value') : 'value';
+        $cadIdenticador = $objForeach->getAttribute('id')    != '' ? $objForeach->getAttribute('id') . '.' : '';
+        $mixedVar = $this->_importarVariable($cadNombreVariable);
         $objFrag = null;
 
-        // Aqui procezar el foreach
+        $cadContenido = $this->_obtenerHTML($objForeach);
+        $cadContenidoProcesado = '';
+        if (is_array($mixedVar) || is_object($mixedVar)) {
+            foreach ($mixedVar as $clave => $valor) {
+                $varclave = is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave];
+                $cadContenidoProcesado .= str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadNombreClave . $this->_cierraVariable, $varclave, $cadContenido);
+                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreClave . $this->_cierraVariable, $clave, $cadContenidoProcesado);
+                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreValor . $this->_cierraVariable, $valor, $cadContenidoProcesado);
+            }
+            print_pre($cadContenidoProcesado);
+            //$objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
 
+        } 
         if ($this->_bolEliminarComentario) {
             $this->_eliminarComentarios($objForeach);
         }
