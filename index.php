@@ -39,6 +39,7 @@ $objPhtml->agregarVariable('nombre', 'Dragos');
 
 $arrUsuario['nombre'] = 'Dragos';
 $arrUsuario['edad'] = 35;
+
 $objPhtml->agregarVariable('arrUsuario', $arrUsuario);
 class usuario {
     public $nombre = 'Dragos';
@@ -73,4 +74,10 @@ echo $objPhtml->obtenerContenido('for');
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
+$start = 0;
+$longitud = sizeof($arrUsuario);
+for($i = $start; $i < $longitud; $i++) {
+    echo $arrUsuario[$i] . '<br>';
+}
+
 ?>

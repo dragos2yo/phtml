@@ -622,10 +622,9 @@ class Phtml
      * Compila el TAG foreach
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <foreach var="variable" key="key" value="value" id="id">
-     *      contenido del bucle foreach
-     *      acceso variables variable.key OR id.variable.key
-     *                       key OR id.key
-     *                       value OR id.value
+     *      {{variable.key}} OR {{id.variable.key}}
+     *      {{key}}          OR {{id.key}}
+     *      {{value}}        OR {{id.value}}
      * </forach>
      */
     private function _compilar_foreach()
@@ -636,10 +635,9 @@ class Phtml
         $cadNombreClave = $objForeach->getAttribute('key')   != '' ? $objForeach->getAttribute('key') : 'key';
         $cadNombreValor = $objForeach->getAttribute('value') != '' ? $objForeach->getAttribute('value') : 'value';
         $cadIdenticador = $objForeach->getAttribute('id')    != '' ? $objForeach->getAttribute('id') . '.' : '';
+        $cadContenido = $this->_obtenerHTML($objForeach);
         $mixedVar = $this->_importarVariable($cadNombreVariable);
         $objFrag = null;
-
-        $cadContenido = $this->_obtenerHTML($objForeach);
         $cadContenidoProcesado = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $clave => $valor) {
@@ -666,16 +664,47 @@ class Phtml
 
     /**
      * Compila el TAG for
-     * <for index="i" var="variable" init="0" fin="count" order="asc">
-     *      contenido bucle for
-     *      acceso variable variable.i
-     *                      this.i
-     *                      variable.1
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
+     * <for index="i" var="variable" init="0" fin="count" order="asc" id="id">
+     *      {{variable.i}} OR {{id.variable.i}}
+     *      {{i}}          OR {{id.i}}
      * </for>
      */
     private function _compilar_for()
     {
-        return (true);
+        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
+        $objFor = $objDom->getElementsByTagName('for')->item(0);
+        $cadNombreVariable = $objFor->getAttribute('var');
+        $cadIndex = $objFor->getAttribute('index')    != '' ? $objFor->getAttribute('index')    : 'i';
+        $start = 0;
+        if($objFor->getAttribute('init') == '') {
+            $arrIndice = explode('.', $cadIndex);
+            $cadIndex = $arrIndice[0];
+            $start = $arrIndice[1];
+        } else {
+            $start = $objFor->getAttribute('init');
+        }
+        $cadOrden = $objFor->getAttribute('order')    != '' ? $objFor->getAttribute('order')    : 'asc';
+        $cadIdenticador = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
+        $mixedVar = $this->_importarVariable($cadNombreVariable);
+        $cadContenido = $this->_obtenerHTML($objFor);
+        $objFrag = null;
+
+        // procesar bucle for
+        /* if(is_array($mixedVar)) {
+        } */
+
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objFor);
+        }
+        if (!$objFrag) {
+            $objFor->parentNode->removeChild($objFor);
+        } else {
+            $objFor->parentNode->replaceChild($objFrag, $objFor);
+        }
+        $objDom->saveHTML();
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
 
 
