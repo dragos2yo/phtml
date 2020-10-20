@@ -261,7 +261,8 @@ class Phtml
         $esteObjDom = $this->_obtenerObjDOM($cadHTML);
         $objPhtml = $esteObjDom->getElementById($this->_idAleatorio);
         $objFrag = $objDom->createDocumentFragment();
-        while ($esteElemento = $objPhtml->firstChild) {
+        $esteElemento = $objPhtml->firstChild;
+        while ($esteElemento) {
             $objFrag->appendChild($objDom->importNode($esteElemento, true));
             $esteElemento = $esteElemento->nextSibling;
         }
@@ -647,10 +648,8 @@ class Phtml
                 $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreClave . $this->_cierraVariable, $clave, $cadContenidoProcesado);
                 $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreValor . $this->_cierraVariable, $valor, $cadContenidoProcesado);
             }
-            print_pre($cadContenidoProcesado);
-            //$objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
-
-        } 
+            $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
+        }
         if ($this->_bolEliminarComentario) {
             $this->_eliminarComentarios($objForeach);
         }
