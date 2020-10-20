@@ -706,7 +706,9 @@ class Phtml
             $this->{'_compilar_' . $nombreTag}();
             //$this->_compilar_const();
             //$this->_compilar_var();
-            //break;
+            if(defined('PHTML_DEPURANDO') && PHTML_DEPURANDO == true) {
+                 break;
+            }
         }
     }
 

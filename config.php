@@ -17,4 +17,6 @@ define('PHTML_COMPRIMIR',             false);
 define('PHTML_EJECUTAR_PHP',           true);
 define('PHTML_EJECUTAR_METODO',        true);
 define('PHTML_ELIMINAR_COMENTARIO',    true);
+
+define('PHTML_DEPURANDO', true);
 ?>
