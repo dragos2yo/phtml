@@ -1,4 +1,4 @@
-//<?php
+<?php
 function print_pre($cadContenido) {
     echo '<pre>';
     print_r($cadContenido);
