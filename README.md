@@ -1,2 +1,2 @@
 # phtml
-phtml template engine
+phtml template engine, compile tags HTML in PHP
