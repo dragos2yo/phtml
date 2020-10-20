@@ -73,7 +73,4 @@ echo $objPhtml->obtenerContenido('for') . '<br>';
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
-foreach($arrUsuario as $clave => $valor) {
-    echo $valor . "<br>";
-} 
 ?>
