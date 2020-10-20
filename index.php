@@ -1,4 +1,4 @@
-<?php
+//<?php
 function print_pre($cadContenido) {
     echo '<pre>';
     print_r($cadContenido);
@@ -56,14 +56,14 @@ $objPhtml->agregarVariable('objUsuario', new usuario());
 $objPhtml->agregarArchivo('plantillas/if-elseif-else.phtml', 'if');
 echo $objPhtml->obtenerContenido('if'); */
 
-// ejemplo de depurar un tag switch-case-default
+/* // ejemplo de depurar un tag switch-case-default
 $objPhtml->agregarArchivo('plantillas/switch-case-default.phtml', 'switch');
-echo $objPhtml->obtenerContenido('switch');
+echo $objPhtml->obtenerContenido('switch'); */
 
-/* // ejemplo de depurar un tag foreach
+// ejemplo de depurar un tag foreach
 $objPhtml->agregarArchivo('plantillas/foreach.phtml', 'foreach');
 echo $objPhtml->obtenerContenido('foreach') . '<br>';
- */
+ 
 /* // ejemplo de depurar un tag for
 $objPhtml->agregarArchivo('plantillas/for.phtml', 'for');
 echo $objPhtml->obtenerContenido('for') . '<br>';
