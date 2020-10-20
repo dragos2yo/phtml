@@ -618,6 +618,7 @@ class Phtml
     }
 
 
+
     /**
      * Compila el TAG foreach
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
@@ -664,10 +665,11 @@ class Phtml
     }
 
 
+
     /**
      * Compila el TAG for
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
-     * <for index="i" var="variable" init="0" fin="count" order="asc" id="id">
+     * <for index="i" var="variable" init="0" fin="count" order="asc" id="id" offset="">
      *      {{variable.i}} OR {{id.variable.i}}
      *      {{i}}          OR {{id.i}}
      * </for>
@@ -677,25 +679,49 @@ class Phtml
         $objDom = $this->_obtenerObjDOM($this->_cadContenido);
         $objFor = $objDom->getElementsByTagName('for')->item(0);
         $cadNombreVariable = $objFor->getAttribute('var');
-        $cadIndex = $objFor->getAttribute('index')    != '' ? $objFor->getAttribute('index')    : 'i';
-        $start = 0;
+        $mixedVar          = $this->_importarVariable($cadNombreVariable);
+        $cadIdenticador    = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
+        $offset            = $objFor->getAttribute('offset');
+        $cadContenido      = $this->_obtenerHTML($objFor);
+        $objFrag           = null;
+        $cadIndice         = $objFor->getAttribute('index') != '' ? $objFor->getAttribute('index')    : 'i';
+        $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
+        $offset            = $objFor->getAttribute('offset');
+        $init              = 0;
         if($objFor->getAttribute('init') == '') {
-            $arrIndice = explode('.', $cadIndex);
-            $cadIndex = $arrIndice[0];
-            $start = $arrIndice[1];
+            $arrIndice = explode('.', $cadIndice);
+            $cadIndice = $arrIndice[0];
+            $init = $arrIndice[1];
         } else {
-            $start = $objFor->getAttribute('init');
+            $init = $objFor->getAttribute('init');
         }
-        $cadOrden = $objFor->getAttribute('order')    != '' ? $objFor->getAttribute('order')    : 'asc';
-        $cadIdenticador = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
-        $mixedVar = $this->_importarVariable($cadNombreVariable);
-        $cadContenido = $this->_obtenerHTML($objFor);
-        $objFrag = null;
-
-        // procesar bucle for
-        if(is_array($mixedVar)) {
+        $cadTotal = $objFor->getAttribute('size');
+        switch($cadTotal) {
+            case 'length':
+                $max = strlen($mixedVar);
+                break;
+            case 'sizeof':
+            case 'count':
+            case '':
+                $max = sizeof($mixedVar);
+                break;
+            default:
+                $max = $cadTotal;
+                break;
         }
+        $cadContenidoProcesado = '';
+        for($asc == 1 ? $i = $init : $i = $max -1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+            $cadContenidoProcesado .= str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenido);
+            if($offset != '') {
+                $offsetCalculado = 0;
+                eval('$offsetCalculado=' . $i . $offset . ';');
+                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadIndice . $this->_cierraVariable, $offsetCalculado, $cadContenidoProcesado);
 
+            } else {
+                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadIndice . $this->_cierraVariable, $i, $cadContenidoProcesado);
+            }
+        }
+        $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
         if ($this->_bolEliminarComentario) {
             $this->_eliminarComentarios($objFor);
         }
@@ -708,6 +734,7 @@ class Phtml
         $objPhtml = $objDom->getElementById($this->_idAleatorio);
         $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
+
 
 
     /**
