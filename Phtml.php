@@ -530,18 +530,18 @@ class Phtml
         } else {
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 if (strtolower(@$objIf->nextSibling->nodeName) == 'elseif') {
-                    if(!$objFrag) {
+                    if (!$objFrag) {
                         $variableElseif = $objIf->nextSibling->getAttribute('var');
                         $cadCondicionElseif = $objIf->nextSibling->getAttribute('cond');
                         if ($this->_comprobarCondicion($variableElseif, $cadCondicionElseif)) {
                             $objFrag = $this->_obtenerElementos($objDom, $objIf->nextSibling);
                         }
-                    } 
+                    }
                 }
                 $objIf->parentNode->removeChild($objIf->nextSibling);
             }
             if (strtolower(@$objIf->nextSibling->nodeName) == 'else') {
-                if(!$objFrag) {
+                if (!$objFrag) {
                     $objFrag = $this->_obtenerElementos($objDom, $objIf->nextSibling);
                 }
                 $objIf->parentNode->removeChild($objIf->nextSibling);
@@ -581,17 +581,17 @@ class Phtml
         $objFrag = null;
         while (strtolower(@$objSwitch->firstChild->nodeName) == 'case' || @$objSwitch->firstChild->nodeType == XML_COMMENT_NODE || (@$objSwitch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$objSwitch->firstChild->textContent))) {
             if (strtolower(@$objSwitch->firstChild->nodeName) == 'case') {
-                if(!$objFrag) {
+                if (!$objFrag) {
                     $cadCondicion = $objSwitch->firstChild->getAttribute('cond');
                     if ($this->_comprobarCondicion($variable, $cadCondicion)) {
                         $objFrag = $this->_obtenerElementos($objDom, $objSwitch->firstChild);
                     }
-                } 
+                }
             }
             $objSwitch->removeChild($objSwitch->firstChild);
         }
         if (strtolower(@$objSwitch->firstChild->nodeName) == 'default') {
-            if(!$objFrag) {
+            if (!$objFrag) {
                 $objFrag = $this->_obtenerElementos($objDom, $objSwitch->firstChild);
             }
             $objSwitch->removeChild($objSwitch->firstChild);
@@ -610,6 +610,40 @@ class Phtml
     }
 
 
+    /**
+     * Compila el TAG foreach
+     * <foreach var="variable" key="key" value="value">
+     *      contenido del bucle foreach
+     *      acceso variables variable.key
+     *                       variable.value
+     *                       this.key
+     *                       this.value
+     * </forach>
+     */
+    private function _compilar_foreach()
+    {
+        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
+        $objForeach = $objDom->getElementsByTagName('foreach')->item(0);
+        $variable = $this->_importarVariable($objForeach->getAttribute('var'));
+        $cadNombreClave = $objForeach->getAttribute('key')   != '' ? $objForeach->getAttribute('key') : 'key';
+        $cadNombreValor = $objForeach->getAttribute('value') != '' ? $objForeach->getAttribute('value') : 'value';
+        $objFrag = null;
+
+        // Aqui procezar el foreach
+
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objForeach);
+        }
+        if (!$objFrag) {
+            $objForeach->parentNode->removeChild($objForeach);
+        } else {
+            $objForeach->parentNode->replaceChild($objFrag, $objForeach);
+        }
+        $objDom->saveHTML();
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
+    }
+
 
     /**
      * Compila el TAG for
@@ -624,24 +658,6 @@ class Phtml
     {
         return (true);
     }
-
-
-
-    /**
-     * Compila el TAG foreach
-     * <foreach var="variable" key="key" value="value">
-     *      contenido del bucle foreach
-     *      acceso variables variable.key
-     *                       variable.value
-     *                       this.key
-     *                       this.value
-     * </forach>
-     */
-    private function _compilar_foreach()
-    {
-        return (true);
-    }
-
 
 
     /**
@@ -665,8 +681,8 @@ class Phtml
      */
     private function _compilar()
     {
-        /*$patron = '/<(if|switch|for|foreach|while|include)[\s]*.*?>(.*?)<\/(if|switch|for|foreach|while|include)>/is';*/
-        while (preg_match('/<(if|switch|for|foreach|while|include)[\s]*.*?>(.*?)<\/(if|switch|for|foreach|while|include)>/is', $this->_cadContenido, $arrResultado)) {
+        $cadPatron = '/<(if|switch|foreach|for|while|include)[\s]*.*?>(.*?)<\/(if|switch|foreach|for|while|include)>/is';
+        while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower($arrResultado[1]);
             $this->{'_compilar_' . $nombreTag}();
             //$this->_compilar_const();

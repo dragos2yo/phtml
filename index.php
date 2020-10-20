@@ -62,7 +62,7 @@ echo $objPhtml->obtenerContenido('switch'); */
 
 // ejemplo de depurar un tag foreach
 $objPhtml->agregarArchivo('plantillas/foreach.phtml', 'foreach');
-echo $objPhtml->obtenerContenido('foreach') . '<br>';
+echo $objPhtml->obtenerContenido('foreach');
  
 /* // ejemplo de depurar un tag for
 $objPhtml->agregarArchivo('plantillas/for.phtml', 'for');
