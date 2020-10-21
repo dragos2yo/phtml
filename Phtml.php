@@ -711,6 +711,20 @@ class Phtml
         }
         $cadContenidoProcesado = '';
         for($asc == 1 ? $i = $init : $i = $max -1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+            // {{id.var.i}}
+            // {{var.i}}
+            // {{id.i}}
+            // {{i}}
+            // "id.var.i"
+            // "var.i"
+            // 'id.var.i'
+            // 'var.i'
+            // 'id.i'
+            // 'i'
+            // {{id.var.i.X}} cambiar valor de i
+            // {{var.i.X}}    cambiar valor de i
+            // "id.var.i.X"   cambiar valor de i
+            // 'id.var.i.X'   cambiar valor de i
             $cadContenidoProcesado .= str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenido);
             if($offset != '') {
                 $offsetCalculado = 0;

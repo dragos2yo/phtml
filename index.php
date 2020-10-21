@@ -33,13 +33,19 @@ EOL;
 $objPhtml->agregarContenido($cadInclude, 'include');
 echo $objPhtml->obtenerContenido('include') . '<br>'; */ 
 
-// ejemplo de depurar un tag if-elseif-if 
+// variables standard
 $objPhtml->agregarVariable('edad', 35);
 $objPhtml->agregarVariable('nombre', 'Dragos');
 
+// variable arreglo simple
 $arrUsuario[] = 'Dragos';
 $arrUsuario[] = 35;
 
+// variable arreglo multidimensional 
+$arrDias[] = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes');
+$arrDias[] = array('domingo', 'sabado');
+
+// variable objeto
 $objPhtml->agregarVariable('arrUsuario', $arrUsuario);
 class usuario {
     public $nombre = 'Dragos';
@@ -74,4 +80,12 @@ echo $objPhtml->obtenerContenido('for');
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
+
+ for($i = 0; $i < count($arrDias); $i++) {
+     echo '<ul>';
+     for($j = 0; $j < count($arrDias[$i]); $j++) {
+         echo '<li>' . $arrDias[$i][$j] . '</li>';
+     }
+     echo '</ul>';
+ }
 ?>
