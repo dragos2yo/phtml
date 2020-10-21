@@ -398,11 +398,21 @@ class Phtml
                 }
                 break;
             case 3:
-                /* if(isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0][$arrVar[1]]])) {
-                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1][$arrVar[2]]])) {
-                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1][2]];
+                if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
+                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]];
                     }
-                } */
+                } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
+                    if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                        $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2]);
+                    }
+                } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                    if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
+                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]};
+                    } else if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
+                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}();
+                    }
+                }
                 break;
             case 4:
                 break;
@@ -645,7 +655,7 @@ class Phtml
         $mixedVar = $this->_importarVariable($cadNombreVariable);
         $objFrag = null;
 
-        
+
         $cadContenidoProcesado = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $clave => $valor) {
@@ -693,7 +703,7 @@ class Phtml
         $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
         $offset            = $objFor->getAttribute('offset');
         $init              = 0;
-        if($objFor->getAttribute('init') == '') {
+        if ($objFor->getAttribute('init') == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
             $init = $arrIndice[1];
@@ -701,7 +711,7 @@ class Phtml
             $init = $objFor->getAttribute('init');
         }
         $cadTotal = $objFor->getAttribute('size');
-        switch($cadTotal) {
+        switch ($cadTotal) {
             case 'length':
                 $max = strlen($mixedVar);
                 break;
@@ -715,9 +725,9 @@ class Phtml
                 break;
         }
         $a = $this->_abreVariable;  //visibilidad para leer en depuracion
-        $c = $this->_cierraVariable;//visibilidad para leer en depuracion
+        $c = $this->_cierraVariable; //visibilidad para leer en depuracion
         $cadContenidoProcesado = '';
-        for($asc == 1 ? $i = $init : $i = $max -1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+        for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
             // {{id.var.i}}
             // {{var.i}}
             // {{id.i}}
@@ -734,19 +744,15 @@ class Phtml
             // 'id.var.i.X'   cambiar valor de i
             $cadContenidoProcesado .= $cadContenido;
 
-            $cadContenidoProcesado = str_replace($a.$id.$cadNombreVariable.'.'.$cadIndice.$c, $mixedVar[$i], $cadContenidoProcesado);
-            if($offset != '') { 
+            $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
+            if ($offset != '') {
                 // efecto visual
                 $offsetCalculado = 0;
                 eval('$offsetCalculado=' . $i . $offset . ';');
-                $cadContenidoProcesado  = str_replace($a.$id.$cadIndice.$c, $offsetCalculado, $cadContenidoProcesado);
-
+                $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $offsetCalculado, $cadContenidoProcesado);
             } else {
-                $cadContenidoProcesado  = str_replace($a.$id.$cadIndice.$c, $i, $cadContenidoProcesado);
+                $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $i, $cadContenidoProcesado);
             }
-
-
-
         }
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
         if ($this->_bolEliminarComentario) {
@@ -789,8 +795,8 @@ class Phtml
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower($arrResultado[1]);
             $this->{'_compilar_' . $nombreTag}();
-            if(defined('PHTML_DEPURANDO') && PHTML_DEPURANDO == true) {
-                 break;
+            if (defined('PHTML_DEPURANDO') && PHTML_DEPURANDO == true) {
+                break;
             }
         }
         //$this->_compilar_const(true);
