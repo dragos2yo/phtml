@@ -40,13 +40,14 @@ $objPhtml->agregarVariable('nombre', 'Dragos');
 // variable arreglo simple
 $arrUsuario[] = 'Dragos';
 $arrUsuario[] = 35;
+$objPhtml->agregarVariable('arrUsuario', $arrUsuario);
 
 // variable arreglo multidimensional 
 $arrDias[] = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes');
 $arrDias[] = array('domingo', 'sabado');
+$objPhtml->agregarVariable('arrDias', $arrDias);
 
 // variable objeto
-$objPhtml->agregarVariable('arrUsuario', $arrUsuario);
 class usuario {
     public $nombre = 'Dragos';
     public $edad   = 35;
