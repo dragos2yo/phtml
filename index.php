@@ -33,14 +33,21 @@ EOL;
 $objPhtml->agregarContenido($cadInclude, 'include');
 echo $objPhtml->obtenerContenido('include') . '<br>'; */ 
 
-// ejemplo de depurar un tag if-elseif-if 
+// variables standard
 $objPhtml->agregarVariable('edad', 35);
 $objPhtml->agregarVariable('nombre', 'Dragos');
 
+// variable arreglo simple
 $arrUsuario[] = 'Dragos';
 $arrUsuario[] = 35;
-
 $objPhtml->agregarVariable('arrUsuario', $arrUsuario);
+
+// variable arreglo multidimensional 
+$arrDias[] = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes');
+$arrDias[] = array('domingo', 'sabado');
+$objPhtml->agregarVariable('arrDias', $arrDias);
+
+// variable objeto
 class usuario {
     public $nombre = 'Dragos';
     public $edad   = 35;
@@ -54,9 +61,6 @@ class usuario {
 $objUsuario = new usuario();
 $objPhtml->agregarVariable('objUsuario', $objUsuario);
 
-$arrSemana[] = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes');
-$arrSemana[] = array('sabado', 'domingo');
-$objPhtml->agregarVariable('arrSemana', $arrSemana);
 
 /* // ejemplo de depurar un tag if-elseif-else
 $objPhtml->agregarArchivo('plantillas/if-elseif-else.phtml', 'if');
@@ -79,11 +83,11 @@ $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
 
-/*  for($i = 0; $i < sizeof($arrSemana); $i++) {
-     echo "<ul>";
-     for($j = 0; $j < sizeof($arrSemana[$i]); $j++) {
-        echo "<li>" . $arrSemana[$i][$j] . "</li>";
+ for($i = 0; $i < count($arrDias); $i++) {
+     echo '<ul>';
+     for($j = 0; $j < count($arrDias[$i]); $j++) {
+         echo '<li>' . $arrDias[$i][$j] . '</li>';
      }
-     echo "</ul>";
- } */
+     echo '</ul>';
+ }
 ?>

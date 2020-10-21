@@ -681,11 +681,11 @@ class Phtml
      */
     private function _compilar_for()
     {
-        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
-        $objFor = $objDom->getElementsByTagName('for')->item(0);
+        $objDom            = $this->_obtenerObjDOM($this->_cadContenido);
+        $objFor            = $objDom->getElementsByTagName('for')->item(0);
         $cadNombreVariable = $objFor->getAttribute('var');
         $mixedVar          = $this->_importarVariable($cadNombreVariable);
-        $cadIdenticador    = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
+        $id                = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
         $cadContenido      = $this->_obtenerHTML($objFor);
         $objFrag           = null;
@@ -714,22 +714,39 @@ class Phtml
                 $max = $cadTotal;
                 break;
         }
+        $a = $this->_abreVariable;  //visibilidad para leer en depuracion
+        $c = $this->_cierraVariable;//visibilidad para leer en depuracion
         $cadContenidoProcesado = '';
         for($asc == 1 ? $i = $init : $i = $max -1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
-            $cadContenidoProcesado = $cadContenido;
-            $cadContenidoProcesado = str_replace("'" . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . "'", "'" . $cadNombreVariable . '.' . $i . "'", $cadContenidoProcesado);
-            $cadContenidoProcesado = str_replace('"' . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . '"', '"' . $cadNombreVariable . '.' . $i . '"', $cadContenidoProcesado);
-            $cadContenidoProcesado = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenidoProcesado);
-            $cadContenidoProcesado = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenidoProcesado);
+            // {{id.var.i}}
+            // {{var.i}}
+            // {{id.i}}
+            // {{i}}
+            // "id.var.i"
+            // "var.i"
+            // 'id.var.i'
+            // 'var.i'
+            // 'id.i'
+            // 'i'
+            // {{id.var.i.X}} cambiar valor de i
+            // {{var.i.X}}    cambiar valor de i
+            // "id.var.i.X"   cambiar valor de i
+            // 'id.var.i.X'   cambiar valor de i
+            $cadContenidoProcesado .= $cadContenido;
 
-            if($offset != '') {
+            $cadContenidoProcesado = str_replace($a.$id.$cadNombreVariable.'.'.$cadIndice.$c, $mixedVar[$i], $cadContenidoProcesado);
+            if($offset != '') { 
+                // efecto visual
                 $offsetCalculado = 0;
                 eval('$offsetCalculado=' . $i . $offset . ';');
-                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadIndice . $this->_cierraVariable, $offsetCalculado, $cadContenidoProcesado);
+                $cadContenidoProcesado  = str_replace($a.$id.$cadIndice.$c, $offsetCalculado, $cadContenidoProcesado);
 
             } else {
-                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadIndice . $this->_cierraVariable, $i, $cadContenidoProcesado);
+                $cadContenidoProcesado  = str_replace($a.$id.$cadIndice.$c, $i, $cadContenidoProcesado);
             }
+
+
+
         }
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
         if ($this->_bolEliminarComentario) {
