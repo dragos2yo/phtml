@@ -54,6 +54,10 @@ class usuario {
 $objUsuario = new usuario();
 $objPhtml->agregarVariable('objUsuario', $objUsuario);
 
+$arrSemana[] = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes');
+$arrSemana[] = array('sabado', 'domingo');
+$objPhtml->agregarVariable('arrSemana', $arrSemana);
+
 /* // ejemplo de depurar un tag if-elseif-else
 $objPhtml->agregarArchivo('plantillas/if-elseif-else.phtml', 'if');
 echo $objPhtml->obtenerContenido('if'); */
@@ -74,4 +78,12 @@ echo $objPhtml->obtenerContenido('for');
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
+
+/*  for($i = 0; $i < sizeof($arrSemana); $i++) {
+     echo "<ul>";
+     for($j = 0; $j < sizeof($arrSemana[$i]); $j++) {
+        echo "<li>" . $arrSemana[$i][$j] . "</li>";
+     }
+     echo "</ul>";
+ } */
 ?>

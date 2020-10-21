@@ -397,10 +397,15 @@ class Phtml
                         break;
                 }
                 break;
-                /* case 3:
+            case 3:
+                /* if(isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0][$arrVar[1]]])) {
+                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1][$arrVar[2]]])) {
+                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1][2]];
+                    }
+                } */
                 break;
             case 4:
-                break; */
+                break;
         }
         return ($varTemporal);
     }
@@ -711,7 +716,12 @@ class Phtml
         }
         $cadContenidoProcesado = '';
         for($asc == 1 ? $i = $init : $i = $max -1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
-            $cadContenidoProcesado .= str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenido);
+            $cadContenidoProcesado = $cadContenido;
+            $cadContenidoProcesado = str_replace("'" . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . "'", "'" . $cadNombreVariable . '.' . $i . "'", $cadContenidoProcesado);
+            $cadContenidoProcesado = str_replace('"' . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . '"', '"' . $cadNombreVariable . '.' . $i . '"', $cadContenidoProcesado);
+            $cadContenidoProcesado = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenidoProcesado);
+            $cadContenidoProcesado = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadIndice . $this->_cierraVariable, $mixedVar[$i], $cadContenidoProcesado);
+
             if($offset != '') {
                 $offsetCalculado = 0;
                 eval('$offsetCalculado=' . $i . $offset . ';');
@@ -762,12 +772,12 @@ class Phtml
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower($arrResultado[1]);
             $this->{'_compilar_' . $nombreTag}();
-            //$this->_compilar_const();
-            //$this->_compilar_var();
             if(defined('PHTML_DEPURANDO') && PHTML_DEPURANDO == true) {
                  break;
             }
         }
+        //$this->_compilar_const(true);
+        //$this->_compilar_var(true);
     }
 
 
