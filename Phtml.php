@@ -685,8 +685,6 @@ class Phtml
      * Compila el TAG for
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
      * <for index="i" var="variable" init="0" fin="count" order="asc" id="id" offset="">
-     *      {{variable.i}} OR {{id.variable.i}}
-     *      {{i}}          OR {{id.i}}
      * </for>
      */
     private function _compilar_for()
@@ -706,7 +704,11 @@ class Phtml
         if ($objFor->getAttribute('init') == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
-            $init = $arrIndice[1];
+            if(!$arrIndice[1]) {
+                $init = 0;
+            } else {
+                $init = $arrIndice[1];
+            }
         } else {
             $init = $objFor->getAttribute('init');
         }
@@ -728,25 +730,43 @@ class Phtml
         $c = $this->_cierraVariable; //visibilidad para leer en depuracion
         $cadContenidoProcesado = '';
         for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+            $cadContenidoProcesado .= $cadContenido;
+            // var="id.var.i"
+            // var="var.i"
+            // var='id.var.i'
+            // var='var.i'
+            $patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\s*[\'|"]{1}/';
+            $patronReemplazoVarIndice = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
+            $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazoVarIndice, $cadContenidoProcesado);
+            // var='id.i'
+            // var='i'
+            // var="id.i"
+            // var="i"
+            $patronIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*[\'|"]{1}/';
+            $patronReemplazoIndice = 'var="' . $i . '"';
+            $cadContenidoProcesado = preg_replace($patronIndice, $patronReemplazoIndice, $cadContenidoProcesado);
+            // var="id.var.i.XXX.etc"
+            // var='id.var.i.XXX.etc'
+            // var="var.i.XXX.etc"
+            // var='var.i.XXX.etc'
+            $patronVarIndiceJ = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
+            while (preg_match($patronVarIndiceJ, $cadContenidoProcesado, $arrResultado)) {
+                $patronReemplazoInciceJ = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
+                $cadContenidoProcesado = preg_replace($patronVarIndiceJ, $patronReemplazoInciceJ, $cadContenidoProcesado);
+            }
+            // {{id.var.i.XXX.etc}} 
+            // {{var.i.XXX.etc}}
+            $patronPrintVar = '/' . $a . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\.(.*?)' . $c  . '/';
+            while (preg_match($patronPrintVar, $cadContenidoProcesado, $arrResultado)) {
+                $patronReemplazoPrintVar = $a . $id . $cadNombreVariable . '.' . $i . '.' . $arrResultado[1] . $c;
+                $cadContenidoProcesado = preg_replace($patronPrintVar, $patronReemplazoPrintVar, $cadContenidoProcesado);
+            }
             // {{id.var.i}}
             // {{var.i}}
+            $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
             // {{id.i}}
             // {{i}}
-            // "id.var.i"
-            // "var.i"
-            // 'id.var.i'
-            // 'var.i'
-            // 'id.i'
-            // 'i'
-            // {{id.var.i.X}} cambiar valor de i
-            // {{var.i.X}}    cambiar valor de i
-            // "id.var.i.X"   cambiar valor de i
-            // 'id.var.i.X'   cambiar valor de i
-            $cadContenidoProcesado .= $cadContenido;
-
-            $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
-            if ($offset != '') {
-                // efecto visual
+            if ($offset != '') { // efecto visual
                 $offsetCalculado = 0;
                 eval('$offsetCalculado=' . $i . $offset . ';');
                 $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $offsetCalculado, $cadContenidoProcesado);
