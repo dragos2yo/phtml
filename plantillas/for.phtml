@@ -7,6 +7,9 @@
     </ul>
 </for>
 
-<for var="arrUsuario" index="i" >
-    <p>{{arrUsuario.i}}</p>
+<for var="arrUsuario" index="i">
+    <h3>{{arrUsuario.i}} al reves</h3>
+    <for var="arrUsuario.i" index="j" offset="+1" order="asc">
+        <p>La pozicion <b>{{j}}</b> es la letra <b>{{arrUsuario.i.j}}</b> de la palabra <i>{{arrUsuario.i}}</i></p>
+    </for>
 </for>

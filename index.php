@@ -40,6 +40,8 @@ $objPhtml->agregarVariable('nombre', 'Dragos');
 
 // variable arreglo simple
 $arrUsuario[] = 'Dragos';
+$arrUsuario[] = 'Petrica';
+$arrUsuario[] = 'Macovei';
 $arrUsuario[] = 35;
 $objPhtml->agregarVariable('arrUsuario', $arrUsuario);
 

@@ -712,12 +712,21 @@ class Phtml
         }
         $cadTotal = $objFor->getAttribute('size');
         switch ($cadTotal) {
+            case '':
+                if(is_array($mixedVar)) {
+                    $max = sizeof($mixedVar);
+                } else if(is_int($mixedVar)) {
+                    $max = 1;
+                } else {
+                    $max = strlen((string)$mixedVar);
+                }
+                break;
+            case 'strlen':
             case 'length':
-                $max = strlen($mixedVar);
+                $max = strlen((string)$mixedVar);
                 break;
             case 'sizeof':
             case 'count':
-            case '':
                 $max = sizeof($mixedVar);
                 break;
             default:
@@ -731,7 +740,7 @@ class Phtml
             $cadContenidoProcesado .= $cadContenido;
             // {{id.var.i}}
             // {{var.i}}
-            if(is_string($mixedVar[$i]) || is_numeric($mixedVar[$i])) {
+            if(!is_array($mixedVar[$i]) || !is_object($mixedVar[$i])) {
                 $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
             } else {/* manejar error la variable es objeto o arreglo*/}
             // {{id.i}}
@@ -755,8 +764,10 @@ class Phtml
             // var="id.i"
             // var="i"
             $patronIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*[\'|"]{1}/';
-            $patronReemplazoIndice = 'var="' . $i . '"';
-            $cadContenidoProcesado = preg_replace($patronIndice, $patronReemplazoIndice, $cadContenidoProcesado);
+            if(preg_match($patronIndice, $cadContenidoProcesado)) {
+                $patronReemplazoIndice = 'var="' . $i . '"';
+                $cadContenidoProcesado = preg_replace($patronIndice, $patronReemplazoIndice, $cadContenidoProcesado);  
+            }
             // var="id.var.i.XXX.etc"
             // var='id.var.i.XXX.etc'
             // var="var.i.XXX.etc"
