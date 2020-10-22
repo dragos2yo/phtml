@@ -682,7 +682,7 @@ class Phtml
     /**
      * Compila el TAG for
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
-     * <for index="i" var="variable" init="0" fin="count" order="asc" id="id" offset="">
+     * <for index="i" var="variable" init="0" size="count" order="asc" id="id" offset="">
      * </for>
      */
     private function _compilar_for()
@@ -702,10 +702,10 @@ class Phtml
         if ($objFor->getAttribute('init') == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
-            if(!$arrIndice[1]) {
-                $init = 0;
-            } else {
+            if(isset($arrIndice[1])) {
                 $init = $arrIndice[1];
+            } else {
+                $init = 0;
             }
         } else {
             $init = $objFor->getAttribute('init');
@@ -729,6 +729,20 @@ class Phtml
         $cadContenidoProcesado = '';
         for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
             $cadContenidoProcesado .= $cadContenido;
+            // {{id.var.i}}
+            // {{var.i}}
+            if(is_string($mixedVar[$i]) || is_numeric($mixedVar[$i])) {
+                $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
+            } else {/* manejar error la variable es objeto o arreglo*/}
+            // {{id.i}}
+            // {{i}}
+            if ($offset != '') { // efecto visual
+                $offsetCalculado = 0;
+                eval('$offsetCalculado=' . $i . $offset . ';');
+                $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $offsetCalculado, $cadContenidoProcesado);
+            } else {
+                $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $i, $cadContenidoProcesado);
+            }
             // var="id.var.i"
             // var="var.i"
             // var='id.var.i'
@@ -758,18 +772,6 @@ class Phtml
             while (preg_match($patronPrintVar, $cadContenidoProcesado, $arrResultado)) {
                 $patronReemplazoPrintVar = $a . $id . $cadNombreVariable . '.' . $i . '.' . $arrResultado[1] . $c;
                 $cadContenidoProcesado = preg_replace($patronPrintVar, $patronReemplazoPrintVar, $cadContenidoProcesado);
-            }
-            // {{id.var.i}}
-            // {{var.i}}
-            $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
-            // {{id.i}}
-            // {{i}}
-            if ($offset != '') { // efecto visual
-                $offsetCalculado = 0;
-                eval('$offsetCalculado=' . $i . $offset . ';');
-                $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $offsetCalculado, $cadContenidoProcesado);
-            } else {
-                $cadContenidoProcesado  = str_replace($a . $id . $cadIndice . $c, $i, $cadContenidoProcesado);
             }
         }
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
