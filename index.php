@@ -42,7 +42,7 @@ $objPhtml->agregarVariable('nombre', 'Dragos');
 $arrUsuario[] = 'Dragos';
 $arrUsuario[] = 'Petrica';
 $arrUsuario[] = 'Macovei';
-$arrUsuario[] = 35;
+//$arrUsuario[] = 35;
 $objPhtml->agregarVariable('arrUsuario', $arrUsuario);
 
 // variable arreglo multidimensional 
@@ -105,7 +105,7 @@ echo $objPhtml->obtenerContenido('while') . '<br>';
  $patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\s*[\'|"]{1}/';
  $patronReemplazoVarIndice = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
  $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazoVarIndice, $cadContenidoProcesado);
- print_pre($cadContenidoProcesado); */
+ print_pre($cadContenidoProcesado);  */
 
 /* $a = '{{';
 $c = '}}';
@@ -127,10 +127,15 @@ $cadIndice = 'i';
 $i = '1';
 $cadContenidoProcesado = "var='blah.arrDias.i.j'";
 
-$patronVarIndiceJ = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
-while (preg_match($patronVarIndiceJ, $cadContenidoProcesado, $arrResultado)) {
-    $patronReemplazoInciceJ = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
-    $cadContenidoProcesado = preg_replace($patronVarIndiceJ, $patronReemplazoInciceJ, $cadContenidoProcesado);
+$patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
+while (preg_match($patronVarIndice, $cadContenidoProcesado, $arrResultado)) {
+    if(trim($arrResultado[1]) != '') {
+        $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
+    } else  {
+        $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
+    }
+    $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazo, $cadContenidoProcesado);
 }
 print_pre($cadContenidoProcesado);
- */
+  */
+

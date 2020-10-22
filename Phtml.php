@@ -735,15 +735,16 @@ class Phtml
                 $max = $cadTotal;
                 break;
         }
+        $esCadena = is_string($max) ? 1 : 0;
         $a = $this->_abreVariable;  //visibilidad para leer en depuracion
         $c = $this->_cierraVariable; //visibilidad para leer en depuracion
         $cadContenidoProcesado = '';
-        for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+        for ($asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($asc == 1 ? $i != $max : $i != $init) : ($asc == 1 ? $i < $max : $init <= $i); $asc == 1 ? $i++ : $i--) {
             $cadContenidoProcesado .= $cadContenido;
             // {{id.var.i}}
             // {{var.i}}
-            if(!is_array($mixedVar[$i]) || !is_object($mixedVar[$i])) {
-                $cadContenidoProcesado = str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
+            if(!@is_array($mixedVar[$i]) || !@is_object($mixedVar[$i])) {
+                $cadContenidoProcesado = @str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadContenidoProcesado);
             } else {/* manejar error la variable es objeto o arreglo*/}
             // {{id.i}}
             // {{i}}
@@ -758,9 +759,19 @@ class Phtml
             // var="var.i"
             // var='id.var.i'
             // var='var.i'
-            $patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\s*[\'|"]{1}/';
-            $patronReemplazoVarIndice = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
-            $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazoVarIndice, $cadContenidoProcesado);
+            // var="id.var.i.XXX.etc"
+            // var='id.var.i.XXX.etc'
+            // var="var.i.XXX.etc"
+            // var='var.i.XXX.etc'
+            $patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
+            while (preg_match($patronVarIndice, $cadContenidoProcesado, $arrResultado)) {
+                if(trim($arrResultado[1]) != '') {
+                    $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
+                } else  {
+                    $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
+                }
+                $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazo, $cadContenidoProcesado);
+            }
             // var='id.i'
             // var='i'
             // var="id.i"
@@ -769,15 +780,6 @@ class Phtml
             if(preg_match($patronIndice, $cadContenidoProcesado)) {
                 $patronReemplazoIndice = 'var="' . $i . '"';
                 $cadContenidoProcesado = preg_replace($patronIndice, $patronReemplazoIndice, $cadContenidoProcesado);  
-            }
-            // var="id.var.i.XXX.etc"
-            // var='id.var.i.XXX.etc'
-            // var="var.i.XXX.etc"
-            // var='var.i.XXX.etc'
-            $patronVarIndiceJ = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
-            while (preg_match($patronVarIndiceJ, $cadContenidoProcesado, $arrResultado)) {
-                $patronReemplazoInciceJ = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
-                $cadContenidoProcesado = preg_replace($patronVarIndiceJ, $patronReemplazoInciceJ, $cadContenidoProcesado);
             }
             // {{id.var.i.XXX.etc}} 
             // {{var.i.XXX.etc}}
