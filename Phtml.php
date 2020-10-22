@@ -333,6 +333,8 @@ class Phtml
             case 1:
                 if (isset($this->_arrVariables[$arrVar[0]])) {
                     $varTemporal = $this->_arrVariables[$arrVar[0]];
+                } else { // admitir valores
+                    $varTemporal = $arrVar[0];
                 }
                 break;
             case 2:
