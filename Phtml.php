@@ -768,8 +768,8 @@ class Phtml
     {
         $objDom            = $this->_obtenerObjDOM($this->_cadContenido);
         $objFor            = $objDom->getElementsByTagName('for')->item(0);
-        $cadNombreVariable = $objFor->getAttribute('var');
-        $mixedVar          = $this->_importarVariable($cadNombreVariable);
+        $cadVariable       = $objFor->getAttribute('var');
+        $mixedVar          = $this->_importarVariable($cadVariable);
         $id                = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
         $cadContenido      = $this->_obtenerHTML($objFor);
@@ -778,7 +778,13 @@ class Phtml
         $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
         $offset            = $objFor->getAttribute('offset');
         $init              = 0;
-        if ($objFor->getAttribute('init') == '') {
+        $a                 = $this->_abreVariable;
+        $c                 = $this->_cierraVariable;
+        $cadProcesada      = '';
+        $cadTotal          = $objFor->getAttribute('size');
+        $init              = $objFor->getAttribute('init');
+
+        if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
             if(isset($arrIndice[1])) {
@@ -786,10 +792,8 @@ class Phtml
             } else {
                 $init = 0;
             }
-        } else {
-            $init = $objFor->getAttribute('init');
-        }
-        $cadTotal = $objFor->getAttribute('size');
+        } 
+        
         switch ($cadTotal) {
             case '':
                 if(is_array($mixedVar)) {
@@ -813,62 +817,63 @@ class Phtml
                 break;
         }
         $esCadena = is_string($max) ? 1 : 0;
-        $a = $this->_abreVariable;  //visibilidad para leer en depuracion
-        $c = $this->_cierraVariable; //visibilidad para leer en depuracion
-        $cadProcesada = '';
         for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esCadena == 1 || $asc == 1 ? $i++ : $i--) {
             $cadProcesada .= $cadContenido;
 
-            // {{id.var.i}}
-            // {{var.i}}
+            //* {{id.var.i}}
+            //* {{var.i}}
             if(!@is_array($mixedVar[$i]) || !@is_object($mixedVar[$i])) {
-                $cadProcesada = @str_replace($a . $id . $cadNombreVariable . '.' . $cadIndice . $c, $mixedVar[$i], $cadProcesada);
-            } else {/* manejar error la variable es objeto o arreglo*/}
-
-            // {{id.i}}
-            // {{i}}
-            if ($offset != '') { // efecto visual
-                $offsetCalculado = 0;
-                eval('$offsetCalculado=' . $i . $offset . ';');
-                $cadProcesada  = str_replace($a . $id . $cadIndice . $c, $offsetCalculado, $cadProcesada);
-            } else {
-                $cadProcesada  = str_replace($a . $id . $cadIndice . $c, $i, $cadProcesada);
-            }
-
-            // var="id.var.i"
-            // var="var.i"
-            // var='id.var.i'
-            // var='var.i'
-            // var="id.var.i.XXX.etc"
-            // var='id.var.i.XXX.etc'
-            // var="var.i.XXX.etc"
-            // var='var.i.XXX.etc'
-            $patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
-            while (preg_match($patronVarIndice, $cadProcesada, $arrResultado)) {
-                if(trim($arrResultado[1]) != '') {
-                    $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
-                } else  {
-                    $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
+                $patronVarI = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\s*' . $c  . '/';
+                while (@preg_match($patronVarI, $cadProcesada)) {
+                    $cadProcesada = @preg_replace($patronVarI, $mixedVar[$i], $cadProcesada);
                 }
-                $cadProcesada = preg_replace($patronVarIndice, $patronReemplazo, $cadProcesada);
-            }
-
-            // var='id.i'
-            // var='i'
-            // var="id.i"
-            // var="i"
-            $patronIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*[\'|"]{1}/';
-            if(preg_match($patronIndice, $cadProcesada)) {
-                $patronReemplazoIndice = 'var="' . $i . '"';
-                $cadProcesada = preg_replace($patronIndice, $patronReemplazoIndice, $cadProcesada);  
             }
 
             // {{id.var.i.XXX.etc}} 
             // {{var.i.XXX.etc}}
-            $patronPrintVar = '/' . $a . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\.(.*?)' . $c  . '/';
-            while (preg_match($patronPrintVar, $cadProcesada, $arrResultado)) {
-                $patronReemplazoPrintVar = $a . $id . $cadNombreVariable . '.' . $i . '.' . $arrResultado[1] . $c;
-                $cadProcesada = preg_replace($patronPrintVar, $patronReemplazoPrintVar, $cadProcesada);
+            $patronVarIEtc = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\.(.*?)\s*' . $c  . '/';
+            while (@preg_match($patronVarIEtc, $cadProcesada, $arrResultado)) {
+                $patronReemplazo = $a . $id . $cadVariable . '.' . $i . '.' . $arrResultado[1] . $c;
+                $cadProcesada = @preg_replace($patronVarIEtc, $patronReemplazo, $cadProcesada);
+            }
+
+            //* {{id.i}}
+            //* {{i}}
+            if($offset != '') {
+                eval('$offsetCalculado=' . $i . $offset . ';');
+            }
+            $patronI = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*' . $c  . '/';
+            while (@preg_match($patronI, $cadProcesada)) {
+                $cadProcesada = @preg_replace($patronI, isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
+            }
+
+            //* var="var.i"
+            //* var="id.var.i"
+            //* var='var.i'
+            //* var='id.var.i'
+            $patronComillasVarI = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\s*[\'|"]{1}/';
+            while (@preg_match($patronComillasVarI, $cadProcesada)) {
+                $patronReemplazo = 'var="' .  $id . $cadVariable . '.' . $i . '"';
+                $cadProcesada = @preg_replace($patronComillasVarI, $patronReemplazo, $cadProcesada);
+            }
+
+            //* var="id.var.i.XXX.etc"
+            //* var='id.var.i.XXX.etc'
+            //* var="var.i.XXX.etc"
+            //* var='var.i.XXX.etc'
+            $patronComillasVarIEtc = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\.(.*?)\s*[\'|"]{1}/';
+            while (@preg_match($patronComillasVarIEtc, $cadProcesada, $arrResultado)) {
+                $patronReemplazo = 'var="' .  $id . $cadVariable . '.' . $i . '.' . $arrResultado[1] . '"';
+                $cadProcesada = @preg_replace($patronComillasVarIEtc, $patronReemplazo, $cadProcesada);
+            }
+
+            //* var='id.i'
+            //* var='i'
+            //* var="id.i"
+            //* var="i"
+            $patronComillasI = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*[\'|"]{1}/';
+            if(@preg_match($patronComillasI, $cadProcesada)) {
+                $cadProcesada = @preg_replace($patronComillasI, 'var="' . $i . '"', $cadProcesada);  
             }
         }
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
