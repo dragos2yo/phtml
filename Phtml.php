@@ -652,17 +652,76 @@ class Phtml
         $cadNombreVariable = $objForeach->getAttribute('var');
         $cadNombreClave = $objForeach->getAttribute('key')   != '' ? $objForeach->getAttribute('key') : 'key';
         $cadNombreValor = $objForeach->getAttribute('value') != '' ? $objForeach->getAttribute('value') : 'value';
-        $cadIdenticador = $objForeach->getAttribute('id')    != '' ? $objForeach->getAttribute('id') . '.' : '';
+        $id = $objForeach->getAttribute('id')    != '' ? $objForeach->getAttribute('id') . '.' : '';
         $cadContenido = $this->_obtenerHTML($objForeach);
         $mixedVar = $this->_importarVariable($cadNombreVariable);
         $objFrag = null;
         $cadContenidoProcesado = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $clave => $valor) {
+                $cadContenidoProcesado = $cadContenido;
                 $varclave = is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave];
-                $cadContenidoProcesado .= str_replace($this->_abreVariable . $cadIdenticador . $cadNombreVariable . '.' . $cadNombreClave . $this->_cierraVariable, $varclave, $cadContenido);
-                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreClave . $this->_cierraVariable, $clave, $cadContenidoProcesado);
-                $cadContenidoProcesado  = str_replace($this->_abreVariable . $cadIdenticador . $cadNombreValor . $this->_cierraVariable, $valor, $cadContenidoProcesado);
+                // {{var.key}}
+                // {{id.var.key}}
+                $cadContenidoProcesado = str_replace($this->_abreVariable . $id . $cadNombreVariable . '.' . $cadNombreClave . $this->_cierraVariable, $varclave, $cadContenido);
+                // {{key}}
+                // {{id.key}}
+                $cadContenidoProcesado  = str_replace($this->_abreVariable . $id . $cadNombreClave . $this->_cierraVariable, $clave, $cadContenidoProcesado);
+                // {{value}}
+                // {{id.value}}
+                $cadContenidoProcesado  = str_replace($this->_abreVariable . $id . $cadNombreValor . $this->_cierraVariable, $valor, $cadContenidoProcesado);
+                // var='key'
+                // var='id.key'
+                // var="key"
+                // var="id.key"
+                // var='key.XXX.etc'
+                // var='id.key.XXX.etc'
+                // var="key.XXX.etc"
+                // var="id.key.XXX.etc"
+                $patronClave = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreClave) . '(.*?)\s*[\'|"]{1}/';
+                while (preg_match($patronClave, $cadContenidoProcesado, $arrResultado)) {
+                    if(trim($arrResultado[1]) != '') {
+                        $patronReemplazo = 'var="' .  $id .  $clave . $arrResultado[1] . '"';
+                    } else  {
+                        $patronReemplazo = 'var="' .  $id . $clave . '"';
+                    }
+                    $cadContenidoProcesado = preg_replace($patronClave, $patronReemplazo, $cadContenidoProcesado);
+                }
+                // var='value'
+                // var='id.value'
+                // var="value"
+                // var="id.value"
+                $patronValor = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreValor) . '\s*[\'|"]{1}/';
+                if (preg_match($patronValor, $cadContenidoProcesado)) {
+                    while(preg_match($patronValor, $cadContenidoProcesado)) {
+                        $cadContenidoProcesado = preg_replace($patronValor, 'var="' . $valor . '"', $cadContenidoProcesado);
+                    }
+                }
+                // {{id.var.key.XXX.etc}} 
+                // {{var.key.XXX.etc}}
+                $patronPrintVar = '/' . $this->_abreVariable . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadNombreClave) . '\.(.*?)' . $this->_cierraVariable  . '/';
+                while (preg_match($patronPrintVar, $cadContenidoProcesado, $arrResultado)) {
+                    $patronReemplazoPrintVar = $this->_abreVariable . $id . $cadNombreVariable . '.' . $clave . '.' . $arrResultado[1] . $this->_cierraVariable;
+                    $cadContenidoProcesado = preg_replace($patronPrintVar, $patronReemplazoPrintVar, $cadContenidoProcesado);
+                }
+                // var="id.var.key"
+                // var="var.key"
+                // var='id.var.key'
+                // var='var.key'
+                // var="id.var.key.XXX.etc"
+                // var='id.var.key.XXX.etc'
+                // var="var.key.XXX.etc"
+                // var='var.key.XXX.etc'
+                $patronVarClave = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadNombreClave) . '(.*?)\s*[\'|"]{1}/';
+                while (preg_match($patronVarClave, $cadContenidoProcesado, $arrResultado)) {
+                    if(trim($arrResultado[1]) != '') {
+                        $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $clave . $arrResultado[1] . '"';
+                    } else  {
+                        $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $clave . '"';
+                    }
+                    $cadContenidoProcesado = preg_replace($patronVarClave, $patronReemplazo, $cadContenidoProcesado);
+                }
+                
             }
             $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenidoProcesado);
         }
