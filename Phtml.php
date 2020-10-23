@@ -739,7 +739,7 @@ class Phtml
         $a = $this->_abreVariable;  //visibilidad para leer en depuracion
         $c = $this->_cierraVariable; //visibilidad para leer en depuracion
         $cadContenidoProcesado = '';
-        for ($asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($asc == 1 ? $i != $max : $i != $init) : ($asc == 1 ? $i < $max : $init <= $i); $asc == 1 ? $i++ : $i--) {
+        for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esCadena == 1 || $asc == 1 ? $i++ : $i--) {
             $cadContenidoProcesado .= $cadContenido;
             // {{id.var.i}}
             // {{var.i}}
