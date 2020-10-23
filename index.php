@@ -76,66 +76,17 @@ echo $objPhtml->obtenerContenido('if'); */
 $objPhtml->agregarArchivo('plantillas/switch-case-default.phtml', 'switch');
 echo $objPhtml->obtenerContenido('switch'); */
 
-/* // ejemplo de depurar un tag foreach
+// ejemplo de depurar un tag foreach
 $objPhtml->agregarArchivo('plantillas/foreach.phtml', 'foreach');
-echo $objPhtml->obtenerContenido('foreach'); */
+echo $objPhtml->obtenerContenido('foreach');
 
-// ejemplo de depurar un tag for
+/* // ejemplo de depurar un tag for
 $objPhtml->agregarArchivo('plantillas/for.phtml', 'for');
-echo $objPhtml->obtenerContenido('for');
+echo $objPhtml->obtenerContenido('for'); */
 
 /* // ejemplo de depurar un tag while
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
 
-/* for($i = 0; $i < count($arrDias); $i++) {
-     echo '<ul>';
-     for($j = 0; $j < count($arrDias[$i]); $j++) {
-         echo '<li>' . $arrDias[$i][$j] . '</li>';
-     }
-     echo '</ul>';
- } */
-
-/* $id = 'blah.';
- $cadNombreVariable = 'arrDias';
- $cadIndice = 'i';
- $i = '1';
- $cadContenidoProcesado = "var='blah.arrDias.i'";
- $patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\s*[\'|"]{1}/';
- $patronReemplazoVarIndice = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
- $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazoVarIndice, $cadContenidoProcesado);
- print_pre($cadContenidoProcesado);  */
-
-/* $a = '{{';
-$c = '}}';
-$id = 'blah.';
-$cadNombreVariable = 'arrDias';
-$cadIndice = 'i';
-$i = '1';
-$cadContenidoProcesado = "{{blah.arrDias.i.j}}";
-$patronPrintVar = '/' . $a . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '\.(.*?)' . $c  . '/';
-while (preg_match($patronPrintVar, $cadContenidoProcesado, $arrResultado)) {
-    $patronReemplazoPrintVar = $a . $id . $cadNombreVariable . '.' . $i . '.' . $arrResultado[1] . $c;
-    $cadContenidoProcesado = preg_replace($patronPrintVar, $patronReemplazoPrintVar, $cadContenidoProcesado);
-}
-print_pre($cadContenidoProcesado); */
-
-/* $id = 'blah.';
-$cadNombreVariable = 'arrDias';
-$cadIndice = 'i';
-$i = '1';
-$cadContenidoProcesado = "var='blah.arrDias.i.j'";
-
-$patronVarIndice = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadNombreVariable . '.' . $cadIndice) . '(.*?)\s*[\'|"]{1}/';
-while (preg_match($patronVarIndice, $cadContenidoProcesado, $arrResultado)) {
-    if(trim($arrResultado[1]) != '') {
-        $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . $arrResultado[1] . '"';
-    } else  {
-        $patronReemplazo = 'var="' .  $id . $cadNombreVariable . '.' . $i . '"';
-    }
-    $cadContenidoProcesado = preg_replace($patronVarIndice, $patronReemplazo, $cadContenidoProcesado);
-}
-print_pre($cadContenidoProcesado);
-  */
 

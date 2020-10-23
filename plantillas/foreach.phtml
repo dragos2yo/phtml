@@ -1,7 +1,13 @@
 <!-- Comentario del foreach -->
 <foreach var="arrUsuario" key="clave" value="valor">
-    <p>Variable "clave" es <b>{{clave}}</b></p>
-    <p>Variable "valor" es <b>{{valor}}</b></p>
-    <p>Variable "arrUsuario.clave" es <b>{{arrUsuario.clave}}</b></p>
+    <p>{var.key}           ___ <b>{{arrUsuario.clave}}</b></p>
+    <p>{var.key.xxx.etc}   ___ <b>{{arrUsuario.clave.otro}}</b></p>
+    <p>{key}               ___ <b>{{clave}}</b></p>
+    <p>{value}             ___ <b>{{valor}}</b></p>
+    <p>var=key             ___ <b>var='clave'</b></p>
+    <p>var=key.xxx.etc     ___ <b>var='clave.otracosa'</b></p>
+    <p>var=value           ___ <b>var='valor'</b></p>
+    <p>var=var.key         ___ <b>var='arrUsuario.clave'</b></p>
+    <p>var=var.key.xxx.etc ___ <b>var='arrUsuario.clave.otracosa'</b></p>
     <hr>
 </foreach>
