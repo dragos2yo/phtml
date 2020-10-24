@@ -835,18 +835,16 @@ class Phtml
         $offset            = $objFor->getAttribute('offset');
         $cadProcesada      = '';
         $cadTotal          = $objFor->getAttribute('size');
+        $init              = $objFor->getAttribute('init');
 
-
-        if ($objFor->getAttribute('init') == '') {
+        if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
-        } else {
-            $init = $objFor->getAttribute('init');
         }
 
 
-        if ($cadVariable != '') {
+        if ($cadVariable != '' && !empty($mixedVar)) {
             if (is_array($mixedVar)) {
                 switch ($cadTotal) {
                     case '':
@@ -874,8 +872,11 @@ class Phtml
                 }
             }
         } else {
-            // operar sin variables
-            // operar con cadenas numeros fechas
+            if(preg_match('/[0-9\.]+?/', $cadTotal)) {
+                $max = (int)$cadTotal;
+            } else {
+                $max = (string)$cadTotal;
+            }
         }
 
         
