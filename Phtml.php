@@ -846,7 +846,7 @@ class Phtml
         }
 
 
-        if (isset($mixedVar)) {
+        if ($cadVariable != '') {
             if (is_array($mixedVar)) {
                 switch ($cadTotal) {
                     case '':
@@ -874,14 +874,15 @@ class Phtml
                 }
             }
         } else {
+            // operar sin variables
             // operar con cadenas numeros fechas
         }
 
-
+        
         for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
             $cadProcesada .= $cadContenido;
-            if (is_array($mixedVar) && is_scalar($mixedVar[$i])) {
-                $cadProcesada = $this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
+            if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
+                $cadProcesada = @$this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
             }
             if ($offset != '') {
                 eval('$offsetCalculado=' . $i . $offset . ';');
