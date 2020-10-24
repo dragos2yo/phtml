@@ -457,6 +457,133 @@ class Phtml
 
 
     /**
+     * Reemplaza los las variables de los bucles for - foreach - while
+     * var="id.var.key.XXX.etc"
+     * var='id.var.key.XXX.etc'
+     * var="var.key.XXX.etc"
+     * var='var.key.XXX.etc'
+     * var="id.var.i.XXX.etc"
+     * var='id.var.i.XXX.etc'
+     * var="var.i.XXX.etc"
+     * var='var.i.XXX.etc'
+     * var='key.XXX.etc'
+     * var='id.key.XXX.etc'
+     * var="key.XXX.etc"
+     * var="id.key.XXX.etc"
+     * 
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
+     * 
+     * @return string
+     */
+    private function _reemplazarComillasEtc($cadBuscar, $cadReemplazar, $cadContenido = '')
+    {
+        $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*[\'|"]/';
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $patronReemplazo = 'var="' .  $cadReemplazar . '.' . $arrResultado[1] . '"';
+            $cadContenido = @preg_replace($patron, $patronReemplazo, $cadContenido);
+        }
+        return ($cadContenido);
+    }
+
+
+    /**
+     * Reemplaza los las variables de los bucles for - foreach - while
+     * var='id.i'
+     * var='i'
+     * var="id.i"
+     * var="i"
+     * var="var.i"
+     * var="id.var.i"
+     * var='var.i'
+     * var='id.var.i'
+     * var="id.var.key"
+     * var="var.key"
+     * var='id.var.key'
+     * var='var.key'
+     * var='value'
+     * var='id.value'
+     * var="value"
+     * var="id.value"
+     * var='key'
+     * var='id.key'
+     * var="key"
+     * var="id.key"
+     * 
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
+     * 
+     * @return string
+     */
+    private function _reemplazarComillas($cadBuscar, $cadReemplazar, $cadContenido = '')
+    {
+        $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\s*[\'|"]/';
+        while (@preg_match($patron, $cadContenido)) {
+            $patronReemplazo = 'var="' .  $cadReemplazar . '"';
+            $cadContenido = @preg_replace($patron, $patronReemplazo, $cadContenido);
+        }
+        return ($cadContenido);
+    }
+
+
+
+    /**
+     * Reemplaza los las variables de los bucles for - foreach - while
+     * 
+     * {{var.key}}
+     * {{id.var.key}}
+     * {{key}}
+     * {{id.key}}
+     * {{value}}
+     * {{id.value}}
+     * {{id.var.i}}
+     * {{var.i}}
+     * {{id.i}}
+     * {{i}}
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
+     * 
+     * @return string
+     */
+    private function _reemplazarVariable($cadBuscar, $cadReemplazar, $cadContenido = '')
+    {
+        $patron = '/' . $this->_abreVariable . '\s*' . str_replace('.', '\.', $cadBuscar) . '\s*' . $this->_cierraVariable  . '/';
+        while (@preg_match($patron, $cadContenido)) {
+            $cadContenido = @preg_replace($patron, $cadReemplazar, $cadContenido);
+        }
+        return ($cadContenido);
+    }
+
+
+
+    /**
+     * Reemplaza los las variables de los bucles for - foreach - while
+     * 
+     * {{var.key.XXX.etc}}
+     * {{id.var.key.XXX.etc}}
+     * {{id.var.i.XXX.etc}} 
+     * {{var.i.XXX.etc}}
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
+     * 
+     * @return string
+     */
+    private function _reemplazarVariableEtc($cadBuscar, $cadReemplazar, $cadContenido = '')
+    {
+        $patron = '/' . $this->_abreVariable . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_cierraVariable  . '/';
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $reemplazo = $this->_abreVariable . $cadReemplazar . '.' . $arrResultado[1] . $this->_cierraVariable;
+            $cadContenido = @preg_replace($patron, $reemplazo, $cadContenido);
+        }
+        return ($cadContenido);
+    }
+
+
+    /**
      * Imprime todas las variables
      */
     private function _compilar_var()
@@ -656,90 +783,19 @@ class Phtml
         $cadContenido   = $this->_obtenerHTML($objForeach);
         $mixedVar       = $this->_importarVariable($cadVariable);
         $objFrag        = null;
-        $a              = $this->_abreVariable;
-        $c              = $this->_cierraVariable;
         $cadProcesada   = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $clave => $valor) {
                 $cadProcesada .= $cadContenido;
-
-                //* {{var.key}}
-                //* {{id.var.key}}
-                $variable = is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave];
-                $patronVar = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadClave) . '\s*' . $c  . '/';
-                while (@preg_match($patronVar, $cadProcesada)) {
-                    $cadProcesada = @preg_replace($patronVar, $variable, $cadProcesada);
-                }
-                
-                //* {{var.key.XXX.etc}}
-                //* {{id.var.key.XXX.etc}}
-                $patronVarClaveEtc = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadClave) . '\.(.*?)\s*' . $c  . '/';
-                while (@preg_match($patronVarClaveEtc, $cadProcesada, $arrResultado)) {
-                    $patronReemplazoPrintVar = $a . $id . $cadVariable . '.' . $clave . '.' . $arrResultado[1] . $c;
-                    $cadProcesada = @preg_replace($patronVarClaveEtc, $patronReemplazoPrintVar, $cadProcesada);
-                }
-
-                //* {{key}}
-                //* {{id.key}}
-                $patronClave = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadClave) . '\s*' . $c  . '/';
-                while (@preg_match($patronClave, $cadProcesada)) {
-                    $cadProcesada = @preg_replace($patronClave, $clave, $cadProcesada);
-                }
-
-                //* {{value}}
-                //* {{id.value}}
-                $patronValor = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadValor) . '\s*' . $c  . '/';
-                while (@preg_match($patronValor, $cadProcesada)) {
-                    $cadProcesada = @preg_replace($patronValor, $valor, $cadProcesada);
-                }
-
-                //* var='key'
-                //* var='id.key'
-                //* var="key"
-                //* var="id.key"
-                $patronComillasClave = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadClave) . '\s*[\'|"]{1}/';
-                while (@preg_match($patronComillasClave, $cadProcesada)) {
-                    $patronReemplazo = 'var="' . $clave . '"';
-                    $cadProcesada = @preg_replace($patronComillasClave, $patronReemplazo, $cadProcesada);
-                }
-
-                //* var='key.XXX.etc'
-                //* var='id.key.XXX.etc'
-                //* var="key.XXX.etc"
-                //* var="id.key.XXX.etc"
-                $patronComillasClaveEtc = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadClave) . '\.(.*?)\s*[\'|"]{1}/';
-                while (@preg_match($patronComillasClaveEtc, $cadProcesada, $arrResultado)) {
-                    $patronReemplazo = 'var="' .  $id .  $cadVariable . '.' . $clave . '.' . $arrResultado[1] . '"';
-                    $cadProcesada = @preg_replace($patronComillasClaveEtc, $patronReemplazo, $cadProcesada);
-                }
-
-                //* var='value'
-                //* var='id.value'
-                //* var="value"
-                //* var="id.value"
-                $patronComillasValor = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadValor) . '\s*[\'|"]{1}/';
-                while(@preg_match($patronComillasValor, $cadProcesada)) {
-                     $cadProcesada = @preg_replace($patronComillasValor, 'var="' . $valor . '"', $cadProcesada);
-                }
-
-                //* var="id.var.key"
-                //* var="var.key"
-                //* var='id.var.key'
-                //* var='var.key'
-                $patronComillasVarClave = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadClave) . '\s*[\'|"]{1}/';
-                while (@preg_match($patronComillasVarClave, $cadProcesada)) {
-                    $cadProcesada = @preg_replace($patronComillasVarClave, 'var="' .  $id . $cadVariable . '.' . $clave . '"', $cadProcesada);
-                }
-
-                //* var="id.var.key.XXX.etc"
-                //* var='id.var.key.XXX.etc'
-                //* var="var.key.XXX.etc"
-                //* var='var.key.XXX.etc'
-                $patronComillasVarClaveEtc = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadClave) . '\.(.*?)\s*[\'|"]{1}/';
-                while (@preg_match($patronComillasVarClaveEtc, $cadProcesada, $arrResultado)) {
-                    $patronReemplazo = 'var="' .  $id . $cadVariable . '.' . $clave . '.' . $arrResultado[1] . '"';
-                    $cadProcesada = @preg_replace($patronComillasVarClaveEtc, $patronReemplazo, $cadProcesada);
-                }
+                $cadProcesada = $this->_reemplazarVariable($id . $cadVariable . '.' . $cadClave,  is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave], $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadClave,  $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadValor,  $valor, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariableEtc($id . $cadVariable . '.' . $cadClave,  $id . $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadClave, $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadValor, $valor, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadClave, $id .  $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
             }
             $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
         }
@@ -787,18 +843,18 @@ class Phtml
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
-            if(isset($arrIndice[1])) {
+            if (isset($arrIndice[1])) {
                 $init = $arrIndice[1];
             } else {
                 $init = 0;
             }
-        } 
-        
+        }
+
         switch ($cadTotal) {
             case '':
-                if(is_array($mixedVar)) {
+                if (is_array($mixedVar)) {
                     $max = sizeof($mixedVar);
-                } else if(is_int($mixedVar)) {
+                } else if (is_int($mixedVar)) {
                     $max = 1;
                 } else {
                     $max = strlen((string)$mixedVar);
@@ -813,67 +869,25 @@ class Phtml
                 $max = sizeof($mixedVar);
                 break;
             default:
-                $max = $cadTotal;
+                $max = (int)$cadTotal;
                 break;
         }
-        $esCadena = is_string($max) ? 1 : 0;
-        for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esCadena == 1 || $asc == 1 ? $i++ : $i--) {
-            $cadProcesada .= $cadContenido;
-
-            //* {{id.var.i}}
-            //* {{var.i}}
-            if(!@is_array($mixedVar[$i]) || !@is_object($mixedVar[$i])) {
-                $patronVarI = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\s*' . $c  . '/';
-                while (@preg_match($patronVarI, $cadProcesada)) {
-                    $cadProcesada = @preg_replace($patronVarI, $mixedVar[$i], $cadProcesada);
+        if (is_string($max)) {
+            //operar cadenas
+        } else {
+            for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+                $cadProcesada .= $cadContenido;
+                if (!@is_array($mixedVar[$i]) || !@is_object($mixedVar[$i])) {
+                    $cadProcesada = $this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
                 }
-            }
-
-            // {{id.var.i.XXX.etc}} 
-            // {{var.i.XXX.etc}}
-            $patronVarIEtc = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\.(.*?)\s*' . $c  . '/';
-            while (@preg_match($patronVarIEtc, $cadProcesada, $arrResultado)) {
-                $patronReemplazo = $a . $id . $cadVariable . '.' . $i . '.' . $arrResultado[1] . $c;
-                $cadProcesada = @preg_replace($patronVarIEtc, $patronReemplazo, $cadProcesada);
-            }
-
-            //* {{id.i}}
-            //* {{i}}
-            if($offset != '') {
-                eval('$offsetCalculado=' . $i . $offset . ';');
-            }
-            $patronI = '/' . $a . '\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*' . $c  . '/';
-            while (@preg_match($patronI, $cadProcesada)) {
-                $cadProcesada = @preg_replace($patronI, isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
-            }
-
-            //* var="var.i"
-            //* var="id.var.i"
-            //* var='var.i'
-            //* var='id.var.i'
-            $patronComillasVarI = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\s*[\'|"]{1}/';
-            while (@preg_match($patronComillasVarI, $cadProcesada)) {
-                $patronReemplazo = 'var="' .  $id . $cadVariable . '.' . $i . '"';
-                $cadProcesada = @preg_replace($patronComillasVarI, $patronReemplazo, $cadProcesada);
-            }
-
-            //* var="id.var.i.XXX.etc"
-            //* var='id.var.i.XXX.etc'
-            //* var="var.i.XXX.etc"
-            //* var='var.i.XXX.etc'
-            $patronComillasVarIEtc = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadVariable . '.' . $cadIndice) . '\.(.*?)\s*[\'|"]{1}/';
-            while (@preg_match($patronComillasVarIEtc, $cadProcesada, $arrResultado)) {
-                $patronReemplazo = 'var="' .  $id . $cadVariable . '.' . $i . '.' . $arrResultado[1] . '"';
-                $cadProcesada = @preg_replace($patronComillasVarIEtc, $patronReemplazo, $cadProcesada);
-            }
-
-            //* var='id.i'
-            //* var='i'
-            //* var="id.i"
-            //* var="i"
-            $patronComillasI = '/[v|V][a|A][r|R]\s*=\s*[\'|"]{1}\s*' . str_replace('.', '\.', $id . $cadIndice) . '\s*[\'|"]{1}/';
-            if(@preg_match($patronComillasI, $cadProcesada)) {
-                $cadProcesada = @preg_replace($patronComillasI, 'var="' . $i . '"', $cadProcesada);  
+                if ($offset != '') {
+                    eval('$offsetCalculado=' . $i . $offset . ';');
+                }
+                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariableEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
         }
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
