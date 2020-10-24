@@ -88,3 +88,4 @@ echo $objPhtml->obtenerContenido('for');
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
+

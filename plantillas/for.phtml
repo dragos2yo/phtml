@@ -10,10 +10,34 @@
 </for>
 
 
+
 <for var="arrUsuario" index="i.0">
+    <h5>Iterrando la palabra <b>{{arrUsuario.i}}</b></h5>
+    <for var="arrUsuario.i" index="j.0">
+        <p>La letra <b>{{arrUsuario.i.j}}</b> esta en la pozilion <b>{{j}}</b></p>
+    </for>
+</for>
+
+
+<for var="arrDias" index="i.0">
     <ul>
-      
-            <li>{{arrUsuario.i}}</li>
-      
+        <for var="arrDias.i" index="j.0">
+            <li>{{arrDias.i.j}}</li>
+        </for>
     </ul>
 </for>
+
+
+<p>
+    <for index="i.0" size="10" offset="+1">
+        {{i}} 
+    </for>
+</p>
+
+<p>
+    <for index="i.0" size="10" offset="+1" order="desc">
+        {{i}} 
+    </for>
+</p>
+
+
