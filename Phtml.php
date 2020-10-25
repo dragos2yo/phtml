@@ -817,7 +817,7 @@ class Phtml
     /**
      * Compila el TAG for
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
-     * <for index="i" var="variable" init="0" size="count" order="asc" id="id" offset="">
+     * <for index="i" var="variable" init="0" size="count" order="asc" id="id" offset="+1">
      * </for>
      */
     private function _compilar_for()
@@ -828,22 +828,20 @@ class Phtml
         $mixedVar          = $this->_importarVariable($cadVariable);
         $id                = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
-        $cadContenido      = $this->_obtenerHTML($objFor);
-        $objFrag           = null;
         $cadIndice         = $objFor->getAttribute('index') != '' ? $objFor->getAttribute('index')    : 'i';
-        $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
-        $offset            = $objFor->getAttribute('offset');
-        $cadProcesada      = '';
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
+        $format            = $objFor->getAttribute('format');
+        $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
+        $cadContenido      = $this->_obtenerHTML($objFor);
+        $cadProcesada      = '';
+        $objFrag           = null;
         $esCadena          = 0;
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
-
-
         if ($cadVariable != '' && !empty($mixedVar)) {
             if (is_array($mixedVar)) {
                 switch ($cadTotal) {
@@ -872,23 +870,33 @@ class Phtml
                 }
             }
         } else {
-            if(preg_match('/^[0-9\.]+?$/', $cadTotal)) {
+            if (preg_match('/^[0-9\.]+?$/', $cadTotal)) { // numeros
                 $max = (int)$cadTotal;
             } else {
-                $max = (string)$cadTotal;
-                if(preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', (string)$init)) {
-                    $max = strtoupper($max);
-                    $init = strtoupper((string)$init);
+                function esFecha($fecha) {
+                    $fecha = str_replace('.', '-', $fecha);
+                    $fecha = str_replace('/', '-', $fecha);
+                    $fecha = str_replace('_', '-', $fecha);
+                    $fecha = str_replace(' ', '-', $fecha);
                 }
-                $max++;
-                $esCadena = 1;
+                if (strtotime($cadTotal) || strtotime($init)) { // fechas
+
+                } else {
+                    $max = (string)$cadTotal;
+                    if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', (string)$init)) {
+                        $max = strtoupper($max);
+                        $init = strtoupper((string)$init);
+                    }
+                    $max++;
+                    $esCadena = 1;
+                }
             }
         }
 
-        
+
         for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esCadena == 1 || $asc == 1 ? $i++ : $i--) {
             $cadProcesada .= $cadContenido;
-            if($cadVariable != '') {
+            if ($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
                     $cadProcesada = @$this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
                 }
