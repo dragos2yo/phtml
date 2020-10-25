@@ -876,6 +876,10 @@ class Phtml
                 $max = (int)$cadTotal;
             } else {
                 $max = (string)$cadTotal;
+                if(preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', (string)$init)) {
+                    $max = strtoupper($max);
+                    $init = strtoupper((string)$init);
+                }
                 $max++;
                 $esCadena = 1;
             }
