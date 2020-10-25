@@ -651,11 +651,11 @@ class Phtml
     /**
      * Compila los TAG if - elseif - else
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
-     * <if var="variable" cond="condicion">
+     * <if var="variable" cond="condicion" and="condicion" or="condicion">
      *      contenido si pasa la condicion
      * </if>
      * <!-- Este comentario se eliminara -->
-     * <elseif var="variable" cond="condicion">
+     * <elseif var="variable" cond="condicion" and="condicion" or="condicion">
      *      contenido si pasa la condicion
      * </elseif>
      * <!-- Este comentario se eliminara -->
@@ -669,6 +669,8 @@ class Phtml
         $objIf = $objDom->getElementsByTagName('if')->item(0);
         $variableIf = $this->_importarVariable($objIf->getAttribute('var'));
         $cadCondIf = $objIf->getAttribute('cond');
+        $cadCondAnd = $objIf->getAttribute('and');
+        $cadCondOr = $objIf->getAttribute('or');
         $objFrag = null;
         if ($this->_comprobarCondicion($variableIf, $cadCondIf)) {
             $objFrag = $this->_obtenerElementos($objDom, $objIf);
@@ -738,6 +740,8 @@ class Phtml
             if (strtolower(@$objSwitch->firstChild->nodeName) == 'case') {
                 if (!$objFrag) {
                     $cadCondicion = $objSwitch->firstChild->getAttribute('cond');
+                    $cadCondicionAnd = $objSwitch->firstChild->getAttribute('and');
+                    $cadCondicionOr = $objSwitch->firstChild->getAttribute('or');
                     if ($this->_comprobarCondicion($variable, $cadCondicion)) {
                         $objFrag = $this->_obtenerElementos($objDom, $objSwitch->firstChild);
                     }
@@ -768,11 +772,10 @@ class Phtml
 
     /**
      * Compila el TAG foreach
+     * (!) Testar arreglos multidimensionales
+     * 
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <foreach var="variable" key="key" value="value" id="id">
-     *      {{variable.key}} OR {{id.variable.key}}
-     *      {{key}}          OR {{id.key}}
-     *      {{value}}        OR {{id.value}}
      * </forach>
      */
     private function _compilar_foreach()
@@ -819,6 +822,9 @@ class Phtml
 
     /**
      * Compila el TAG for
+     * (!) repasar las fechas pasadas por puntos
+     * (!) crear una funcion el inicializar fechas para no repetir codigo
+     * 
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
      * <for index="i" var="variable" init="0" size="count" order="asc" id="id" offset="+1">
      * </for>
