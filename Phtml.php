@@ -882,17 +882,19 @@ class Phtml
         
         for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
             $cadProcesada .= $cadContenido;
-            if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
-                $cadProcesada = @$this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
+            if($cadVariable != '') {
+                if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
+                    $cadProcesada = @$this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
+                }
+                $cadProcesada = $this->_reemplazarVariableEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
             if ($offset != '') {
                 eval('$offsetCalculado=' . $i . $offset . ';');
             }
             $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
-            $cadProcesada = $this->_reemplazarVariableEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
-            $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
-            $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
         }
 
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
