@@ -1,6 +1,27 @@
+
+<p>
+    <!-- Escribir las fechas -->
+    <for index="i.20-10-2020" size="25-10-2020">
+        <p>{{i}}</p> 
+    </for>
+</p>
 <p>
     <!-- Escribir las letras de A a Z -->
-    <for index="i.A" size="Z">
+    <for index="i.a" size="z">
+        {{i}} 
+    </for>
+</p>
+
+<p>
+    <!-- Escribir los numeros de 1 a 10-->
+    <for size="25" offset="+1">
+        {{i}} 
+    </for>
+</p>
+
+<p>
+    <!-- Escribir los numeros de 1 a 10 al reves -->
+    <for size="10" offset="+1" order="desc">
         {{i}} 
     </for>
 </p>
@@ -23,20 +44,6 @@
     </ul>
 </for>
 
-
-<p>
-    <!-- Escribir los numeros de 1 a 10-->
-    <for size="10" offset="+1">
-        {{i}} 
-    </for>
-</p>
-
-<p>
-    <!-- Escribir los numeros de 1 a 10 al reves -->
-    <for size="10" offset="+1" order="desc">
-        {{i}} 
-    </for>
-</p>
 
 <!-- Usos que se compilan dentro del bucle for -->
 <for var="arrUsuario" index="i.0">

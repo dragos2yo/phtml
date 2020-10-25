@@ -338,7 +338,7 @@ class Phtml
                 }
                 break;
             case 2:
-                switch ($arrVar[0]) {
+                switch ($arrVar[0]) { // obtener super globales
                     case 'GLOBALS':
                         if ($this->_bolPermitir_GLOBALS == true && isset($_GLOBALS[$arrVar[1]])) {
                             $varTemporal = $GLOBALS[$arrVar[1]];
@@ -385,14 +385,14 @@ class Phtml
                         }
                         break;
                     default:
-                        if (isset($this->_arrVariables[$arrVar[0]]) && is_array($this->_arrVariables[$arrVar[0]])) {
+                        if (isset($this->_arrVariables[$arrVar[0]]) && is_array($this->_arrVariables[$arrVar[0]])) { // arreglo
                             if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
                                 $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]];
                             }
-                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
-                            if (property_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) { // objeto
+                            if (property_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) { // objeto propiedad
                                 $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]};
-                            } else if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                            } else if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) { // objeto metodo
                                 $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}();
                             }
                         }
@@ -586,8 +586,11 @@ class Phtml
     /**
      * Imprime todas las variables
      */
-    private function _compilar_var()
+    private function _compilar_var($eliminarVariables = false)
     {
+        $patron = '/' . $this->_abreVariable . '\s*?(.*?)\s*?' . $this->_cierraVariable .  '/';
+        if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
+        }
         return (true);
     }
 
@@ -831,17 +834,19 @@ class Phtml
         $cadIndice         = $objFor->getAttribute('index') != '' ? $objFor->getAttribute('index')    : 'i';
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
-        $format            = $objFor->getAttribute('format');
+        $format            = $objFor->getAttribute('format') != '' ? $objFor->getAttribute('format') : 'd-m-Y';
         $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
         $cadContenido      = $this->_obtenerHTML($objFor);
         $cadProcesada      = '';
         $objFrag           = null;
         $esCadena          = 0;
+        $esFecha           = 0;
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
+
         if ($cadVariable != '' && !empty($mixedVar)) {
             if (is_array($mixedVar)) {
                 switch ($cadTotal) {
@@ -873,28 +878,36 @@ class Phtml
             if (preg_match('/^[0-9\.]+?$/', $cadTotal)) { // numeros
                 $max = (int)$cadTotal;
             } else {
-                function esFecha($fecha) {
-                    $fecha = str_replace('.', '-', $fecha);
-                    $fecha = str_replace('/', '-', $fecha);
-                    $fecha = str_replace('_', '-', $fecha);
-                    $fecha = str_replace(' ', '-', $fecha);
-                }
-                if (strtotime($cadTotal) || strtotime($init)) { // fechas
-
-                } else {
-                    $max = (string)$cadTotal;
-                    if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', (string)$init)) {
-                        $max = strtoupper($max);
-                        $init = strtoupper((string)$init);
+                $patronFecha = '/^\s*?([0-9]{1,2})[\.\-\/\s]([0-9]{1,2})[\.\-\/\s]([0-9]{4})\s*?([0-9]{1,2}[:][0-9]{1,2})?([:][0-9]{1,2})?\s*?$/';
+                if (preg_match($patronFecha, $init, $arrResultado)) {
+                    $fecha = $arrResultado[1] . '-' .  $arrResultado[2] . '-' . $arrResultado[3] . (isset($arrResultado[4]) ? ' ' . $arrResultado[4]  . (isset($arrResultado[5]) ?  $arrResultado[5] : '') : '');
+                    $init = strtotime($fecha);
+                    if (preg_match($patronFecha, $cadTotal, $arrResultado)) {
+                        $fecha = $arrResultado[1] . '-' .  $arrResultado[2] . '-' . $arrResultado[3] . (isset($arrResultado[4]) ? ' ' . $arrResultado[4]  . (isset($arrResultado[5]) ?  $arrResultado[5] : '') : '');
+                        $max = strtotime($fecha);
+                        $max += 86400;
+                    } else {
+                        $max = strtotime('now');
                     }
-                    $max++;
-                    $esCadena = 1;
+                    $esFecha = 1;
+                } else {
+                    $max = $cadTotal;
+                    if (preg_match('/[a-zA-Z]/', $max) || preg_match('/[a-zA-Z]/', $init)) {
+                        if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', $init)) {
+                            $max = strtoupper($max);
+                            $init = strtoupper($init);
+                        }
+                        $max = strlen($max) > 3 ? substr($max, 0, 3) : $max;
+                        $init = strlen($init) > 3 ? substr($init, 0, 3) : $init;
+                        $max++;
+                        $esCadena = 1;
+                    }
                 }
             }
         }
 
 
-        for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esCadena == 1 || $asc == 1 ? $i++ : $i--) {
+        for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esFecha == 1 ? ($asc == 1 ? $i += 86400 : $i -= 86400) : ($esCadena == 1 || $asc == 1 ? $i++ : $i--)) {
             $cadProcesada .= $cadContenido;
             if ($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
@@ -904,11 +917,16 @@ class Phtml
                 $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
                 $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
-            if ($offset != '') {
-                eval('$offsetCalculado=' . $i . $offset . ';');
+            if ($esFecha == 1) {
+                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  date($format, $i), $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, date($format, $i), $cadProcesada);
+            } else {
+                if ($offset != '') {
+                    eval('$offsetCalculado=' . $i . $offset . ';');
+                }
+                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
             }
-            $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
-            $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
         }
 
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
