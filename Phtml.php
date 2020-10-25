@@ -836,7 +836,7 @@ class Phtml
         $cadProcesada      = '';
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
-
+        $esCadena          = 0;
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
@@ -872,15 +872,17 @@ class Phtml
                 }
             }
         } else {
-            if(preg_match('/[0-9\.]+?/', $cadTotal)) {
+            if(preg_match('/^[0-9\.]+?$/', $cadTotal)) {
                 $max = (int)$cadTotal;
             } else {
                 $max = (string)$cadTotal;
+                $max++;
+                $esCadena = 1;
             }
         }
 
         
-        for ($asc == 1 ? $i = $init : $i = $max - 1; $asc == 1 ? $i < $max : $init <= $i; $asc == 1 ? $i++ : $i--) {
+        for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esCadena == 1 || $asc == 1 ? $i++ : $i--) {
             $cadProcesada .= $cadContenido;
             if($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
