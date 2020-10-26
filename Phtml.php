@@ -116,6 +116,12 @@ class Phtml
 
 
     /**
+     * @var boolean $_esAnonima;
+     */
+    private $_esAnonima = false;
+
+
+    /**
      * Inicializar los componentes necesarios
      */
     public function __construct()
@@ -333,8 +339,9 @@ class Phtml
             case 1:
                 if (isset($this->_arrVariables[$arrVar[0]])) {
                     $varTemporal = $this->_arrVariables[$arrVar[0]];
-                } else { // admitir valores
+                } else { // admitir valores anonimos
                     $varTemporal = $arrVar[0];
+                    $this->_esAnonima = true;
                 }
                 break;
             case 2:
@@ -583,15 +590,40 @@ class Phtml
     }
 
 
+    private function _existeMetodo($cadNombreMetodo) {
+        return (true);
+    }
+
+
     /**
      * Imprime todas las variables
      */
     private function _compilar_var($eliminarVariables = false)
     {
-        $patron = '/' . $this->_abreVariable . '\s*?(.*?)\s*?' . $this->_cierraVariable .  '/';
-        if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
-        }
-        return (true);
+        $patron = '/' . $this->_abreVariable . '\s*(.*?)\s*' . $this->_cierraVariable .  '/';
+        if (preg_match($patron, $this->_cadContenido, $arrResultado)) {
+            $arrVar = explode('.', $arrResultado[1], 2);
+            if(sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
+                    $mixedVar = $this->_importarVariable($arrVar[1]);
+                    if(!empty($mixedVar) && !$this->_esAnonima) {
+                        $this->_cadContenido = str_replace($arrResultado[0], $mixedVar, $this->_cadContenido);
+                    } else {
+                        if($eliminarVariables) {
+                            $this->_cadContenido = str_replace($arrResultado[0], '', $this->_cadContenido);
+                        }
+                    }
+            } else {
+                $mixedVar = $this->_importarVariable($arrResultado[1]);
+                if(!empty($mixedVar) && !$this->_esAnonima) {
+                    $this->_cadContenido = str_replace($arrResultado[0], $mixedVar, $this->_cadContenido);
+                } else {
+                    if($eliminarVariables) {
+                        $this->_cadContenido = str_replace($arrResultado[0], '', $this->_cadContenido);
+                    }
+                }
+            }
+            print_pre($arrVar);
+        } 
     }
 
 
@@ -972,16 +1004,21 @@ class Phtml
      */
     private function _compilar()
     {
+        $this->_compilar_var();
+
         $cadPatron = '/<(if|switch|foreach|for|while|include)[\s]*.*?>(.*?)<\/(if|switch|foreach|for|while|include)>/is';
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower($arrResultado[1]);
             $this->{'_compilar_' . $nombreTag}();
+            if ($nombreTag == 'include') {
+                $this->_compilar_var();
+            }
             if (defined('PHTML_DEPURANDO') && PHTML_DEPURANDO == true) {
                 break;
             }
         }
         //$this->_compilar_const(true);
-        //$this->_compilar_var(true);
+        $this->_compilar_var(true);
     }
 
 

@@ -80,27 +80,16 @@ echo $objPhtml->obtenerContenido('switch'); */
 $objPhtml->agregarArchivo('plantillas/foreach.phtml', 'foreach');
 echo $objPhtml->obtenerContenido('foreach'); */
 
-// ejemplo de depurar un tag for
+/* // ejemplo de depurar un tag for
 $objPhtml->agregarArchivo('plantillas/for.phtml', 'for');
-echo $objPhtml->obtenerContenido('for');
+echo $objPhtml->obtenerContenido('for'); */
 
 /* // ejemplo de depurar un tag while
 $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
 
-
-
-
-
-/*  $init = '20-9-2020 9:23:12';
- $max = '25-10-2020';
-
- $finit = strtotime($init);
- $fmax = strtotime('now');
-
+// ejemplo de imprimir variables
+$objPhtml->agregarArchivo('plantillas/var.phtml', 'var');
+echo $objPhtml->obtenerContenido('var');
  
-
- for($i = $finit; $i <= $fmax; $i+=86400) {
-   echo '<p>' . date('d-m-Y', $i) . "</p>";
- } */
