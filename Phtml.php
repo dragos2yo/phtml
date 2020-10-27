@@ -118,7 +118,7 @@ class Phtml
     /**
      * @var boolean $_esAnonima;
      */
-    private $_esAnonima = false;
+    private $_esAnonima;
 
 
     /**
@@ -335,6 +335,7 @@ class Phtml
         $arrVar = explode('.', $cadVariable);
         $numParametros = sizeof($arrVar);
         $varTemporal = null;
+        $this->_esAnonima = false;
         switch ($numParametros) {
             case 1:
                 if (isset($this->_arrVariables[$arrVar[0]])) {
