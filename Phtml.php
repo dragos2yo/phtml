@@ -122,6 +122,12 @@ class Phtml
 
 
     /**
+     * @var array $_arrMetodos
+     */
+    private $_arrMetodos = array('upper', 'strtoupper', 'upercase', 'lower', 'strtolower', 'lowercase', 'ucwords', 'camelcase');
+
+
+    /**
      * Inicializar los componentes necesarios
      */
     public function __construct()
@@ -591,40 +597,72 @@ class Phtml
     }
 
 
+    /**
+     * Comprueba si un metodo de formatear es soportado
+     * 
+     * @param string $cadNombreMetodo
+     */
     private function _existeMetodo($cadNombreMetodo) {
-        return (true);
+        return(in_array($cadNombreMetodo, $this->_arrMetodos));
     }
 
 
     /**
+     * Devuelve la cadena formateada
+     */
+    private function _obtenerFormato($cadNombreMetodo, $mixedVar) {
+        switch($cadNombreMetodo) {
+            case 'strtolower':
+            case 'lowercase':
+            case 'lower':
+                $cadFormateada = strtolower($mixedVar);
+                break;
+            case 'strtoupper':
+            case 'uppercase':
+            case 'upper':
+                $cadFormateada = strtoupper($mixedVar);
+                break;
+            case 'ucword':
+            case 'camelcase':
+                $cadFormateada = ucwords($mixedVar);
+                break;
+        }
+        return($cadFormateada);
+    }
+
+
+
+    /**
      * Imprime todas las variables
+     * 
+     * @param boolean $eliminarVariables
      */
     private function _compilar_var($eliminarVariables = false)
     {
+        $bolEliminar = false;
         $patron = '/' . $this->_abreVariable . '\s*(.*?)\s*' . $this->_cierraVariable .  '/';
         if (preg_match($patron, $this->_cadContenido, $arrResultado)) {
             $arrVar = explode('.', $arrResultado[1], 2);
             if(sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
-                    $mixedVar = $this->_importarVariable($arrVar[1]);
-                    if(!empty($mixedVar) && !$this->_esAnonima) {
-                        $this->_cadContenido = str_replace($arrResultado[0], $mixedVar, $this->_cadContenido);
-                    } else {
-                        if($eliminarVariables) {
-                            $this->_cadContenido = str_replace($arrResultado[0], '', $this->_cadContenido);
-                        }
-                    }
-            } else {
-                $mixedVar = $this->_importarVariable($arrResultado[1]);
-                if(!empty($mixedVar) && !$this->_esAnonima) {
-                    $this->_cadContenido = str_replace($arrResultado[0], $mixedVar, $this->_cadContenido);
+                $mixedVar = $this->_importarVariable($arrVar[1]);
+                if(!empty($mixedVar) && !$this->_esAnonima) { 
+                    $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
                 } else {
-                    if($eliminarVariables) {
-                        $this->_cadContenido = str_replace($arrResultado[0], '', $this->_cadContenido);
-                    }
+                    $bolEliminar = true;
+                }
+            } else {
+                $mixedVar = $this->_importarVariable($arrResultado[1]); 
+                if(!empty($mixedVar) && !$this->_esAnonima) { 
+                    $cadContenido = $mixedVar;
+                } else {
+                    $bolEliminar = true;
                 }
             }
-            print_pre($arrVar);
-        } 
+            if($bolEliminar && $eliminarVariables) {
+                $cadContenido = '';
+            }
+            $this->_cadContenido = str_replace($arrResultado[0], $cadContenido, $this->_cadContenido);
+        }
     }
 
 
@@ -874,12 +912,12 @@ class Phtml
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
         $format            = $objFor->getAttribute('format') != '' ? $objFor->getAttribute('format') : 'd-m-Y';
-        $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? 0 : 1;
+        $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? false : true;
         $cadContenido      = $this->_obtenerHTML($objFor);
         $cadProcesada      = '';
         $objFrag           = null;
-        $esCadena          = 0;
-        $esFecha           = 0;
+        $esCadena          = false;
+        $esFecha           = false;
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
@@ -928,7 +966,7 @@ class Phtml
                     } else {
                         $max = strtotime('now');
                     }
-                    $esFecha = 1;
+                    $esFecha = true;
                 } else {
                     $max = $cadTotal;
                     if (preg_match('/[a-zA-Z]/', $max) || preg_match('/[a-zA-Z]/', $init)) {
@@ -939,14 +977,14 @@ class Phtml
                         $max = strlen($max) > 3 ? substr($max, 0, 3) : $max;
                         $init = strlen($init) > 3 ? substr($init, 0, 3) : $init;
                         $max++;
-                        $esCadena = 1;
+                        $esCadena = true;
                     }
                 }
             }
         }
 
 
-        for ($esCadena == 1 || $asc == 1 ? $i = $init : $i = $max - 1; $esCadena == 1 ? ($i != $max) : ($asc == 1 ? $i < $max : $init <= $i); $esFecha == 1 ? ($asc == 1 ? $i += 86400 : $i -= 86400) : ($esCadena == 1 || $asc == 1 ? $i++ : $i--)) {
+        for ($esCadena || $asc ? $i = $init : $i = $max - 1; $esCadena ? ($i != $max) : ($asc ? $i < $max : $init <= $i); $esFecha ? ($asc ? $i += 86400 : $i -= 86400) : ($esCadena || $asc ? $i++ : $i--)) {
             $cadProcesada .= $cadContenido;
             if ($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
@@ -956,7 +994,7 @@ class Phtml
                 $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
                 $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
-            if ($esFecha == 1) {
+            if ($esFecha) {
                 $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  date($format, $i), $cadProcesada);
                 $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, date($format, $i), $cadProcesada);
             } else {
