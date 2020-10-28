@@ -123,8 +123,9 @@ class Phtml
 
     /**
      * @var array $_arrMetodos
+     * (*) agregar un objeto que contenga metodos de formateo
      */
-    private $_arrMetodos = array('upper', 'strtoupper', 'upercase', 'lower', 'strtolower', 'lowercase', 'ucwords', 'camelcase');
+    private $_arrMetodos = array('upper', 'strtoupper', 'uppercase', 'lower', 'strtolower', 'lowercase', 'ucwords', 'camelcase', 'ucfirst');
 
 
     /**
@@ -622,9 +623,15 @@ class Phtml
             case 'upper':
                 $cadFormateada = strtoupper($mixedVar);
                 break;
-            case 'ucword':
+            case 'ucwords':
             case 'camelcase':
                 $cadFormateada = ucwords($mixedVar);
+                break;
+            case 'ucfirst';
+                $cadFormateada = ucfirst($mixedVar);
+                break;
+            default;
+                $cadFormateada = '';
                 break;
         }
         return($cadFormateada);
@@ -640,6 +647,7 @@ class Phtml
     private function _compilar_var($eliminarVariables = false)
     {
         $bolEliminar = false;
+        $cadContenido = '';
         $patron = '/' . $this->_abreVariable . '\s*(.*?)\s*' . $this->_cierraVariable .  '/';
         if (preg_match($patron, $this->_cadContenido, $arrResultado)) {
             $arrVar = explode('.', $arrResultado[1], 2);
