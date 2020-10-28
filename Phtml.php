@@ -305,8 +305,8 @@ class Phtml
 
 
     /**
-     * Crea una cadena a partir de un TAG
-     * 
+     * Crea una cadena con el contenido de un nodo
+     *  
      * @param object DOMNode $objNodo
      * @return string
      */
