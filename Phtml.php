@@ -125,7 +125,9 @@ class Phtml
      * @var array $_arrMetodos
      * (*) agregar un objeto que contenga metodos de formateo
      */
-    private $_arrMetodos = array('upper', 'strtoupper', 'uppercase', 'lower', 'strtolower', 'lowercase', 'ucwords', 'camelcase', 'ucfirst');
+    private $_arrMetodos = array('upper', 'strtoupper', 'uppercase', 'lower', 
+                                 'strtolower', 'lowercase', 'ucwords', 'camelcase', 
+                                 'ucfirst', 'urlencode', 'encodeurl', 'urldecode', 'decodeurl');
 
 
     /**
@@ -415,6 +417,7 @@ class Phtml
                 }
                 break;
             case 3:
+                // recuperar variables globales multinivel
                 if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
                     if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
                         $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]];
@@ -432,6 +435,7 @@ class Phtml
                 }
                 break;
             case 4:
+                // depurar variables mulinivel 2
                 break;
         }
         return ($varTemporal);
@@ -447,7 +451,7 @@ class Phtml
      */
     private function _crearIdAleatorio($cadClave)
     {
-        $contexto = hash_init('sha256', HASH_HMAC, '/^P|-|T|V||_$/' . rand(0, 1000));
+        $contexto = hash_init('sha256', HASH_HMAC, '/^P|-|T|V||_$dPm/' . rand(0, 1000));
         hash_update($contexto, $cadClave);
         return (hash_final($contexto));
     }
@@ -629,6 +633,14 @@ class Phtml
                 break;
             case 'ucfirst';
                 $cadFormateada = ucfirst($mixedVar);
+                break;
+            case 'urlencode':
+            case 'encodeurl':
+                $cadFormateada = urlencode($mixedVar);
+                break;
+            case 'urldecode':
+            case 'decodeurl':
+                $cadFormateada = urldecode($mixedVar);
                 break;
             default;
                 $cadFormateada = '';
