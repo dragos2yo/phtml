@@ -603,16 +603,18 @@ class Phtml
      * 
      * @param string $cadNombreMetodo
      */
-    private function _existeMetodo($cadNombreMetodo) {
-        return(in_array($cadNombreMetodo, $this->_arrMetodos));
+    private function _existeMetodo($cadNombreMetodo)
+    {
+        return (in_array($cadNombreMetodo, $this->_arrMetodos));
     }
 
 
     /**
      * Devuelve la cadena formateada
      */
-    private function _obtenerFormato($cadNombreMetodo, $mixedVar) {
-        switch($cadNombreMetodo) {
+    private function _obtenerFormato($cadNombreMetodo, $mixedVar)
+    {
+        switch ($cadNombreMetodo) {
             case 'strtolower':
             case 'lowercase':
             case 'lower':
@@ -634,7 +636,7 @@ class Phtml
                 $cadFormateada = '';
                 break;
         }
-        return($cadFormateada);
+        return ($cadFormateada);
     }
 
 
@@ -649,27 +651,32 @@ class Phtml
         $bolEliminar = false;
         $cadContenido = '';
         $patron = '/' . $this->_abreVariable . '\s*(.*?)\s*' . $this->_cierraVariable .  '/';
-        if (preg_match($patron, $this->_cadContenido, $arrResultado)) {
-            $arrVar = explode('.', $arrResultado[1], 2);
-            if(sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
-                $mixedVar = $this->_importarVariable($arrVar[1]);
-                if(!empty($mixedVar) && !$this->_esAnonima) { 
-                    $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
+        if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
+            print_pre($arrResultado);
+            $totalCoincidencias = sizeof($arrResultado[0]);
+            for ($i = 0; $i < $totalCoincidencias; $i++) {
+
+                $arrVar = explode('.', $arrResultado[1][$i], 2);
+                if (sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
+                    $mixedVar = $this->_importarVariable($arrVar[1]);
+                    if (!empty($mixedVar) && !$this->_esAnonima) {
+                        $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
+                    } else {
+                        $bolEliminar = true;
+                    }
                 } else {
-                    $bolEliminar = true;
+                    $mixedVar = $this->_importarVariable($arrResultado[1][$i]);
+                    if (!empty($mixedVar) && !$this->_esAnonima) {
+                        $cadContenido = $mixedVar;
+                    } else {
+                        $bolEliminar = true;
+                    }
                 }
-            } else {
-                $mixedVar = $this->_importarVariable($arrResultado[1]); 
-                if(!empty($mixedVar) && !$this->_esAnonima) { 
-                    $cadContenido = $mixedVar;
-                } else {
-                    $bolEliminar = true;
+                if ($bolEliminar && $eliminarVariables) {
+                    $cadContenido = '';
                 }
+                $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
             }
-            if($bolEliminar && $eliminarVariables) {
-                $cadContenido = '';
-            }
-            $this->_cadContenido = str_replace($arrResultado[0], $cadContenido, $this->_cadContenido);
         }
     }
 
