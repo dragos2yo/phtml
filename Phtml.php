@@ -125,9 +125,14 @@ class Phtml
      * @var array $_arrMetodos
      * (*) agregar un objeto que contenga metodos de formateo
      */
-    private $_arrMetodos = array('upper', 'strtoupper', 'uppercase', 'lower', 
-                                 'strtolower', 'lowercase', 'ucwords', 'camelcase', 
-                                 'ucfirst', 'urlencode', 'encodeurl', 'urldecode', 'decodeurl');
+    private $_arrMetodos = array(
+        'upper', 'strtoupper', 'uppercase', 'lower',
+        'strtolower', 'lowercase', 'ucwords', 'camelcase',
+        'ucfirst', 'urlencode', 'urldecode',
+        'trim', 'rtrim', 'ltrim', 'htmlentities',
+        'html_entity_decode', 'addslashes', 'stripcslashes',
+        'htmlspecialchars'
+    );
 
 
     /**
@@ -341,102 +346,107 @@ class Phtml
      */
     private function _importarVariable($cadVariable)
     {
-        $arrVar = explode('.', $cadVariable);
-        $numParametros = sizeof($arrVar);
-        $varTemporal = null;
         $this->_esAnonima = false;
-        switch ($numParametros) {
-            case 1:
-                if (isset($this->_arrVariables[$arrVar[0]])) {
-                    $varTemporal = $this->_arrVariables[$arrVar[0]];
-                } else { // admitir valores anonimos
-                    $varTemporal = $arrVar[0];
-                    $this->_esAnonima = true;
-                }
-                break;
-            case 2:
-                switch ($arrVar[0]) { // obtener super globales
-                    case 'GLOBALS':
-                        if ($this->_bolPermitir_GLOBALS == true && isset($_GLOBALS[$arrVar[1]])) {
-                            $varTemporal = $GLOBALS[$arrVar[1]];
-                        }
-                        break;
-                    case '_SERVER':
-                        if ($this->_bolPermitir_SERVER == true && isset($_SERVER[$arrVar[1]])) {
-                            $varTemporal = $_SERVER[$arrVar[1]];
-                        }
-                        break;
-                    case '_GET':
-                        if ($this->_bolPermitir_GET == true && isset($_GET[$arrVar[1]])) {
-                            $varTemporal = $_GET[$arrVar[1]];
-                        }
-                        break;
-                    case '_POST':
-                        if ($this->_bolPermitir_POST == true && isset($_POST[$arrVar[1]])) {
-                            $varTemporal = $_POST[$arrVar[1]];
-                        }
-                        break;
-                    case '_FILES':
-                        if ($this->_bolPermitir_FILES == true && isset($_FILES[$arrVar[1]])) {
-                            $varTemporal = $_FILES[$arrVar[1]];
-                        }
-                        break;
-                    case '_COOKIE':
-                        if ($this->_bolPermitir_COOKIE == true && isset($_COOKIE[$arrVar[1]])) {
-                            $varTemporal = $_COOKIE[$arrVar[1]];
-                        }
-                        break;
-                    case '_SESSION':
-                        if ($this->_bolPermitir_SESSION == true && isset($_SESSION[$arrVar[1]])) {
-                            $varTemporal = $_SESSION[$arrVar[1]];
-                        }
-                        break;
-                    case '_REQUEST':
-                        if ($this->_bolPermitir_REQUEST == true && isset($_REQUEST[$arrVar[1]])) {
-                            $varTemporal = $_REQUEST[$arrVar[1]];
-                        }
-                        break;
-                    case '_ENV':
-                        if ($this->_bolPermitir_ENV == true && isset($_ENV[$arrVar[1]])) {
-                            $varTemporal = $_ENV[$arrVar[1]];
-                        }
-                        break;
-                    default:
-                        if (isset($this->_arrVariables[$arrVar[0]]) && is_array($this->_arrVariables[$arrVar[0]])) { // arreglo
-                            if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]];
+        if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
+            $arrVar = explode('.', $cadVariable);
+            $numParametros    = sizeof($arrVar);
+            $varTemporal      = null;
+            switch ($numParametros) {
+                case 1:
+                    if (isset($this->_arrVariables[$arrVar[0]])) {
+                        $varTemporal = $this->_arrVariables[$arrVar[0]];
+                    } else { // admitir valores anonimos
+                        $varTemporal = $arrVar[0];
+                        $this->_esAnonima = true;
+                    }
+                    break;
+                case 2:
+                    switch ($arrVar[0]) { // obtener super globales
+                        case 'GLOBALS':
+                            if ($this->_bolPermitir_GLOBALS && isset($_GLOBALS[$arrVar[1]])) {
+                                $varTemporal = $GLOBALS[$arrVar[1]];
                             }
-                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) { // objeto
-                            if (property_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) { // objeto propiedad
-                                $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]};
-                            } else if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) { // objeto metodo
-                                $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}();
+                            break;
+                        case '_SERVER':
+                            if ($this->_bolPermitir_SERVER && isset($_SERVER[$arrVar[1]])) {
+                                $varTemporal = $_SERVER[$arrVar[1]];
                             }
+                            break;
+                        case '_GET':
+                            if ($this->_bolPermitir_GET && isset($_GET[$arrVar[1]])) {
+                                $varTemporal = $_GET[$arrVar[1]];
+                            }
+                            break;
+                        case '_POST':
+                            if ($this->_bolPermitir_POST && isset($_POST[$arrVar[1]])) {
+                                $varTemporal = $_POST[$arrVar[1]];
+                            }
+                            break;
+                        case '_FILES':
+                            if ($this->_bolPermitir_FILES && isset($_FILES[$arrVar[1]])) {
+                                $varTemporal = $_FILES[$arrVar[1]];
+                            }
+                            break;
+                        case '_COOKIE':
+                            if ($this->_bolPermitir_COOKIE && isset($_COOKIE[$arrVar[1]])) {
+                                $varTemporal = $_COOKIE[$arrVar[1]];
+                            }
+                            break;
+                        case '_SESSION':
+                            if ($this->_bolPermitir_SESSION && isset($_SESSION[$arrVar[1]])) {
+                                $varTemporal = $_SESSION[$arrVar[1]];
+                            }
+                            break;
+                        case '_REQUEST':
+                            if ($this->_bolPermitir_REQUEST && isset($_REQUEST[$arrVar[1]])) {
+                                $varTemporal = $_REQUEST[$arrVar[1]];
+                            }
+                            break;
+                        case '_ENV':
+                            if ($this->_bolPermitir_ENV && isset($_ENV[$arrVar[1]])) {
+                                $varTemporal = $_ENV[$arrVar[1]];
+                            }
+                            break;
+                        default:
+                            if (isset($this->_arrVariables[$arrVar[0]]) && is_array($this->_arrVariables[$arrVar[0]])) {
+                                if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                                    $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]; // arreglo[]
+                                }
+                            } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
+                                if (property_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                                    $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}; // objeto->propiedad
+                                } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                                    $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}(); // objeto->metodo()
+                                }
+                            }
+                            break;
+                    }
+                    break;
+                case 3:
+                    /** (*) agregar soporte variables globales multinivel */
+                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                        if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]; // arreglo[][]
                         }
-                        break;
-                }
-                break;
-            case 3:
-                // recuperar variables globales multinivel
-                if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
-                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]];
+                    } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
+                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2]); // objeto metodo(param)
+                        }
+                    } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                        if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}; // objeto->propiedad
+                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}(); // objeto->metodo()
+                        }
                     }
-                } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
-                    if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                        $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2]);
-                    }
-                } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                    if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
-                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]};
-                    } else if ($this->_bolEjecutarMetodos == true && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
-                        $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}();
-                    }
-                }
-                break;
-            case 4:
-                // depurar variables mulinivel 2
-                break;
+                    break;
+                    /* case 4:
+                    // depurar variables mulinivel 2
+                    break; */
+            }
+        } else { // admitir valores anonimos
+            $varTemporal = $cadVariable;
+            $this->_esAnonima = true;
         }
         return ($varTemporal);
     }
@@ -637,12 +647,34 @@ class Phtml
                 $cadFormateada = ucfirst($mixedVar);
                 break;
             case 'urlencode':
-            case 'encodeurl':
                 $cadFormateada = urlencode($mixedVar);
                 break;
             case 'urldecode':
-            case 'decodeurl':
                 $cadFormateada = urldecode($mixedVar);
+                break;
+            case 'trim':
+                $cadFormateada = trim($mixedVar);
+                break;
+            case 'ltrim':
+                $cadFormateada = ltrim($mixedVar);
+                break;
+            case 'rtrim':
+                $cadFormateada = rtrim($mixedVar);
+                break;
+            case 'htmlentities':
+                $cadFormateada = htmlentities($mixedVar);
+                break;
+            case 'html_entity_decode':
+                $cadFormateada = html_entity_decode($mixedVar);
+                break;
+            case 'addslashes':
+                $cadFormateada = addslashes($mixedVar);
+                break;
+            case 'stripslashes':
+                $cadFormateada = stripslashes($mixedVar);
+                break;
+            case 'htmlespecialschars':
+                $cadFormateada = htmlspecialchars($mixedVar);
                 break;
             default;
                 $cadFormateada = '';
@@ -662,12 +694,10 @@ class Phtml
     {
         $bolEliminar = false;
         $cadContenido = '';
-        $patron = '/' . $this->_abreVariable . '\s*(.*?)\s*' . $this->_cierraVariable .  '/';
+        $patron = '/' . $this->_abreVariable . '\s*([^0-9][a-zA-Z_\.]+)\s*' . $this->_cierraVariable .  '/';
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
-            print_pre($arrResultado);
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
-
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
                 if (sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
                     $mixedVar = $this->_importarVariable($arrVar[1]);
