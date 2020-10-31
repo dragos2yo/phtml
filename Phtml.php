@@ -477,11 +477,49 @@ class Phtml
      */
     private function _comprobarCondicion($mixedVar = null, $cadCondicion = '')
     {
-        if ($cadCondicion == '') {
-            return (false);
+        if($cadCondicion != '') {
+            switch($cadCondicion) {
+                case 'true':
+                    return($mixedVar == true);
+                case 'false':
+                    return($mixedVar == false);
+                case 'null':
+                case 'NULL':
+                case 'is_null':
+                    return(is_null($mixedVar));
+                case 'is_array':
+                    return(is_array($mixedVar));
+                case '!is_array':
+                    return(!is_array($mixedVar));
+                case 'is_object':
+                    return(is_object($mixedVar));
+                case '!is_object':
+                    return(!is_object($mixedVar));
+                case 'is_numeric':
+                    return(is_numeric($mixedVar));
+                case '!is_numeric':
+                    return(!is_numeric($mixedVar));
+                case 'is_int':
+                    return(is_int((int)$mixedVar));
+                case '!is_int':
+                    return(!is_int((int)$mixedVar));
+                case 'isset':
+                    return(isset($mixedVar));
+                case '!isset':
+                    return(!isset($mixedVar));
+                case 'empty':
+                    return(empty($mixedVar));
+                default:
+                    $arrCondicion = explode('.', $cadCondicion, 2);
+                    return($mixedVar == $cadCondicion);
+
+           }
+ 
+   
         } else {
-            return (true);
+            return (false);
         }
+
     }
 
 
@@ -988,7 +1026,6 @@ class Phtml
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
-
         if ($cadVariable != '' && !empty($mixedVar)) {
             if (is_array($mixedVar)) {
                 switch ($cadTotal) {
@@ -1047,8 +1084,6 @@ class Phtml
                 }
             }
         }
-
-
         for ($esCadena || $asc ? $i = $init : $i = $max - 1; $esCadena ? ($i != $max) : ($asc ? $i < $max : $init <= $i); $esFecha ? ($asc ? $i += 86400 : $i -= 86400) : ($esCadena || $asc ? $i++ : $i--)) {
             $cadProcesada .= $cadContenido;
             if ($cadVariable != '') {
@@ -1070,7 +1105,6 @@ class Phtml
                 $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
             }
         }
-
         $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
         if ($this->_bolEliminarComentario) {
             $this->_eliminarComentarios($objFor);
