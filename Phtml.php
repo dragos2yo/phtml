@@ -514,8 +514,6 @@ class Phtml
                     return($mixedVar == $cadCondicion);
 
            }
- 
-   
         } else {
             return (false);
         }
