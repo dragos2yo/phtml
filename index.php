@@ -1,4 +1,8 @@
 <?php
+
+define('URL', 'http://localhost/phtml');
+define('URL_DESCRIPCION', 'Phtml');
+
 function print_pre($cadContenido)
 {
     echo '<pre>';
@@ -89,7 +93,12 @@ $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
 
-// ejemplo de imprimir variables
+/* // ejemplo de imprimir variables
 $objPhtml->agregarArchivo('plantillas/var.phtml', 'var');
-echo $objPhtml->obtenerContenido('var');
+echo $objPhtml->obtenerContenido('var'); */
+
+
+// ejemplo de imprimir variables
+$objPhtml->agregarArchivo('plantillas/const.phtml', 'const');
+echo $objPhtml->obtenerContenido('const');
  

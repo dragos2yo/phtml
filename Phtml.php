@@ -123,7 +123,7 @@ class Phtml
 
     /**
      * @var array $_arrMetodos
-     * (*) agregar un objeto que contenga metodos de formateo
+     * (*) agregar un objeto que contenga metodos de formato
      */
     private $_arrMetodos = array(
         'upper', 'strtoupper', 'uppercase', 'lower',
@@ -694,7 +694,7 @@ class Phtml
     {
         $bolEliminar = false;
         $cadContenido = '';
-        $patron = '/' . $this->_abreVariable . '\s*([^0-9][a-zA-Z_\.]+)\s*' . $this->_cierraVariable .  '/';
+        $patron = '/' . $this->_abreVariable . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_cierraVariable .  '/';
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
@@ -729,7 +729,15 @@ class Phtml
      */
     private function _compilar_const()
     {
-        return (true);
+        $patron = '/' . str_replace('[', '\[', $this->_abreConstante) . '\s*([^0-9][A-Z0-9_]+)\s*' . str_replace(']', '\]', $this->_cierraConstante) .  '/';
+        while (preg_match($patron, $this->_cadContenido, $arrResultado)) {
+            if (defined($arrResultado[1])) {
+                $cadContenido = constant($arrResultado[1]);
+            } else {
+                $cadContenido = '';
+            }
+            $this->_cadContenido = str_replace($arrResultado[0], $cadContenido, $this->_cadContenido);
+        }
     }
 
 
@@ -1100,20 +1108,17 @@ class Phtml
      */
     private function _compilar()
     {
+        $this->_compilar_const();
         $this->_compilar_var();
-
         $cadPatron = '/<(if|switch|foreach|for|while|include)[\s]*.*?>(.*?)<\/(if|switch|foreach|for|while|include)>/is';
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower($arrResultado[1]);
             $this->{'_compilar_' . $nombreTag}();
             if ($nombreTag == 'include') {
+                $this->_compilar_const();
                 $this->_compilar_var();
             }
-            if (defined('PHTML_DEPURANDO') && PHTML_DEPURANDO == true) {
-                break;
-            }
         }
-        //$this->_compilar_const(true);
         $this->_compilar_var(true);
     }
 
