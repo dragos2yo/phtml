@@ -72,9 +72,9 @@ $objUsuario = new usuario();
 $objPhtml->agregarVariable('objUsuario', $objUsuario);
 
 
-/* // ejemplo de depurar un tag if-elseif-else
+// ejemplo de depurar un tag if-elseif-else
 $objPhtml->agregarArchivo('plantillas/if-elseif-else.phtml', 'if');
-echo $objPhtml->obtenerContenido('if'); */
+echo $objPhtml->obtenerContenido('if');
 
 /* // ejemplo de depurar un tag switch-case-default
 $objPhtml->agregarArchivo('plantillas/switch-case-default.phtml', 'switch');
@@ -98,7 +98,9 @@ $objPhtml->agregarArchivo('plantillas/var.phtml', 'var');
 echo $objPhtml->obtenerContenido('var'); */
 
 
-// ejemplo de imprimir variables
+/* // ejemplo de imprimir variables
 $objPhtml->agregarArchivo('plantillas/const.phtml', 'const');
-echo $objPhtml->obtenerContenido('const');
- 
+echo $objPhtml->obtenerContenido('const'); */
+
+
+

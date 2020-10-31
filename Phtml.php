@@ -312,8 +312,8 @@ class Phtml
     /**
      * Crea una cadena con el contenido de un nodo
      *  
-     * @param object DOMNode $objNodo
-     * @return string
+     * @param object DOMNode $objNodo el nodo del que se quere crear el contenido
+     * @return string la cadena con el contenido del nodo especificado
      */
     private function _obtenerHTML(DOMNode $objNodo)
     {
@@ -327,7 +327,9 @@ class Phtml
 
 
     /**
-     * Elimina los comentarios del nodo especificado
+     * Elimina los comentarios antes del nodo especificado
+     * 
+     * @param object $objNodo el nodo del que se quere eliminar los comentarios
      */
     private function _eliminarComentarios(DOMNode $objNodo)
     {
@@ -340,9 +342,9 @@ class Phtml
     /**
      * Transforma las cadenas pasadas en la plantilla en variables
      * 
-     * @param string $cadCapuraVariable
+     * @param string $cadVariable captura del supuesto nombre de variable
      * 
-     * @return mixed
+     * @return mixed devuelve el valor que contiene la variable
      */
     private function _importarVariable($cadVariable)
     {
@@ -470,54 +472,118 @@ class Phtml
 
     /**
      * Comprueba que la variable cumpla una condicion
+     * (*) agregar un objeto de condiciones
      * 
      * @param string $cadCondicion
      * @param mixed $mixedVar
      * @return boolean
      */
-    private function _comprobarCondicion($mixedVar = null, $cadCondicion = '')
+    private function _comprobarCondicion($mixedVar, $cadCondicion = '')
     {
-        if($cadCondicion != '') {
-            switch($cadCondicion) {
+        if ($cadCondicion != '') {
+            switch ($cadCondicion) {
+                case 'TRUE':
                 case 'true':
-                    return($mixedVar == true);
+                    return ($mixedVar == true);
+                case 'FALSE':
                 case 'false':
-                    return($mixedVar == false);
+                    return ($mixedVar == false);
                 case 'null':
                 case 'NULL':
                 case 'is_null':
-                    return(is_null($mixedVar));
+                    return (is_null($mixedVar));
                 case 'is_array':
-                    return(is_array($mixedVar));
+                    return (is_array($mixedVar));
                 case '!is_array':
-                    return(!is_array($mixedVar));
+                    return (!is_array($mixedVar));
                 case 'is_object':
-                    return(is_object($mixedVar));
+                    return (is_object($mixedVar));
                 case '!is_object':
-                    return(!is_object($mixedVar));
+                    return (!is_object($mixedVar));
                 case 'is_numeric':
-                    return(is_numeric($mixedVar));
+                    return (is_numeric($mixedVar));
+                case 'not_numeric':
                 case '!is_numeric':
-                    return(!is_numeric($mixedVar));
+                    return (!is_numeric($mixedVar));
                 case 'is_int':
-                    return(is_int((int)$mixedVar));
+                    return (is_int((int)$mixedVar));
+                case 'not_int':
                 case '!is_int':
-                    return(!is_int((int)$mixedVar));
+                    return (!is_int((int)$mixedVar));
                 case 'isset':
-                    return(isset($mixedVar));
+                    return (isset($mixedVar));
+                case 'not_isset':
                 case '!isset':
-                    return(!isset($mixedVar));
+                    return (!isset($mixedVar));
                 case 'empty':
-                    return(empty($mixedVar));
+                    return (empty($mixedVar));
+                case 'not_empty':
+                case '!empty':
+                    return (!empty($mixedVar));
+                case 'is_email':
+                    return (!filter_var($mixedVar, FILTER_VALIDATE_EMAIL) ? false : true);
                 default:
                     $arrCondicion = explode('.', $cadCondicion, 2);
-                    return($mixedVar == $cadCondicion);
-
-           }
+                    if (sizeof($arrCondicion) == 2) {
+                        $cadMetodo = $arrCondicion[0];
+                        $cadOperador = $arrCondicion[1];
+                        switch ($cadMetodo) {
+                            case '==':
+                            case 'equalto':
+                                return ($mixedVar == $cadOperador);
+                            case '!=':
+                            case 'not_equalto':
+                                return ($mixedVar != $cadOperador);
+                            case '>':
+                            case 'morethan':
+                                return ($mixedVar > $cadOperador);
+                            case '<':
+                            case 'lessthan':
+                                return ($mixedVar < $cadOperador);
+                            case '>=':
+                            case 'morethan_equalto':
+                                return ($mixedVar >= $cadOperador);
+                            case '<=':
+                            case 'lessthan_equalto':
+                                return ($mixedVar <= $cadOperador);
+                            case 'permitted_regexp':
+                                return (preg_match($cadOperador, $mixedVar) ? true : false);
+                            case 'not_permitted_regexp':
+                                return (preg_match($cadOperador, $mixedVar) ? false : true);
+                            case 'maxlength':
+                                return (strlen($mixedVar) <= $cadOperador ? true : false);
+                            case 'minlength':
+                                return (strlen($mixedVar) >= $cadOperador ? true : false);
+                            case 'length':
+                                return (strlen($mixedVar) == $cadOperador ? true : false);
+                            case 'permitted_characters':
+                                $totalCaracteres = strlen($mixedVar);
+                                for ($i = 0; $i < $totalCaracteres; $i++) {
+                                    $esteCaracter = substr($mixedVar, $i, 1);
+                                    if (strpos($cadOperador, $esteCaracter) === false) {
+                                        return (false);
+                                    }
+                                }
+                                return (true);
+                            case 'not_permitted_characters':
+                                $totalCaracteres = strlen($mixedVar);
+                                for ($i = 0; $i < $totalCaracteres; $i++) {
+                                    $esteCaracter = substr($mixedVar, $i, 1);
+                                    if (strpos($cadOperador, $esteCaracter) !== false) {
+                                        return (false);
+                                    }
+                                }
+                                return (true);
+                            default:
+                                return($mixedVar == $cadCondicion);
+                        }
+                    } else {
+                        return ($mixedVar == $cadCondicion);
+                    }
+            }
         } else {
             return (false);
         }
-
     }
 
 
@@ -631,11 +697,11 @@ class Phtml
      * {{id.var.key.XXX.etc}}
      * {{id.var.i.XXX.etc}} 
      * {{var.i.XXX.etc}}
-     * @param string $cadBuscar
-     * @param string $cadReemplazar
-     * @param string $cadContenido
+     * @param string $cadBuscar     antiguo valor
+     * @param string $cadReemplazar nuevo valor
+     * @param string $cadContenido el contenido que hay que modificar
      * 
-     * @return string
+     * @return string devuele el contenido con los valores reemplazados
      */
     private function _reemplazarVariableEtc($cadBuscar, $cadReemplazar, $cadContenido = '')
     {
@@ -660,7 +726,11 @@ class Phtml
 
 
     /**
-     * Devuelve la cadena formateada
+     * Formatear el contenido de salida de la variable
+     * 
+     * @param string  $cadNombreMetodo el nombre del metodo formateador
+     * @param mixed   $mixedVar la variable que contiene el contenido a formatear
+     * @return string devuelve el contenido formateado segun el metodo
      */
     private function _obtenerFormato($cadNombreMetodo, $mixedVar)
     {
@@ -712,8 +782,8 @@ class Phtml
             case 'htmlespecialschars':
                 $cadFormateada = htmlspecialchars($mixedVar);
                 break;
-            default;
-                $cadFormateada = '';
+            default:
+                $cadFormateada = $mixedVar;
                 break;
         }
         return ($cadFormateada);
@@ -724,7 +794,7 @@ class Phtml
     /**
      * Imprime todas las variables
      * 
-     * @param boolean $eliminarVariables
+     * @param boolean $eliminarVariables elimina las coencidencias si esta en true
      */
     private function _compilar_var($eliminarVariables = false)
     {
@@ -853,7 +923,7 @@ class Phtml
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 if (strtolower(@$objIf->nextSibling->nodeName) == 'elseif') {
                     if (!$objFrag) {
-                        $variableElseif = $objIf->nextSibling->getAttribute('var');
+                        $variableElseif = $this->_importarVariable($objIf->nextSibling->getAttribute('var'));
                         $cadCondicionElseif = $objIf->nextSibling->getAttribute('cond');
                         if ($this->_comprobarCondicion($variableElseif, $cadCondicionElseif)) {
                             $objFrag = $this->_obtenerElementos($objDom, $objIf->nextSibling);
