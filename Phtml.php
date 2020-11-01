@@ -131,7 +131,7 @@ class Phtml
         'ucfirst', 'urlencode', 'urldecode',
         'trim', 'rtrim', 'ltrim', 'htmlentities',
         'html_entity_decode', 'addslashes', 'stripcslashes',
-        'htmlspecialchars'
+        'htmlspecialchars', 'strlen'
     );
 
 
@@ -547,15 +547,15 @@ class Phtml
                             case 'lessthan_equalto':
                                 return ($mixedVar <= $cadOperador);
                             case 'permitted_regexp':
-                                return (preg_match($cadOperador, $mixedVar) ? true : false);
+                                return (preg_match($cadOperador, $mixedVar));
                             case 'not_permitted_regexp':
-                                return (preg_match($cadOperador, $mixedVar) ? false : true);
+                                return (!preg_match($cadOperador, $mixedVar));
                             case 'maxlength':
-                                return (strlen($mixedVar) <= $cadOperador ? true : false);
+                                return (strlen($mixedVar) <= (int)$cadOperador);
                             case 'minlength':
-                                return (strlen($mixedVar) >= $cadOperador ? true : false);
+                                return (strlen($mixedVar) >= (int)$cadOperador);
                             case 'length':
-                                return (strlen($mixedVar) == $cadOperador ? true : false);
+                                return (strlen($mixedVar) == (int)$cadOperador);
                             case 'permitted_characters':
                                 $totalCaracteres = strlen($mixedVar);
                                 for ($i = 0; $i < $totalCaracteres; $i++) {
@@ -575,7 +575,7 @@ class Phtml
                                 }
                                 return (true);
                             default:
-                                return($mixedVar == $cadCondicion);
+                                return ($mixedVar == $cadCondicion);
                         }
                     } else {
                         return ($mixedVar == $cadCondicion);
@@ -782,6 +782,9 @@ class Phtml
             case 'htmlespecialschars':
                 $cadFormateada = htmlspecialchars($mixedVar);
                 break;
+            case 'strlen':
+                $cadFormateada = strlen($mixedVar);
+                break;
             default:
                 $cadFormateada = $mixedVar;
                 break;
@@ -909,12 +912,28 @@ class Phtml
     {
         $objDom = $this->_obtenerObjDOM($this->_cadContenido);
         $objIf = $objDom->getElementsByTagName('if')->item(0);
-        $variableIf = $this->_importarVariable($objIf->getAttribute('var'));
-        $cadCondIf = $objIf->getAttribute('cond');
-        $cadCondAnd = $objIf->getAttribute('and');
-        $cadCondOr = $objIf->getAttribute('or');
+        $varIf = $this->_importarVariable($objIf->getAttribute('var'));
+        $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_comprobarCondicion($varIf, $objIf->getAttribute('cond')) : isset($varIf);
+        $cadCompare = $objIf->hasAttribute('compare') ? $objIf->getAttribute('compare') : 'and';
         $objFrag = null;
-        if ($this->_comprobarCondicion($variableIf, $cadCondIf)) {
+        $bolPaseIf = false;
+
+
+        if ($objIf->hasAttribute('and') && !$objIf->hasAttribute('or')) {
+            $bolPaseIf = $bolCondIf && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and'));
+        } else if ($objIf->hasAttribute('or') && !$objIf->hasAttribute('and')) {
+            $bolPaseIf = $bolCondIf || $this->_comprobarCondicion($varIf, $objIf->getAttribute('or'));
+        } else if ($objIf->hasAttribute('and') && $objIf->hasAttribute('or') && $cadCompare == 'and') {
+            $bolPaseIf = $bolCondIf && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and')) || $this->_comprobarCondicion($varIf, $objIf->getAttribute('or'));
+        } else if ($objIf->hasAttribute('and') && $objIf->hasAttribute('or') && $cadCompare == 'or') {
+            $bolPaseIf = $bolCondIf || $this->_comprobarCondicion($varIf, $objIf->getAttribute('or')) && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and'));
+        } else {
+            $bolPaseIf = $bolCondIf;
+        }
+
+
+
+        if ($bolPaseIf) {
             $objFrag = $this->_obtenerElementos($objDom, $objIf);
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || strtolower(@$objIf->nextSibling->nodeName) == 'else' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 $objIf->parentNode->removeChild($objIf->nextSibling);
@@ -923,9 +942,23 @@ class Phtml
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 if (strtolower(@$objIf->nextSibling->nodeName) == 'elseif') {
                     if (!$objFrag) {
-                        $variableElseif = $this->_importarVariable($objIf->nextSibling->getAttribute('var'));
-                        $cadCondicionElseif = $objIf->nextSibling->getAttribute('cond');
-                        if ($this->_comprobarCondicion($variableElseif, $cadCondicionElseif)) {
+                        $varElseIf = $this->_importarVariable($objIf->nextSibling->getAttribute('var'));
+                        $bolCondElseIf  = $objIf->nextSibling->hasAttribute('cond') ? $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('cond')) : isset($varElseIf);
+                        $cadCompareElseIf = $objIf->nextSibling->hasAttribute('compare') ? $objIf->nextSibling->getAttribute('compare') : 'and';
+                        if ($objIf->nextSibling->hasAttribute('and') && !$objIf->nextSibling->hasAttribute('or')) {
+                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('and'));
+                        } else if ($objIf->nextSibling->hasAttribute('or') && !$objIf->nextSibling->hasAttribute('and')) {
+                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('or'));
+                        } else if ($objIf->nextSibling->hasAttribute('and') && $objIf->nextSibling->hasAttribute('or') && $cadCompareElseIf == 'and') {
+                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('and')) || $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('or'));
+                        } else if ($objIf->nextSibling->hasAttribute('and') && $objIf->nextSibling->hasAttribute('or') && $cadCompareElseIf == 'or') {
+                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('or')) && $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('and'));
+                        } else {
+                            $bolPaseElseIf = $bolCondElseIf;
+                        }
+
+
+                        if ($bolPaseElseIf) {
                             $objFrag = $this->_obtenerElementos($objDom, $objIf->nextSibling);
                         }
                     }

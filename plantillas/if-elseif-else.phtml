@@ -1,9 +1,10 @@
 <!-- Este comentario configurable eliminacion -->
-<if var="edad" cond="equalto.5">
-    <p>Contenido del bloque <b>if</b></p>
+<if var="nombre" cond="equalto.ovidiu">
+    <p>La variable nombre tiene el valor de <b>{{nombre}}</b></p>
+    <p>y una longitud de <b>{{strlen.nombre}}</b></p>
 </if>
 <!-- este comentario se eliminara -->
-<elseif var="edad" cond="equalto.35">
+<elseif var="nombre" cond="equalto.Drasgos" or="length.6" and="length.s" compare="or">
     <p>Contenido del bloque <b>elseif 1</b></p>
 </elseif>
 <!-- este comentario se eliminara -->
