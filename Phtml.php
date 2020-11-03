@@ -458,8 +458,8 @@ class Phtml
     /**
      * Crea un identificador aleatorio
      * 
-     * @param string $cadClave
-     * @return string 
+     * @param string $cadClave la cadena que se quiere encriptar
+     * @return string devuelve una cadena encriptada aleatoria
      */
     private function _crearIdAleatorio($cadClave)
     {
@@ -477,11 +477,13 @@ class Phtml
      * @return string la cadena con los caracteres escapados
      */
     private function _escaparMetaCaracteres($cadEntrada) {
-        $arrCaracteresMeta = array('.', '\\', '+', '*', '?', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-');
-        $arrCaracteresEsc = array('\.', '\\\\', '\+', '\*', '\?', '\[', '\^', '\]', '\$', '\(', '\)', '\{', '\}', '\=', '\!', '\<', '\>', '\|', '\:', '\-');
+        $arrCaracteresMeta = array('\\', '.',  '+', '*', '?', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-');
+        $arrCaracteresEsc = array('\\\\', '\.', '\+', '\*', '\?', '\[', '\^', '\]', '\$', '\(', '\)', '\{', '\}', '\=', '\!', '\<', '\>', '\|', '\:', '\-');
         $cadEntrada = str_replace($arrCaracteresMeta, $arrCaracteresEsc, $cadEntrada);
         return($cadEntrada);
     }
+
+
 
     /**
      * Comprueba que la variable cumpla una condicion
