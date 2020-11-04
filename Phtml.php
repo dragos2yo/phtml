@@ -1227,7 +1227,7 @@ class Phtml
      * <do>
      *      contenido de do
      * </do>
-     * <while var="variable" init="0" fin="count" index="i">
+     * <while var="variable" init="0" size="count" index="i">
      *      contenido del bloque while
      * </while>
      */
@@ -1245,7 +1245,7 @@ class Phtml
     {
         $this->_compilar_const();
         $this->_compilar_var();
-        $cadPatron = '/<(if|switch|foreach|for|while|include)[\s]*.*?>(.*?)<\/(if|switch|foreach|for|while|include)>/is';
+        $cadPatron = '/<(if|switch|foreach|for[\s]|while|include)[\s]*.*?>(.*?)<\/(if|switch|foreach|for|while|include)>/is';
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower($arrResultado[1]);
             $this->{'_compilar_' . $nombreTag}();
@@ -1256,6 +1256,17 @@ class Phtml
         }
         $this->_compilar_var(true);
     }
+
+
+    /* private function _compilarDom() {
+        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
+
+        while(($nodo = $objDom->getElementsByTagName('else')->item(0)) || ($nodo = $objDom->getElementsByTagName('if')->item(0))) {
+            //$nombreTag = $nodo->nodeName;
+            print_pre($nodo);
+            break;
+        }
+    } */
 
 
     /**
