@@ -120,6 +120,12 @@ class Phtml
      */
     private $_esAnonima;
 
+    /**
+     * @var string $_cadEncoding
+     */
+    private $_cadEncoding;
+
+
 
     /**
      * @var array $_arrMetodos
@@ -157,6 +163,7 @@ class Phtml
         $this->_bolEjecutarPhp        = defined('PHTML_EJECUTAR_PHP')        ? PHTML_EJECUTAR_PHP        : true;
         $this->_bolEjecutarMetodos    = defined('PHTML_EJECUTAR_METODO')     ? PHTML_EJECUTAR_METODO     : true;
         $this->_bolEliminarComentario = defined('PHTML_ELIMINAR_COMENTARIO') ? PHTML_ELIMINAR_COMENTARIO : true;
+        $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
         $this->_idAleatorio = $this->_crearIdAleatorio($cadClave);
     }
@@ -262,7 +269,9 @@ class Phtml
     {
         $objDom = new DOMDocument;
         libxml_use_internal_errors(true);
-        $objDom->loadHTML('<phtml id="' . $this->_idAleatorio . '">' . $cadContenido . '</phtml>');
+        $cadContenido = '<phtml id="' . $this->_idAleatorio . '">' . $cadContenido . '</phtml>';
+        $cadContenidoEncodado = mb_convert_encoding($cadContenido, 'HTML-ENTITIES', $this->_cadEncoding);
+        @$objDom->loadHTML($cadContenidoEncodado);
         libxml_clear_errors();
         return ($objDom);
     }
@@ -1256,17 +1265,6 @@ class Phtml
         }
         $this->_compilar_var(true);
     }
-
-
-    /* private function _compilarDom() {
-        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
-
-        while(($nodo = $objDom->getElementsByTagName('else')->item(0)) || ($nodo = $objDom->getElementsByTagName('if')->item(0))) {
-            //$nombreTag = $nodo->nodeName;
-            print_pre($nodo);
-            break;
-        }
-    } */
 
 
     /**
