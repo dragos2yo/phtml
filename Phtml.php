@@ -177,7 +177,7 @@ class Phtml
                 $this->_arrContenido[$indice] = $cadContenido;
             }
         } else {
-            $this->_arrContenido['PHTML'] .= $cadContenido;
+            $this->_arrContenido[$this->_idAleatorio] .= $cadContenido;
         }
     }
 
@@ -298,7 +298,7 @@ class Phtml
      * 
      * @param object DOMDocument $objDom
      * @param object DOMNode $objNodo
-     * @return object DOMDocumentFragment
+     * @return object DOMDocumentFragment 
      */
     private function _obtenerElementos(DOMDocument $objDom, DOMNode $objNodo)
     {
@@ -349,9 +349,9 @@ class Phtml
      * @return mixed devuelve el valor que contiene la variable
      */
     private function _importarVariable($cadVariable)
-    {   
-        if(is_null($cadVariable)) {
-            return(null);
+    {
+        if (is_null($cadVariable)) {
+            return (null);
         }
         $varTemporal = null;
         if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
@@ -477,11 +477,12 @@ class Phtml
      * 
      * @return string la cadena con los caracteres escapados
      */
-    private function _escaparMetaCaracteres($cadEntrada) {
+    private function _escaparMetaCaracteres($cadEntrada)
+    {
         $arrCaracteresMeta = array('\\', '.',  '+', '*', '?', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-');
         $arrCaracteresEsc = array('\\\\', '\.', '\+', '\*', '\?', '\[', '\^', '\]', '\$', '\(', '\)', '\{', '\}', '\=', '\!', '\<', '\>', '\|', '\:', '\-');
         $cadEntrada = str_replace($arrCaracteresMeta, $arrCaracteresEsc, $cadEntrada);
-        return($cadEntrada);
+        return ($cadEntrada);
     }
 
 
@@ -1136,13 +1137,13 @@ class Phtml
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
         $format            = $objFor->hasAttribute('format') ? $objFor->getAttribute('format') : 'd-m-Y';
-        if($objFor->hasAttribute('order')) {
-            switch(strtolower(trim($objFor->getAttribute('order')))) {
+        if ($objFor->hasAttribute('order')) {
+            switch (strtolower(trim($objFor->getAttribute('order')))) {
                 case 'desc':
                     $asc = false;
                     break;
                 case 'asc':
-                    $asc = true;      
+                    $asc = true;
                     break;
             }
         } else {
