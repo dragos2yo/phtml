@@ -1,5 +1,4 @@
 <?php
-include('config.php');
 
 class Phtml
 {
@@ -116,15 +115,9 @@ class Phtml
 
 
     /**
-     * @var boolean $_esAnonima;
-     */
-    private $_esAnonima;
-
-    /**
      * @var string $_cadEncoding
      */
     private $_cadEncoding;
-
 
 
     /**
@@ -356,8 +349,11 @@ class Phtml
      * @return mixed devuelve el valor que contiene la variable
      */
     private function _importarVariable($cadVariable)
-    {
-        $this->_esAnonima = false;
+    {   
+        if(is_null($cadVariable)) {
+            return(null);
+        }
+        $varTemporal = null;
         if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
             $arrVar = explode('.', $cadVariable);
             $numParametros    = sizeof($arrVar);
@@ -367,8 +363,7 @@ class Phtml
                     if (isset($this->_arrVariables[$arrVar[0]])) {
                         $varTemporal = $this->_arrVariables[$arrVar[0]];
                     } else { // admitir valores anonimos
-                        $varTemporal = $arrVar[0];
-                        $this->_esAnonima = true;
+                        $varTemporal = null;
                     }
                     break;
                 case 2:
@@ -455,10 +450,7 @@ class Phtml
                     // depurar variables mulinivel 2
                     break; */
             }
-        } else { // admitir valores anonimos
-            $varTemporal = $cadVariable;
-            $this->_esAnonima = true;
-        }
+        } 
         return ($varTemporal);
     }
 
@@ -467,14 +459,29 @@ class Phtml
     /**
      * Crea un identificador aleatorio
      * 
-     * @param string $cadClave
-     * @return string 
+     * @param string $cadClave la cadena que se quiere encriptar
+     * @return string devuelve una cadena encriptada aleatoria
      */
     private function _crearIdAleatorio($cadClave)
     {
         $contexto = hash_init('sha256', HASH_HMAC, '/^P|-|T|V||_$dPm/' . rand(0, 1000));
         hash_update($contexto, $cadClave);
         return (hash_final($contexto));
+    }
+
+
+    /**
+     * Escapa los metacaracteres usados por expresiones regulares
+     * 
+     * @param string $cadEntrada la cadena que contiene los caracteres
+     * 
+     * @return string la cadena con los caracteres escapados
+     */
+    private function _escaparMetaCaracteres($cadEntrada) {
+        $arrCaracteresMeta = array('\\', '.',  '+', '*', '?', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-');
+        $arrCaracteresEsc = array('\\\\', '\.', '\+', '\*', '\?', '\[', '\^', '\]', '\$', '\(', '\)', '\{', '\}', '\=', '\!', '\<', '\>', '\|', '\:', '\-');
+        $cadEntrada = str_replace($arrCaracteresMeta, $arrCaracteresEsc, $cadEntrada);
+        return($cadEntrada);
     }
 
 
@@ -690,7 +697,7 @@ class Phtml
      */
     private function _reemplazarVariable($cadBuscar, $cadReemplazar, $cadContenido = '')
     {
-        $patron = '/' . $this->_abreVariable . '\s*' . str_replace('.', '\.', $cadBuscar) . '\s*' . $this->_cierraVariable  . '/';
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
         while (@preg_match($patron, $cadContenido)) {
             $cadContenido = @preg_replace($patron, $cadReemplazar, $cadContenido);
         }
@@ -714,7 +721,7 @@ class Phtml
      */
     private function _reemplazarVariableEtc($cadBuscar, $cadReemplazar, $cadContenido = '')
     {
-        $patron = '/' . $this->_abreVariable . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_cierraVariable  . '/';
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
             $reemplazo = $this->_abreVariable . $cadReemplazar . '.' . $arrResultado[1] . $this->_cierraVariable;
             $cadContenido = @preg_replace($patron, $reemplazo, $cadContenido);
@@ -812,27 +819,27 @@ class Phtml
     {
         $bolEliminar = false;
         $cadContenido = '';
-        $patron = '/' . $this->_abreVariable . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_cierraVariable .  '/';
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable) .  '/';
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
                 if (sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
                     $mixedVar = $this->_importarVariable($arrVar[1]);
-                    if (!empty($mixedVar) && !$this->_esAnonima) {
+                    if (!empty($mixedVar)) {
                         $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
                     } else {
                         $bolEliminar = true;
                     }
                 } else {
                     $mixedVar = $this->_importarVariable($arrResultado[1][$i]);
-                    if (!empty($mixedVar) && !$this->_esAnonima) {
+                    if (!empty($mixedVar)) {
                         $cadContenido = $mixedVar;
                     } else {
                         $bolEliminar = true;
                     }
                 }
-                if ($bolEliminar && $eliminarVariables) {
+                if ($bolEliminar && $eliminarVariables == true) {
                     $cadContenido = '';
                 }
                 $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
@@ -847,7 +854,7 @@ class Phtml
      */
     private function _compilar_const()
     {
-        $patron = '/' . str_replace('[', '\[', $this->_abreConstante) . '\s*([^0-9][A-Z0-9_]+)\s*' . str_replace(']', '\]', $this->_cierraConstante) .  '/';
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreConstante) . '\s*([^0-9][A-Z0-9_]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraConstante) .  '/';
         while (preg_match($patron, $this->_cadContenido, $arrResultado)) {
             if (defined($arrResultado[1])) {
                 $cadContenido = constant($arrResultado[1]);
@@ -919,15 +926,12 @@ class Phtml
      */
     private function _compilar_if()
     {
-        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
-        $objIf = $objDom->getElementsByTagName('if')->item(0);
-        $varIf = $this->_importarVariable($objIf->getAttribute('var'));
+        $objDom     = $this->_obtenerObjDOM($this->_cadContenido);
+        $objIf      = $objDom->getElementsByTagName('if')->item(0);
+        $varIf      = $objIf->hasAttribute('var') && $objIf->getattribute('var') != '' ? $this->_importarVariable($objIf->getAttribute('var')) : null;
         $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_comprobarCondicion($varIf, $objIf->getAttribute('cond')) : isset($varIf);
-        $cadCompare = $objIf->hasAttribute('compare') ? $objIf->getAttribute('compare') : 'and';
-        $objFrag = null;
-        $bolPaseIf = false;
-
-
+        $cadCompare = $objIf->hasAttribute('compare') ? strtolower(trim($objIf->getAttribute('compare'))) : 'and';
+        $objFrag    = null;
         if ($objIf->hasAttribute('and') && !$objIf->hasAttribute('or')) {
             $bolPaseIf = $bolCondIf && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and'));
         } else if ($objIf->hasAttribute('or') && !$objIf->hasAttribute('and')) {
@@ -939,9 +943,6 @@ class Phtml
         } else {
             $bolPaseIf = $bolCondIf;
         }
-
-
-
         if ($bolPaseIf) {
             $objFrag = $this->_obtenerElementos($objDom, $objIf);
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || strtolower(@$objIf->nextSibling->nodeName) == 'else' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
@@ -950,25 +951,24 @@ class Phtml
         } else {
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 if (strtolower(@$objIf->nextSibling->nodeName) == 'elseif') {
+                    $objElseif = $objIf->nextSibling;
                     if (!$objFrag) {
-                        $varElseIf = $this->_importarVariable($objIf->nextSibling->getAttribute('var'));
-                        $bolCondElseIf  = $objIf->nextSibling->hasAttribute('cond') ? $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('cond')) : isset($varElseIf);
-                        $cadCompareElseIf = $objIf->nextSibling->hasAttribute('compare') ? $objIf->nextSibling->getAttribute('compare') : 'and';
-                        if ($objIf->nextSibling->hasAttribute('and') && !$objIf->nextSibling->hasAttribute('or')) {
-                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('and'));
-                        } else if ($objIf->nextSibling->hasAttribute('or') && !$objIf->nextSibling->hasAttribute('and')) {
-                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('or'));
-                        } else if ($objIf->nextSibling->hasAttribute('and') && $objIf->nextSibling->hasAttribute('or') && $cadCompareElseIf == 'and') {
-                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('and')) || $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('or'));
-                        } else if ($objIf->nextSibling->hasAttribute('and') && $objIf->nextSibling->hasAttribute('or') && $cadCompareElseIf == 'or') {
-                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('or')) && $this->_comprobarCondicion($varElseIf, $objIf->nextSibling->getAttribute('and'));
+                        $varElseIf      = $objElseif->hasAttribute('var') && $objElseif->getattribute('var') != '' ? $this->_importarVariable($objElseif->getAttribute('var')) : null;
+                        $bolCondElseIf  = $objElseif->hasAttribute('cond') ? $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('cond')) : isset($varElseIf);
+                        $cadCompareElseIf = $objElseif->hasAttribute('compare') ? strtolower(trim($objElseif->getAttribute('compare'))) : 'and';
+                        if ($objElseif->hasAttribute('and') && !$objElseif->hasAttribute('or')) {
+                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('and'));
+                        } else if ($objElseif->hasAttribute('or') && !$objElseif->hasAttribute('and')) {
+                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('or'));
+                        } else if ($objElseif->hasAttribute('and') && $objElseif->hasAttribute('or') && $cadCompareElseIf == 'and') {
+                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('and')) || $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('or'));
+                        } else if ($objElseif->hasAttribute('and') && $objElseif->hasAttribute('or') && $cadCompareElseIf == 'or') {
+                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('or')) && $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('and'));
                         } else {
                             $bolPaseElseIf = $bolCondElseIf;
                         }
-
-
                         if ($bolPaseElseIf) {
-                            $objFrag = $this->_obtenerElementos($objDom, $objIf->nextSibling);
+                            $objFrag = $this->_obtenerElementos($objDom, $objElseif);
                         }
                     }
                 }
@@ -1018,16 +1018,27 @@ class Phtml
     {
         $objDom = $this->_obtenerObjDOM($this->_cadContenido);
         $objSwitch = $objDom->getElementsByTagName('switch')->item(0);
-        $variable = $this->_importarVariable($objSwitch->getAttribute('var'));
+        $varSwitch      = $objSwitch->hasAttribute('var') && $objSwitch->getattribute('var') != '' ? $this->_importarVariable($objSwitch->getAttribute('var')) : null;
         $objFrag = null;
         while (strtolower(@$objSwitch->firstChild->nodeName) == 'case' || @$objSwitch->firstChild->nodeType == XML_COMMENT_NODE || (@$objSwitch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$objSwitch->firstChild->textContent))) {
             if (strtolower(@$objSwitch->firstChild->nodeName) == 'case') {
                 if (!$objFrag) {
-                    $cadCondicion = $objSwitch->firstChild->getAttribute('cond');
-                    $cadCondicionAnd = $objSwitch->firstChild->getAttribute('and');
-                    $cadCondicionOr = $objSwitch->firstChild->getAttribute('or');
-                    if ($this->_comprobarCondicion($variable, $cadCondicion)) {
-                        $objFrag = $this->_obtenerElementos($objDom, $objSwitch->firstChild);
+                    $objCase = $objSwitch->firstChild;
+                    $bolCond  = $objCase->hasAttribute('cond') ? $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('cond')) : isset($varSwitch);
+                    $cadCompare = $objCase->hasAttribute('compare') ? $objCase->getAttribute('compare') : 'and';
+                    if ($objCase->hasAttribute('and') && !$objCase->hasAttribute('or')) {
+                        $bolPase = $bolCond && $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('and'));
+                    } else if ($objCase->hasAttribute('or') && !$objCase->hasAttribute('and')) {
+                        $bolPase = $bolCond || $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('or'));
+                    } else if ($objCase->hasAttribute('and') && $objCase->hasAttribute('or') && $cadCompare == 'and') {
+                        $bolPase = $bolCond && $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('and')) || $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('or'));
+                    } else if ($objCase->hasAttribute('and') && $objCase->hasAttribute('or') && $cadCompare == 'or') {
+                        $bolPase = $bolCond || $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('or')) && $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('and'));
+                    } else {
+                        $bolPase = $bolCond;
+                    }
+                    if ($bolPase) {
+                        $objFrag = $this->_obtenerElementos($objDom, $objCase);
                     }
                 }
             }
@@ -1066,10 +1077,10 @@ class Phtml
     {
         $objDom         = $this->_obtenerObjDOM($this->_cadContenido);
         $objForeach     = $objDom->getElementsByTagName('foreach')->item(0);
-        $cadVariable    = $objForeach->getAttribute('var');
-        $cadClave       = $objForeach->getAttribute('key')   != '' ? $objForeach->getAttribute('key') : 'key';
-        $cadValor       = $objForeach->getAttribute('value') != '' ? $objForeach->getAttribute('value') : 'value';
-        $id             = $objForeach->getAttribute('id')    != '' ? $objForeach->getAttribute('id') . '.' : '';
+        $cadVariable    = $objForeach->hasAttribute('var') && $objForeach->getAttribute('var') != '' ? $objForeach->getAttribute('var') : null;
+        $cadClave       = $objForeach->hasAttribute('key') ? $objForeach->getAttribute('key') : 'key';
+        $cadValor       = $objForeach->hasAttribute('value') ? $objForeach->getAttribute('value') : 'value';
+        $id             = $objForeach->hasAttribute('id') ? $objForeach->getAttribute('id') . '.' : '';
         $cadContenido   = $this->_obtenerHTML($objForeach);
         $mixedVar       = $this->_importarVariable($cadVariable);
         $objFrag        = null;
@@ -1117,15 +1128,26 @@ class Phtml
     {
         $objDom            = $this->_obtenerObjDOM($this->_cadContenido);
         $objFor            = $objDom->getElementsByTagName('for')->item(0);
-        $cadVariable       = $objFor->getAttribute('var');
+        $cadVariable       = $objFor->hasAttribute('var') && $objFor->getAttribute('var') != '' ? $objFor->getAttribute('var') : null;
         $mixedVar          = $this->_importarVariable($cadVariable);
-        $id                = $objFor->getAttribute('id') != '' ? $objFor->getAttribute('id') . '.' : '';
+        $id                = $objFor->hasAttribute('id') ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
-        $cadIndice         = $objFor->getAttribute('index') != '' ? $objFor->getAttribute('index')    : 'i';
+        $cadIndice         = $objFor->hasAttribute('index') ? $objFor->getAttribute('index')    : 'i';
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
-        $format            = $objFor->getAttribute('format') != '' ? $objFor->getAttribute('format') : 'd-m-Y';
-        $asc               = strtolower($objFor->getAttribute('order')) == 'desc' ? false : true;
+        $format            = $objFor->hasAttribute('format') ? $objFor->getAttribute('format') : 'd-m-Y';
+        if($objFor->hasAttribute('order')) {
+            switch(strtolower(trim($objFor->getAttribute('order')))) {
+                case 'desc':
+                    $asc = false;
+                    break;
+                case 'asc':
+                    $asc = true;      
+                    break;
+            }
+        } else {
+            $asc = true;
+        }
         $cadContenido      = $this->_obtenerHTML($objFor);
         $cadProcesada      = '';
         $objFrag           = null;
@@ -1136,8 +1158,8 @@ class Phtml
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
-        if ($cadVariable != '' && !empty($mixedVar)) {
-            if (is_array($mixedVar)) {
+        if ($objFor->hasAttribute('var') && !empty($mixedVar)) { // solo variables
+            if (is_array($mixedVar)) { // arreglos
                 switch ($cadTotal) {
                     case '':
                     case 'size':
@@ -1150,7 +1172,7 @@ class Phtml
                         $max = $cadTotal;
                         break;
                 }
-            } else if (is_string($mixedVar)) {
+            } else if (is_string($mixedVar)) { // cadenas
                 switch ($cadTotal) {
                     case '':
                     case 'size':
@@ -1163,7 +1185,7 @@ class Phtml
                         break;
                 }
             }
-        } else {
+        } else { // no variables solo index
             if (preg_match('/^[0-9\.]+?$/', $cadTotal)) { // numeros
                 $max = (int)$cadTotal;
             } else {
@@ -1171,7 +1193,7 @@ class Phtml
                 if (preg_match($patronFecha, $init, $arrResultado)) {
                     $fecha = $arrResultado[1] . '-' .  $arrResultado[2] . '-' . $arrResultado[3] . (isset($arrResultado[4]) ? ' ' . $arrResultado[4]  . (isset($arrResultado[5]) ?  $arrResultado[5] : '') : '');
                     $init = strtotime($fecha);
-                    if (preg_match($patronFecha, $cadTotal, $arrResultado)) {
+                    if (preg_match($patronFecha, $cadTotal, $arrResultado)) { // fechas
                         $fecha = $arrResultado[1] . '-' .  $arrResultado[2] . '-' . $arrResultado[3] . (isset($arrResultado[4]) ? ' ' . $arrResultado[4]  . (isset($arrResultado[5]) ?  $arrResultado[5] : '') : '');
                         $max = strtotime($fecha);
                         $max += 86400;
@@ -1179,7 +1201,7 @@ class Phtml
                         $max = strtotime('now');
                     }
                     $esFecha = true;
-                } else {
+                } else { // cadenas
                     $max = $cadTotal;
                     if (preg_match('/[a-zA-Z]/', $max) || preg_match('/[a-zA-Z]/', $init)) {
                         if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', $init)) {
@@ -1209,9 +1231,9 @@ class Phtml
                 $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, date($format, $i), $cadProcesada);
             } else {
                 if ($offset != '') {
-                    eval('$offsetCalculado=' . $i . $offset . ';');
+                    eval('$o=' . $i . $offset . ';');
                 }
-                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($offsetCalculado) ? $offsetCalculado : $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($o) ? $o : $i, $cadProcesada);
                 $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
             }
         }
@@ -1236,7 +1258,7 @@ class Phtml
      * <do>
      *      contenido de do
      * </do>
-     * <while var="variable" init="0" size="count" index="i">
+     * <while var="variable" init="0" fin="count" index="i">
      *      contenido del bloque while
      * </while>
      */
