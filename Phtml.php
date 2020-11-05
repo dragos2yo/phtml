@@ -820,7 +820,6 @@ class Phtml
     {
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable) .  '/';
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
-            print_pre($arrResultado);
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
@@ -1131,7 +1130,7 @@ class Phtml
     {
         $objDom            = $this->_obtenerObjDOM($this->_cadContenido);
         $objFor            = $objDom->getElementsByTagName('for')->item(0);
-        $cadVariable       = $objFor->hasAttribute('var') && $objFor->getAttribute('var') != '' ? $objFor->getAttribute('var') : null;
+        $cadVariable       = $objFor->getAttribute('var') != '' ? $objFor->getAttribute('var') : null;
         $mixedVar          = $this->_importarVariable($cadVariable);
         $id                = $objFor->hasAttribute('id') ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
@@ -1279,9 +1278,9 @@ class Phtml
     {
         $this->_compilar_const();
         $this->_compilar_var();
-        $cadPatron = '/<(if|switch|foreach|for[\s]|while|include)[\s]*.*?>(.*?)<\/(if|switch|foreach|for|while|include)>/is';
+        $cadPatron = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
-            $nombreTag = strtolower($arrResultado[1]);
+            $nombreTag = strtolower(trim($arrResultado[1]));
             $this->{'_compilar_' . $nombreTag}();
             if ($nombreTag == 'include') {
                 $this->_compilar_const();
