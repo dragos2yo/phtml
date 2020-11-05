@@ -631,7 +631,7 @@ class Phtml
         $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*[\'|"]/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
             $patronReemplazo = 'var="' .  $cadReemplazar . '.' . $arrResultado[1] . '"';
-            $cadContenido = @preg_replace($patron, $patronReemplazo, $cadContenido);
+            $cadContenido = @preg_replace($arrResultado[0], $patronReemplazo, $cadContenido);
         }
         return ($cadContenido);
     }
@@ -669,9 +669,9 @@ class Phtml
     private function _reemplazarComillas($cadBuscar, $cadReemplazar, $cadContenido = '')
     {
         $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\s*[\'|"]/';
-        while (@preg_match($patron, $cadContenido)) {
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
             $patronReemplazo = 'var="' .  $cadReemplazar . '"';
-            $cadContenido = @preg_replace($patron, $patronReemplazo, $cadContenido);
+            $cadContenido = @preg_replace($arrResultado[0], $patronReemplazo, $cadContenido);
         }
         return ($cadContenido);
     }
@@ -700,8 +700,8 @@ class Phtml
     private function _reemplazarVariable($cadBuscar, $cadReemplazar, $cadContenido = '')
     {
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
-        while (@preg_match($patron, $cadContenido)) {
-            $cadContenido = @preg_replace($patron, $cadReemplazar, $cadContenido);
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $cadContenido = @preg_replace($arrResultado[0], $cadReemplazar, $cadContenido);
         }
         return ($cadContenido);
     }
@@ -726,7 +726,7 @@ class Phtml
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
             $reemplazo = $this->_abreVariable . $cadReemplazar . '.' . $arrResultado[1] . $this->_cierraVariable;
-            $cadContenido = @preg_replace($patron, $reemplazo, $cadContenido);
+            $cadContenido = @preg_replace($arrResultado[0], $reemplazo, $cadContenido);
         }
         return ($cadContenido);
     }
