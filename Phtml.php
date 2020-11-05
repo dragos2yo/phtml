@@ -1287,7 +1287,7 @@ class Phtml
                 $this->_compilar_var();
             }
         }
-       // $this->_compilar_var(true);
+       $this->_compilar_var(true);
     }
 
 
