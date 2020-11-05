@@ -11,7 +11,7 @@ class Phtml
     /**
      * @var array $_arrContenido
      */
-    private $_arrContenido = array('PHTML' => '');
+    private $_arrContenido;
 
     /**
      * @var boolean $_bolCapturado
@@ -159,6 +159,7 @@ class Phtml
         $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
         $this->_idAleatorio = $this->_crearIdAleatorio($cadClave);
+        $this->_arrContenido[$this->_idAleatorio] = '';
     }
 
 
@@ -1302,7 +1303,7 @@ class Phtml
         if (isset($indice)) {
             $this->_cadContenido = $this->_arrContenido[$indice];
         } else {
-            $this->_cadContenido = $this->_arrContenido['PHTML'];
+            $this->_cadContenido = $this->_arrContenido[$this->_idAleatorio];
         }
         $this->_compilar();
         if ($this->_bolComprimir) {
