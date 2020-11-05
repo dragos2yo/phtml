@@ -451,7 +451,9 @@ class Phtml
                     // depurar variables mulinivel 2
                     break; */
             }
-        } 
+        } else { // no variables
+            $varTemporal = $cadVariable;
+        }
         return ($varTemporal);
     }
 
@@ -573,7 +575,12 @@ class Phtml
                             case 'minlength':
                                 return (strlen($mixedVar) >= (int)$cadOperador);
                             case 'length':
-                                return (strlen($mixedVar) == (int)$cadOperador);
+                                if (is_array($mixedVar)) {
+                                    print_pre($mixedVar);
+                                    return (sizeof($mixedVar) == (int)$cadOperador);
+                                } else {
+                                    return (strlen($mixedVar) == (int)$cadOperador);
+                                }
                             case 'permitted_characters':
                                 $totalCaracteres = strlen($mixedVar);
                                 for ($i = 0; $i < $totalCaracteres; $i++) {
@@ -829,7 +836,7 @@ class Phtml
                     if (!empty($mixedVar)) {
                         $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
                     } else {
-                        if($eliminarVariables) {
+                        if ($eliminarVariables) {
                             $cadContenido = '';
                         }
                     }
@@ -838,12 +845,12 @@ class Phtml
                     if (!empty($mixedVar)) {
                         $cadContenido = $mixedVar;
                     } else {
-                        if($eliminarVariables) {
+                        if ($eliminarVariables) {
                             $cadContenido = '';
                         }
                     }
                 }
-                if(isset($cadContenido)) {
+                if (isset($cadContenido)) {
                     $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
                 }
             }
@@ -1288,7 +1295,7 @@ class Phtml
                 $this->_compilar_var();
             }
         }
-       $this->_compilar_var(true);
+        $this->_compilar_var(true);
     }
 
 
