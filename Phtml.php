@@ -818,10 +818,9 @@ class Phtml
      */
     private function _compilar_var($eliminarVariables = false)
     {
-        $bolEliminar = false;
-        $cadContenido = '';
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable) .  '/';
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
+            print_pre($arrResultado);
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
@@ -830,20 +829,23 @@ class Phtml
                     if (!empty($mixedVar)) {
                         $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
                     } else {
-                        $bolEliminar = true;
+                        if($eliminarVariables) {
+                            $cadContenido = '';
+                        }
                     }
                 } else {
                     $mixedVar = $this->_importarVariable($arrResultado[1][$i]);
                     if (!empty($mixedVar)) {
                         $cadContenido = $mixedVar;
                     } else {
-                        $bolEliminar = true;
+                        if($eliminarVariables) {
+                            $cadContenido = '';
+                        }
                     }
                 }
-                if ($bolEliminar && $eliminarVariables == true) {
-                    $cadContenido = '';
+                if(isset($cadContenido)) {
+                    $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
                 }
-                $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
             }
         }
     }
@@ -1286,7 +1288,7 @@ class Phtml
                 $this->_compilar_var();
             }
         }
-        $this->_compilar_var(true);
+       // $this->_compilar_var(true);
     }
 
 
