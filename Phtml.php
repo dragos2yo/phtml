@@ -574,6 +574,9 @@ class Phtml
                                 return (strlen($mixedVar) <= (int)$cadOperador);
                             case 'minlength':
                                 return (strlen($mixedVar) >= (int)$cadOperador);
+                            case 'size_equalto':
+                            case 'sizeof_equalto':
+                            case 'count_equalto':
                             case 'length':
                                 if (is_array($mixedVar)) {
                                     return (sizeof($mixedVar) == (int)$cadOperador);
