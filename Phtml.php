@@ -1,5 +1,4 @@
 <?php
-
 class Phtml
 {
 
@@ -437,7 +436,7 @@ class Phtml
                         }
                     } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
                         if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2]); // objeto metodo(param)
+                            $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2]); // objeto->metodo(param)
                         }
                     } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
                         if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
@@ -447,9 +446,28 @@ class Phtml
                         }
                     }
                     break;
-                    /* case 4:
-                    // depurar variables mulinivel 2
-                    break; */
+                    case 4:
+                        /** (*) agregar soporte variables globales multinivel */
+                        if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
+                            if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]])) {
+                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]]; // arreglo[][][]
+                            }
+                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
+                            if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                                $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2], $arrVar[3]); // objeto->metodo(param, param)
+                            }
+                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                            if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
+                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}($arrVar[3]); // objeto->metodo(param)
+                            }
+                        } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
+                            if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
+                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}; // objeto->propiedad
+                            } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
+                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}(); // objeto->metodo()
+                            }
+                        }
+                    break;
             }
         } else { // no variables
             $varTemporal = $cadVariable;
@@ -635,7 +653,7 @@ class Phtml
      * 
      * @return string
      */
-    private function _reemplazarComillasEtc($cadBuscar, $cadReemplazar, $cadContenido = '')
+    private function _reemplazarComillasEtc($cadBuscar, $cadReemplazar, $cadContenido)
     {
         $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*[\'|"]/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
@@ -675,7 +693,7 @@ class Phtml
      * 
      * @return string
      */
-    private function _reemplazarComillas($cadBuscar, $cadReemplazar, $cadContenido = '')
+    private function _reemplazarComillas($cadBuscar, $cadReemplazar, $cadContenido)
     {
         $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\s*[\'|"]/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
@@ -706,7 +724,7 @@ class Phtml
      * 
      * @return string
      */
-    private function _reemplazarVariable($cadBuscar, $cadReemplazar, $cadContenido = '')
+    private function _reemplazarVariable($cadBuscar, $cadReemplazar, $cadContenido)
     {
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
@@ -730,7 +748,7 @@ class Phtml
      * 
      * @return string devuele el contenido con los valores reemplazados
      */
-    private function _reemplazarVariableEtc($cadBuscar, $cadReemplazar, $cadContenido = '')
+    private function _reemplazarVariableEtc($cadBuscar, $cadReemplazar, $cadContenido)
     {
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
@@ -1140,7 +1158,7 @@ class Phtml
     {
         $objDom            = $this->_obtenerObjDOM($this->_cadContenido);
         $objFor            = $objDom->getElementsByTagName('for')->item(0);
-        $cadVariable       = $objFor->getAttribute('var') != '' ? $objFor->getAttribute('var') : null;
+        $cadVariable       = $objFor->getAttribute('var');
         $mixedVar          = $this->_importarVariable($cadVariable);
         $id                = $objFor->hasAttribute('id') ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
