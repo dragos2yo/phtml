@@ -1,4 +1,7 @@
 <?php
+include('formatPhtml.php');
+include('condPhtml.php');
+
 class Phtml
 {
 
@@ -119,18 +122,10 @@ class Phtml
     private $_cadEncoding;
 
 
-    /**
-     * @var array $_arrMetodos
-     * (*) agregar un objeto que contenga metodos de formato
-     */
-    private $_arrMetodos = array(
-        'upper', 'strtoupper', 'uppercase', 'lower',
-        'strtolower', 'lowercase', 'ucwords', 'camelcase',
-        'ucfirst', 'urlencode', 'urldecode',
-        'trim', 'rtrim', 'ltrim', 'htmlentities',
-        'html_entity_decode', 'addslashes', 'stripcslashes',
-        'htmlspecialchars', 'strlen'
-    );
+    private $_objFormat;
+
+
+    private $_objCond;
 
 
     /**
@@ -159,6 +154,14 @@ class Phtml
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
         $this->_idAleatorio = $this->_crearIdAleatorio($cadClave);
         $this->_arrContenido[$this->_idAleatorio] = '';
+
+        if(!is_a($this->_objFormat, 'formatPhtml')) {
+            $this->_objFormat = new formatPhtml;
+        }
+
+        if(!is_a($this->_objCond, 'condPhtml')) {
+            $this->_objCond = new condPhtml;
+        }
     }
 
 
@@ -269,6 +272,14 @@ class Phtml
         return ($objDom);
     }
 
+
+    public function agregarObjFormat(formatPhtml $objFormat) {
+        $this->_objFormat = $objFormat;
+    }
+
+    public function agregarObjCond(condPhtml $objCond) {
+        $this->_objCond = $objCond;
+    }
 
 
     /**
@@ -519,114 +530,15 @@ class Phtml
     private function _comprobarCondicion($mixedVar, $cadCondicion = '')
     {
         if ($cadCondicion != '') {
-            switch ($cadCondicion) {
-                case 'TRUE':
-                case 'true':
-                    return ($mixedVar == true);
-                case 'FALSE':
-                case 'false':
-                    return ($mixedVar == false);
-                case 'null':
-                case 'NULL':
-                case 'is_null':
-                    return (is_null($mixedVar));
-                case 'is_array':
-                    return (is_array($mixedVar));
-                case '!is_array':
-                    return (!is_array($mixedVar));
-                case 'is_object':
-                    return (is_object($mixedVar));
-                case '!is_object':
-                    return (!is_object($mixedVar));
-                case 'is_numeric':
-                    return (is_numeric($mixedVar));
-                case 'not_numeric':
-                case '!is_numeric':
-                    return (!is_numeric($mixedVar));
-                case 'is_int':
-                    return (is_int((int)$mixedVar));
-                case 'not_int':
-                case '!is_int':
-                    return (!is_int((int)$mixedVar));
-                case 'isset':
-                    return (isset($mixedVar));
-                case 'not_isset':
-                case '!isset':
-                    return (!isset($mixedVar));
-                case 'empty':
-                    return (empty($mixedVar));
-                case 'not_empty':
-                case '!empty':
-                    return (!empty($mixedVar));
-                case 'is_email':
-                    return (!filter_var($mixedVar, FILTER_VALIDATE_EMAIL) ? false : true);
-                default:
-                    $arrCondicion = explode('.', $cadCondicion, 2);
-                    if (sizeof($arrCondicion) == 2) {
-                        $cadMetodo = $arrCondicion[0];
-                        $cadOperador = $arrCondicion[1];
-                        switch ($cadMetodo) {
-                            case '==':
-                            case 'equalto':
-                                return ($mixedVar == $cadOperador);
-                            case '!=':
-                            case 'not_equalto':
-                                return ($mixedVar != $cadOperador);
-                            case '>':
-                            case 'morethan':
-                                return ($mixedVar > $cadOperador);
-                            case '<':
-                            case 'lessthan':
-                                return ($mixedVar < $cadOperador);
-                            case '>=':
-                            case 'morethan_equalto':
-                                return ($mixedVar >= $cadOperador);
-                            case '<=':
-                            case 'lessthan_equalto':
-                                return ($mixedVar <= $cadOperador);
-                            case 'permitted_regexp':
-                                return (preg_match($cadOperador, $mixedVar));
-                            case 'not_permitted_regexp':
-                                return (!preg_match($cadOperador, $mixedVar));
-                            case 'maxlength':
-                                return (strlen($mixedVar) <= (int)$cadOperador);
-                            case 'minlength':
-                                return (strlen($mixedVar) >= (int)$cadOperador);
-                            case 'size_equalto':
-                            case 'sizeof_equalto':
-                            case 'count_equalto':
-                            case 'length':
-                                if (is_array($mixedVar)) {
-                                    return (sizeof($mixedVar) == (int)$cadOperador);
-                                } else {
-                                    return (strlen($mixedVar) == (int)$cadOperador);
-                                }
-                            case 'permitted_characters':
-                                $totalCaracteres = strlen($mixedVar);
-                                for ($i = 0; $i < $totalCaracteres; $i++) {
-                                    $esteCaracter = substr($mixedVar, $i, 1);
-                                    if (strpos($cadOperador, $esteCaracter) === false) {
-                                        return (false);
-                                    }
-                                }
-                                return (true);
-                            case 'not_permitted_characters':
-                                $totalCaracteres = strlen($mixedVar);
-                                for ($i = 0; $i < $totalCaracteres; $i++) {
-                                    $esteCaracter = substr($mixedVar, $i, 1);
-                                    if (strpos($cadOperador, $esteCaracter) !== false) {
-                                        return (false);
-                                    }
-                                }
-                                return (true);
-                            default:
-                                return ($mixedVar == $cadCondicion);
-                        }
-                    } else {
-                        return ($mixedVar == $cadCondicion);
-                    }
+            $arrCondicion = explode('.', $cadCondicion, 2);
+            if(sizeof($arrCondicion) == 1 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
+                return($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar));
+            } else if(sizeof($arrCondicion) == 2 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
+                return($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar, $arrCondicion[1]));
+            } else {
+                return(false);
             }
-        } else {
+        } else { // (*) agregar por defecto cond
             return (false);
         }
     }
@@ -760,86 +672,6 @@ class Phtml
 
 
     /**
-     * Comprueba si un metodo de formatear es soportado
-     * 
-     * @param string $cadNombreMetodo
-     */
-    private function _existeMetodo($cadNombreMetodo)
-    {
-        return (in_array($cadNombreMetodo, $this->_arrMetodos));
-    }
-
-
-    /**
-     * Formatear el contenido de salida de la variable
-     * 
-     * @param string  $cadNombreMetodo el nombre del metodo formateador
-     * @param mixed   $mixedVar la variable que contiene el contenido a formatear
-     * @return string devuelve el contenido formateado segun el metodo
-     */
-    private function _obtenerFormato($cadNombreMetodo, $mixedVar)
-    {
-        switch ($cadNombreMetodo) {
-            case 'strtolower':
-            case 'lowercase':
-            case 'lower':
-                $cadFormateada = strtolower($mixedVar);
-                break;
-            case 'strtoupper':
-            case 'uppercase':
-            case 'upper':
-                $cadFormateada = strtoupper($mixedVar);
-                break;
-            case 'ucwords':
-            case 'camelcase':
-                $cadFormateada = ucwords($mixedVar);
-                break;
-            case 'ucfirst';
-                $cadFormateada = ucfirst($mixedVar);
-                break;
-            case 'urlencode':
-                $cadFormateada = urlencode($mixedVar);
-                break;
-            case 'urldecode':
-                $cadFormateada = urldecode($mixedVar);
-                break;
-            case 'trim':
-                $cadFormateada = trim($mixedVar);
-                break;
-            case 'ltrim':
-                $cadFormateada = ltrim($mixedVar);
-                break;
-            case 'rtrim':
-                $cadFormateada = rtrim($mixedVar);
-                break;
-            case 'htmlentities':
-                $cadFormateada = htmlentities($mixedVar);
-                break;
-            case 'html_entity_decode':
-                $cadFormateada = html_entity_decode($mixedVar);
-                break;
-            case 'addslashes':
-                $cadFormateada = addslashes($mixedVar);
-                break;
-            case 'stripslashes':
-                $cadFormateada = stripslashes($mixedVar);
-                break;
-            case 'htmlespecialschars':
-                $cadFormateada = htmlspecialchars($mixedVar);
-                break;
-            case 'strlen':
-                $cadFormateada = strlen($mixedVar);
-                break;
-            default:
-                $cadFormateada = $mixedVar;
-                break;
-        }
-        return ($cadFormateada);
-    }
-
-
-
-    /**
      * Imprime todas las variables
      * 
      * @param boolean $eliminarVariables elimina las coencidencias si esta en true
@@ -851,10 +683,10 @@ class Phtml
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
-                if (sizeof($arrVar) == 2 && $this->_existeMetodo($arrVar[0])) {
+                if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) {
                     $mixedVar = $this->_importarVariable($arrVar[1]);
                     if (!empty($mixedVar)) {
-                        $cadContenido = $this->_obtenerFormato($arrVar[0], $mixedVar);
+                        $cadContenido = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
                     } else {
                         if ($eliminarVariables) {
                             $cadContenido = '';
@@ -1216,7 +1048,7 @@ class Phtml
                 }
             }
         } else { // no variables solo index
-            if (preg_match('/^[0-9\.]+?$/', $cadTotal)) { // numeros
+            if (is_numeric($cadTotal)) { // numeros
                 $max = (int)$cadTotal;
             } else {
                 $patronFecha = '/^\s*?([0-9]{1,2})[\.\-\/\s]([0-9]{1,2})[\.\-\/\s]([0-9]{4})\s*?([0-9]{1,2}[:][0-9]{1,2})?([:][0-9]{1,2})?\s*?$/';

@@ -95,12 +95,10 @@ echo $objPhtml->obtenerContenido('while') . '<br>';
 
 /* // ejemplo de imprimir variables
 $objPhtml->agregarArchivo('plantillas/var.phtml', 'var');
-echo $objPhtml->obtenerContenido('var'); */
+echo $objPhtml->obtenerContenido('var') */;
 
 
 /* // ejemplo de imprimir variables
 $objPhtml->agregarArchivo('plantillas/const.phtml', 'const');
 echo $objPhtml->obtenerContenido('const'); */
-
-
 
