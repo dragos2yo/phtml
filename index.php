@@ -11,8 +11,21 @@ function print_pre($cadContenido)
 }
 
 include('Phtml.php');
-
 $objPhtml = new Phtml();
+
+class myFormat extends formatPhtml {
+
+    public function phtml_crear_enlace($mixedVar) {
+        $mixedVar = strtolower($mixedVar);
+        $mixedVar = str_replace(' ', '-', $mixedVar);
+        $mixedVar = urlencode($mixedVar);
+        return($mixedVar);
+    }
+}
+
+
+$objPhtml->agregarObjFormat(new myFormat);
+$objPhtml->agregarVariable('enlace', 'Categoria de Prueba');
 
 /* // agregar contenido manual
 $objPhtml->agregarContenido('<p>Hola Mundo desde <b>agregarContenido</b></p>', 'manual');
@@ -72,9 +85,9 @@ $objUsuario = new usuario();
 $objPhtml->agregarVariable('objUsuario', $objUsuario);
 
 
-// ejemplo de depurar un tag if-elseif-else
+/* // ejemplo de depurar un tag if-elseif-else
 $objPhtml->agregarArchivo('plantillas/if-elseif-else.phtml', 'if');
-echo $objPhtml->obtenerContenido('if');
+echo $objPhtml->obtenerContenido('if'); */
 
 /* // ejemplo de depurar un tag switch-case-default
 $objPhtml->agregarArchivo('plantillas/switch-case-default.phtml', 'switch');
@@ -93,9 +106,9 @@ $objPhtml->agregarArchivo('plantillas/do-while.phtml', 'while');
 echo $objPhtml->obtenerContenido('while') . '<br>';
  */
 
-/* // ejemplo de imprimir variables
+// ejemplo de imprimir variables
 $objPhtml->agregarArchivo('plantillas/var.phtml', 'var');
-echo $objPhtml->obtenerContenido('var') */;
+echo $objPhtml->obtenerContenido('var');
 
 
 /* // ejemplo de imprimir variables
