@@ -5,7 +5,7 @@ define('PHTML_CIERRA_VARIABLE',        '}}');
 define('PHTML_ABRE_CONSTANTE',         '[[');
 define('PHTML_CIERRA_CONSTANTE',       ']]');
 define('PHTML_PERMITIR_GLOBALS',      false);
-define('PHTML_PERMITIR_SERVER',       false);
+define('PHTML_PERMITIR_SERVER',       true);
 define('PHTML_PERMITIR_GET',           true);
 define('PHTML_PERMITIR_POST',          true);
 define('PHTML_PERMITIR_FILES',        false);

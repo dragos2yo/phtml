@@ -155,10 +155,10 @@ class Phtml
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
         $this->_idAleatorio = $this->_crearIdAleatorio($cadClave);
         $this->_arrContenido[$this->_idAleatorio] = '';
-        if(!is_a($this->_objFormat, 'formatPhtml')) {
+        if (!is_a($this->_objFormat, 'formatPhtml')) {
             $this->_objFormat = new formatPhtml;
         }
-        if(!is_a($this->_objCond, 'condPhtml')) {
+        if (!is_a($this->_objCond, 'condPhtml')) {
             $this->_objCond = new condPhtml;
         }
     }
@@ -277,7 +277,8 @@ class Phtml
      * 
      * @param object $objFormat un objeto de tipo formatPhtml
      */
-    public function agregarObjFormat(formatPhtml $objFormat) {
+    public function agregarObjFormat(formatPhtml $objFormat)
+    {
         $this->_objFormat = $objFormat;
     }
 
@@ -287,7 +288,8 @@ class Phtml
      * 
      * @param object $objCond un objeto de tipo condPhtml
      */
-    public function agregarObjCond(condPhtml $objCond) {
+    public function agregarObjCond(condPhtml $objCond)
+    {
         $this->_objCond = $objCond;
     }
 
@@ -371,9 +373,6 @@ class Phtml
      */
     private function _importarVariable($cadVariable)
     {
-        if (is_null($cadVariable)) {
-            return (null);
-        }
         $varTemporal = null;
         if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
             $arrVar = explode('.', $cadVariable);
@@ -467,27 +466,27 @@ class Phtml
                         }
                     }
                     break;
-                    case 4:
-                        /** (*) agregar soporte variables globales multinivel */
-                        if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
-                            if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]])) {
-                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]]; // arreglo[][][]
-                            }
-                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
-                            if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                                $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2], $arrVar[3]); // objeto->metodo(param, param)
-                            }
-                        } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                            if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
-                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}($arrVar[3]); // objeto->metodo(param)
-                            }
-                        } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
-                            if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
-                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}; // objeto->propiedad
-                            } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
-                                $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}(); // objeto->metodo()
-                            }
+                case 4:
+                    /** (*) agregar soporte variables globales multinivel */
+                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
+                        if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]]; // arreglo[][][]
                         }
+                    } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
+                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2], $arrVar[3]); // objeto->metodo(param, param)
+                        }
+                    } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
+                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}($arrVar[3]); // objeto->metodo(param)
+                        }
+                    } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
+                        if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}; // objeto->propiedad
+                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
+                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}(); // objeto->metodo()
+                        }
+                    }
                     break;
             }
         } else { // no variables
@@ -541,12 +540,12 @@ class Phtml
     {
         if ($cadCondicion != '') {
             $arrCondicion = explode('.', $cadCondicion, 2);
-            if(sizeof($arrCondicion) == 1 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
-                return($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar));
-            } else if(sizeof($arrCondicion) == 2 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
-                return($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar, $arrCondicion[1]));
+            if (sizeof($arrCondicion) == 1 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
+                return ($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar));
+            } else if (sizeof($arrCondicion) == 2 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
+                return ($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar, $arrCondicion[1]));
             } else {
-                return(false);
+                return (false);
             }
         } else { // (*) agregar por defecto cond
             return (false);
@@ -695,24 +694,20 @@ class Phtml
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
                 if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
                     $mixedVar = $this->_importarVariable($arrVar[1]);
-                    if (!empty($mixedVar)) {
+                    if (!empty($mixedVar) && isset($mixedVar)) {
                         $cadContenido = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
                     } else {
-                        if ($eliminarVariables) {
-                            $cadContenido = '';
-                        }
+                        $cadContenido = $eliminarVariables ? '' : null;
                     }
                 } else {
                     $mixedVar = $this->_importarVariable($arrResultado[1][$i]);
-                    if (!empty($mixedVar)) { // {{mixedVar}}
+                    if (!empty($mixedVar) && isset($mixedVar)) { // {{mixedVar}}
                         $cadContenido = $mixedVar;
                     } else {
-                        if ($eliminarVariables) {
-                            $cadContenido = '';
-                        }
+                        $cadContenido = $eliminarVariables ? '' : null;
                     }
                 }
-                if (isset($cadContenido)) {
+                if(isset($cadContenido)) {
                     $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
                 }
             }
@@ -1082,7 +1077,7 @@ class Phtml
                         if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', $init)) {
                             $max = strtoupper($max);
                             $init = strtoupper($init);
-                        } 
+                        }
                         // seguridad por tiempo limite de procesamiento
                         $max = strlen($max) > 3 ? substr($max, 0, 3) : $max;
                         $init = strlen($init) > 3 ? substr($init, 0, 3) : $init;
