@@ -1010,6 +1010,12 @@ class Phtml
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
         $format            = $objFor->hasAttribute('format') ? $objFor->getAttribute('format') : 'd-m-Y';
+        $cadContenido      = $this->_obtenerHTML($objFor);
+        $objFrag           = null;
+        $cadProcesada      = '';
+        $esCadena          = false;
+        $esFecha           = false;
+
         if ($objFor->hasAttribute('order')) {
             switch (strtolower(trim($objFor->getAttribute('order')))) {
                 case 'desc':
@@ -1022,16 +1028,13 @@ class Phtml
         } else {
             $asc = true;
         }
-        $cadContenido      = $this->_obtenerHTML($objFor);
-        $cadProcesada      = '';
-        $objFrag           = null;
-        $esCadena          = false;
-        $esFecha           = false;
+
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
+
         if ($objFor->hasAttribute('var') && !empty($mixedVar)) { // solo variables
             if (is_array($mixedVar)) { // arreglos
                 switch ($cadTotal) {
@@ -1081,7 +1084,8 @@ class Phtml
                         if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', $init)) {
                             $max = strtoupper($max);
                             $init = strtoupper($init);
-                        }
+                        } 
+                        // seguridad por tiempo limite de procesamiento
                         $max = strlen($max) > 3 ? substr($max, 0, 3) : $max;
                         $init = strlen($init) > 3 ? substr($init, 0, 3) : $init;
                         $max++;

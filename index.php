@@ -11,7 +11,6 @@ function print_pre($cadContenido)
 }
 
 include('Phtml.php');
-
 $objPhtml = new Phtml();
 
 /* // agregar contenido manual
@@ -101,4 +100,3 @@ echo $objPhtml->obtenerContenido('var') */;
 /* // ejemplo de imprimir variables
 $objPhtml->agregarArchivo('plantillas/const.phtml', 'const');
 echo $objPhtml->obtenerContenido('const'); */
-
