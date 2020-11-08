@@ -1,4 +1,5 @@
 <?php
+include('config.php');
 include('formatPhtml.php');
 include('condPhtml.php');
 
@@ -273,10 +274,21 @@ class Phtml
     }
 
 
+    /**
+     * Agrega un objeto de formatear personalizado
+     * 
+     * @param object $objFormat un objeto de tipo formatPhtml
+     */
     public function agregarObjFormat(formatPhtml $objFormat) {
         $this->_objFormat = $objFormat;
     }
 
+
+    /**
+     * Agrega un objeto de condiciones personalizado
+     * 
+     * @param object $objCond un objeto de tipo condPhtml
+     */
     public function agregarObjCond(condPhtml $objCond) {
         $this->_objCond = $objCond;
     }
@@ -683,7 +695,7 @@ class Phtml
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
-                if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) {
+                if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
                     $mixedVar = $this->_importarVariable($arrVar[1]);
                     if (!empty($mixedVar)) {
                         $cadContenido = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
@@ -694,7 +706,7 @@ class Phtml
                     }
                 } else {
                     $mixedVar = $this->_importarVariable($arrResultado[1][$i]);
-                    if (!empty($mixedVar)) {
+                    if (!empty($mixedVar)) { // {{mixedVar}}
                         $cadContenido = $mixedVar;
                     } else {
                         if ($eliminarVariables) {
@@ -718,7 +730,7 @@ class Phtml
     {
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreConstante) . '\s*([^0-9][A-Z0-9_]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraConstante) .  '/';
         while (preg_match($patron, $this->_cadContenido, $arrResultado)) {
-            if (defined($arrResultado[1])) {
+            if (defined($arrResultado[1])) { // [[CONSTANTE]]
                 $cadContenido = constant($arrResultado[1]);
             } else {
                 $cadContenido = '';
