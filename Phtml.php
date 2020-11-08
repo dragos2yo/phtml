@@ -3,6 +3,14 @@ include('config.php');
 include('formatPhtml.php');
 include('condPhtml.php');
 
+
+/** 
+ * -- TAREAS IMPORTANTES -- 
+ * 
+ * (*) areglar bug de sentencias comentadas
+ * (*) agregar soporte variables globales multinivel
+ * (*) agregar soporte condicion por defecto
+ */
 class Phtml
 {
 
@@ -210,8 +218,6 @@ class Phtml
 
     /**
      * Recoge el contenido que se esta ejecutando de una determinada parte del archivo
-     * (*) Esta funcion ejecuta el codigo php aun que $_bolEjecutarPhp = false
-     * (*) No permite multiples capturas
      * 
      * @param mixed $indice
      */
@@ -530,7 +536,6 @@ class Phtml
 
     /**
      * Comprueba que la variable cumpla una condicion
-     * (*) agregar un objeto de condiciones
      * 
      * @param string $cadCondicion
      * @param mixed $mixedVar
@@ -691,6 +696,7 @@ class Phtml
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
+                echo $i;
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
                 if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
                     $mixedVar = $this->_importarVariable($arrVar[1]);
@@ -735,10 +741,6 @@ class Phtml
 
     /**
      * Compila de TAG include
-     * (*) Dentro del bloque include
-     *      - comentarios SI
-     *      - nodos NO
-     *      - cadena ruta del archivo a incluir
      * 
      * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <include>
@@ -1147,6 +1149,7 @@ class Phtml
     {
         $this->_compilar_const();
         $this->_compilar_var();
+        /** (*) Areglar bug de sentencias comentadas */
         $cadPatron = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower(trim($arrResultado[1]));
