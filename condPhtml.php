@@ -2,7 +2,6 @@
 
 class condPhtml
 {
-
     public function phtml_true($mixedVar)
     {
         return ($mixedVar == true);

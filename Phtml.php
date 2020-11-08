@@ -155,11 +155,9 @@ class Phtml
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
         $this->_idAleatorio = $this->_crearIdAleatorio($cadClave);
         $this->_arrContenido[$this->_idAleatorio] = '';
-
         if(!is_a($this->_objFormat, 'formatPhtml')) {
             $this->_objFormat = new formatPhtml;
         }
-
         if(!is_a($this->_objCond, 'condPhtml')) {
             $this->_objCond = new condPhtml;
         }
