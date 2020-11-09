@@ -9,7 +9,6 @@ include('condPhtml.php');
  * 
  * (*) areglar bug de sentencias comentadas
  * (*) agregar soporte variables globales multinivel
- * (*) agregar soporte condicion por defecto
  */
 class Phtml
 {
@@ -124,21 +123,29 @@ class Phtml
      */
     private $_bolEliminarComentario;
 
-
     /**
      * @var string $_cadEncoding
      */
     private $_cadEncoding;
 
-
+    /**
+     * @var object formatPhtml $_objFormat 
+     */
     private $_objFormat;
 
-
+    /**
+     * @var object condPhtml $_objCond 
+     */
     private $_objCond;
+
+    /**
+     * @var boolean $_bolIsset
+     */
+    private $_bolIsset;
 
 
     /**
-     * Inicializar los componentes necesarios
+     * Inicializar los componentes necesarios 
      */
     public function __construct()
     {
@@ -146,6 +153,7 @@ class Phtml
         $this->_cierraVariable        = defined('PHTML_CIERRA_VARIABLE')     ? PHTML_CIERRA_VARIABLE     : '}}';
         $this->_abreConstante         = defined('PHTML_ABRE_CONSTANTE')      ? PHTML_ABRE_CONSTANTE      : '[[';
         $this->_cierraConstante       = defined('PHTML_CIERRA_CONSTANTE')    ? PHTML_CIERRA_CONSTANTE    : ']]';
+        $this->_bolEjecutarMetodos    = defined('PHTML_EJECUTAR_METODO')     ? PHTML_EJECUTAR_METODO     : true;
         $this->_bolPermitir_GLOBALS   = defined('PHTML_PERMITIR_GLOBALS')    ? PHTML_PERMITIR_GLOBALS    : true;
         $this->_bolPermitir_SERVER    = defined('PHTML_PERMITIR_SERVER')     ? PHTML_PERMITIR_SERVER     : false;
         $this->_bolPermitir_GET       = defined('PHTML_PERMITIR_GET')        ? PHTML_PERMITIR_GET        : true;
@@ -157,18 +165,14 @@ class Phtml
         $this->_bolPermitir_ENV       = defined('PHTML_PERMITIR_ENV')        ? PHTML_PERMITIR_ENV        : false;
         $this->_bolComprimir          = defined('PHTML_COMPRIMIR')           ? PHTML_COMPRIMIR           : false;
         $this->_bolEjecutarPhp        = defined('PHTML_EJECUTAR_PHP')        ? PHTML_EJECUTAR_PHP        : true;
-        $this->_bolEjecutarMetodos    = defined('PHTML_EJECUTAR_METODO')     ? PHTML_EJECUTAR_METODO     : true;
         $this->_bolEliminarComentario = defined('PHTML_ELIMINAR_COMENTARIO') ? PHTML_ELIMINAR_COMENTARIO : true;
+        $this->_bolIsset              = defined('PHTML_COND_ISSET')          ? PHTML_COND_ISSET          : false;
         $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
-        $this->_idAleatorio = $this->_crearIdAleatorio($cadClave);
+        $this->_objFormat             = !is_a($this->_objFormat, 'formatPhtml') ? new formatPhtml : $this->_objFormat;
+        $this->_objCond               = !is_a($this->_condPhtml, 'condPhtml') ? new condPhtml : $this->_condPhtml;
+        $this->_idAleatorio           = $this->_crearIdAleatorio($cadClave);
         $this->_arrContenido[$this->_idAleatorio] = '';
-        if (!is_a($this->_objFormat, 'formatPhtml')) {
-            $this->_objFormat = new formatPhtml;
-        }
-        if (!is_a($this->_objCond, 'condPhtml')) {
-            $this->_objCond = new condPhtml;
-        }
     }
 
 
@@ -552,8 +556,8 @@ class Phtml
             } else {
                 return (false);
             }
-        } else { // (*) agregar por defecto cond
-            return (false);
+        } else {
+            return ($this->_bolIsset ? isset($mixedVar) : false);
         }
     }
 
@@ -662,7 +666,7 @@ class Phtml
 
 
     /**
-     * Reemplaza los las variables de los bucles for - foreach - while
+     * Reemplaza las variables de los bucles for - foreach - while
      * 
      * {{var.key.XXX.etc}}
      * {{id.var.key.XXX.etc}}
@@ -678,7 +682,12 @@ class Phtml
     {
         $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
-            $reemplazo = $this->_abreVariable . $cadReemplazar . '.' . $arrResultado[1] . $this->_cierraVariable;
+            $mixedVar = $this->_importarVariable($cadReemplazar . '.' . $arrResultado[1]);
+            if (isset($mixedVar)) {
+                $reemplazo =  $this->_abreVariable . $mixedVar . $this->_cierraVariable;
+            } else {
+                $reemplazo = $this->_abreVariable . $cadReemplazar . '.' . $arrResultado[1] . $this->_cierraVariable;
+            }
             $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $reemplazo, $cadContenido);
         }
         return ($cadContenido);
@@ -713,7 +722,7 @@ class Phtml
                         $cadContenido = $eliminarVariables ? '' : null;
                     }
                 }
-                if(isset($cadContenido)) {
+                if (isset($cadContenido)) {
                     $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
                 }
             }
