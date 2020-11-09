@@ -7,7 +7,10 @@ include('condPhtml.php');
 /** 
  * -- TAREAS IMPORTANTES -- 
  * 
+ * (*) crear compilador ternario
  * (*) agregar soporte variables globales multinivel
+ * (*) compilar var const y aplicar segComentarios solo al contenido del include
+ * (*) agregar sistema captura errores en depuracion
  */
 class Phtml
 {
@@ -772,6 +775,7 @@ class Phtml
             } else {
                 $cadContenido = file_get_contents($cadRutaArchivo);
             }
+            /* (*) compilar var const y aplicar seguridadComentarios solo al contenido del include */
             $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenido);
             $objInclude->parentNode->replaceChild($objFrag, $objInclude);
         } else {
@@ -780,6 +784,7 @@ class Phtml
         $objDom->saveHTML();
         $objPhtml = $objDom->getElementById($this->_idAleatorio);
         $this->_cadContenido = $this->_obtenerHTML($objPhtml);
+        // modificar esto
         $this->_seguridadComentarios();
         $this->_compilar_const();
         $this->_compilar_var();
@@ -1204,3 +1209,4 @@ class Phtml
         return ($this->_cadContenido);
     }
 }
+
