@@ -169,8 +169,8 @@ class Phtml
         $this->_bolIsset              = defined('PHTML_COND_ISSET')          ? PHTML_COND_ISSET          : false;
         $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
         $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
-        $this->_objFormat             = !is_a($this->_objFormat, 'formatPhtml') ? new formatPhtml : $this->_objFormat;
-        $this->_objCond               = !is_a($this->_condPhtml, 'condPhtml') ? new condPhtml : $this->_condPhtml;
+        $this->_objFormat             = new formatPhtml;
+        $this->_objCond               = new condPhtml;
         $this->_idAleatorio           = $this->_crearIdAleatorio($cadClave);
         $this->_arrContenido[$this->_idAleatorio] = '';
     }
@@ -705,7 +705,6 @@ class Phtml
         if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
             $totalCoincidencias = sizeof($arrResultado[0]);
             for ($i = 0; $i < $totalCoincidencias; $i++) {
-                echo $i;
                 $arrVar = explode('.', $arrResultado[1][$i], 2);
                 if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
                     $mixedVar = $this->_importarVariable($arrVar[1]);
@@ -783,6 +782,8 @@ class Phtml
         $objDom->saveHTML();
         $objPhtml = $objDom->getElementById($this->_idAleatorio);
         $this->_cadContenido = $this->_obtenerHTML($objPhtml);
+        $this->_compilar_const();
+        $this->_compilar_var();
     }
 
 
@@ -1163,10 +1164,6 @@ class Phtml
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower(trim($arrResultado[1]));
             $this->{'_compilar_' . $nombreTag}();
-            if ($nombreTag == 'include') {
-                $this->_compilar_const();
-                $this->_compilar_var();
-            }
         }
         $this->_compilar_var(true);
     }
