@@ -583,7 +583,7 @@ class Phtml
      */
     private function _reemplazarComillasEtc($cadBuscar, $cadReemplazar, $cadContenido)
     {
-        $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*[\'|"]/';
+        $patron = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*[\'|"]/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
             $patronReemplazo = 'var="' .  $cadReemplazar . '.' . $arrResultado[1] . '"';
             $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $patronReemplazo, $cadContenido);
@@ -623,7 +623,7 @@ class Phtml
      */
     private function _reemplazarComillas($cadBuscar, $cadReemplazar, $cadContenido)
     {
-        $patron = '/[v|V][a|A][r|R]\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\s*[\'|"]/';
+        $patron = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\s*[\'|"]/';
         while (@preg_match($patron, $cadContenido, $arrResultado)) {
             $patronReemplazo = 'var="' .  $cadReemplazar . '"';
             $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $patronReemplazo, $cadContenido);
@@ -1140,7 +1140,7 @@ class Phtml
         $objXPath = new DOMXPath($objDom);
         $objComentarios = $objXPath->query('//comment()');
         foreach($objComentarios as $comentario) {
-            $cadPatron = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
+            $cadPatron = '/<(if|elseif|else|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|elseif|else|switch|foreach|while|include|for)>/is';
             if(preg_match($cadPatron, $comentario->textContent)) {
                 $comentario->parentNode->removeChild($comentario);
             }
