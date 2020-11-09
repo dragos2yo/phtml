@@ -7,7 +7,6 @@ include('condPhtml.php');
 /** 
  * -- TAREAS IMPORTANTES -- 
  * 
- * (*) areglar bug de sentencias comentadas
  * (*) agregar soporte variables globales multinivel
  */
 class Phtml
@@ -387,14 +386,13 @@ class Phtml
         if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
             $arrVar = explode('.', $cadVariable);
             $numParametros    = sizeof($arrVar);
-            $varTemporal      = null;
             switch ($numParametros) {
                 case 1:
                     if (isset($this->_arrVariables[$arrVar[0]])) {
                         $varTemporal = $this->_arrVariables[$arrVar[0]];
-                    } else { // admitir valores anonimos
-                        $varTemporal = null;
-                    }
+                    } /* else { // admitir valores anonimos
+                        $varTemporal = $cadVariable;
+                    } */
                     break;
                 case 2:
                     switch ($arrVar[0]) { // obtener super globales
@@ -782,6 +780,7 @@ class Phtml
         $objDom->saveHTML();
         $objPhtml = $objDom->getElementById($this->_idAleatorio);
         $this->_cadContenido = $this->_obtenerHTML($objPhtml);
+        $this->_seguridadComentarios();
         $this->_compilar_const();
         $this->_compilar_var();
     }
@@ -1136,6 +1135,22 @@ class Phtml
 
 
 
+    private function _seguridadComentarios() {
+        $objDom     = $this->_obtenerObjDOM($this->_cadContenido);
+        $objXPath = new DOMXPath($objDom);
+        $objComentarios = $objXPath->query('//comment()');
+        foreach($objComentarios as $comentario) {
+            $cadPatron = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
+            if(preg_match($cadPatron, $comentario->textContent)) {
+                $comentario->parentNode->removeChild($comentario);
+            }
+        }
+        $objDom->saveHTML();
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
+    }
+
+
     /**
      * Compila el TAG while
      * <do>
@@ -1157,9 +1172,9 @@ class Phtml
      */
     private function _compilar()
     {
+        $this->_seguridadComentarios();
         $this->_compilar_const();
         $this->_compilar_var();
-        /** (*) Areglar bug de sentencias comentadas */
         $cadPatron = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
         while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
             $nombreTag = strtolower(trim($arrResultado[1]));
