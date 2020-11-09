@@ -390,9 +390,7 @@ class Phtml
                 case 1:
                     if (isset($this->_arrVariables[$arrVar[0]])) {
                         $varTemporal = $this->_arrVariables[$arrVar[0]];
-                    } /* else { // admitir valores anonimos
-                        $varTemporal = $cadVariable;
-                    } */
+                    }
                     break;
                 case 2:
                     switch ($arrVar[0]) { // obtener super globales
@@ -497,8 +495,10 @@ class Phtml
                     }
                     break;
             }
-        } else { // no variables
-            $varTemporal = $cadVariable;
+        } else {
+            if(is_numeric($cadVariable)) { // solo numeros
+                $varTemporal = $cadVariable;
+            }
         }
         return ($varTemporal);
     }
