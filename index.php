@@ -1,4 +1,5 @@
 <?php
+$inicial = microtime(true);
 
 define('URL', 'http://localhost/phtml');
 define('URL_DESCRIPCION', 'Phtml');
@@ -26,23 +27,23 @@ class myFormat extends formatPhtml
 }
 
 
-$objPhtml->setUserFormat(new myFormat);
+$objPhtml->userFormat(new myFormat);
 $objPhtml->setVar('enlace', 'Categoria de Prueba');
 
 // agregar contenido manual
-$objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>', 'manual');
-echo $objPhtml->obtenerContenido('manual') . '<br>';
+/* $objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>'); */
+//echo $objPhtml->obtenerContenido('manual') . '<br>';
 
 // agregar contenido desde un archivo 
-$objPhtml->addFile('plantillas/hola.phtml', 'archivo');
-echo $objPhtml->obtenerContenido('archivo') . '<br>';
+/* $objPhtml->addFile('plantillas/hola.phtml'); */
+//echo $objPhtml->obtenerContenido('archivo') . '<br>';
 
 
 // agregar contenido en ejecucion
-$objPhtml->catchContent('captar');
+/* $objPhtml->catchContent();
  echo "<p>Hola Mundo desde <b>catchContent</b></p>";
-$objPhtml->catchContent('captar');
-echo $objPhtml->obtenerContenido('captar') . '<br>';
+$objPhtml->catchContent(); */
+//echo $objPhtml->obtenerContenido('captar') . '<br>';
 
 
 // ejemplo de incluir un archivo con el tag include
@@ -52,8 +53,8 @@ $cadInclude = <<<EOL
 <!-- comentario despues del include -->
 <p>Contenido despues de <b>include</b></p>
 EOL;
-$objPhtml->addContent($cadInclude, 'include');
-echo $objPhtml->obtenerContenido('include') . '<br>';
+/* $objPhtml->addContent($cadInclude); */
+//echo $objPhtml->obtenerContenido('include') . '<br>';
 
 // variables standard
 $objPhtml->setVar('edad', 35);
@@ -90,20 +91,20 @@ $objPhtml->setVar('objUsuario', $objUsuario);
 
 
 // ejemplo de depurar un tag if-elseif-else
-$objPhtml->addFile('plantillas/if-elseif-else.phtml', 'if');
-echo $objPhtml->obtenerContenido('if');
+/* $objPhtml->addFile('plantillas/if-elseif-else.phtml'); */
+//echo $objPhtml->obtenerContenido('if');
 
 // ejemplo de depurar un tag switch-case-default
-$objPhtml->addFile('plantillas/switch-case-default.phtml', 'switch');
-echo $objPhtml->obtenerContenido('switch');
+/* $objPhtml->addFile('plantillas/switch-case-default.phtml'); */
+//echo $objPhtml->obtenerContenido('switch');
 
 // ejemplo de depurar un tag foreach
-$objPhtml->addFile('plantillas/foreach.phtml', 'foreach');
-echo $objPhtml->obtenerContenido('foreach');
+/* $objPhtml->addFile('plantillas/foreach.phtml'); */
+//echo $objPhtml->obtenerContenido('foreach');
 
 // ejemplo de depurar un tag for
-$objPhtml->addFile('plantillas/for.phtml', 'for');
-echo $objPhtml->obtenerContenido('for');
+/* $objPhtml->addFile('plantillas/for.phtml', 'for'); */
+//echo $objPhtml->obtenerContenido('for');
 
 /* // ejemplo de depurar un tag while
 $objPhtml->addFile('plantillas/do-while.phtml', 'while');
@@ -111,12 +112,16 @@ echo $objPhtml->obtenerContenido('while') . '<br>';
  */
 
 // ejemplo de imprimir variables
-$objPhtml->addFile('plantillas/var.phtml', 'var');
-echo $objPhtml->obtenerContenido('var');
+$objPhtml->addFile('plantillas/var.phtml');
+//echo $objPhtml->obtenerContenido('var');
 
 
 // ejemplo de imprimir variables
-$objPhtml->addFile('plantillas/const.phtml', 'const');
-echo $objPhtml->obtenerContenido('const');
+/* $objPhtml->addFile('plantillas/const.phtml'); */
 
+
+echo $objPhtml->obtenerContenido();
+
+$final = microtime(true);
+print_pre($final - $inicial);
 

@@ -9,6 +9,8 @@ include('condPhtml.php');
  * 
  * (*) crear compilador ternario
  * (*) agregar soporte variables globales multinivel
+ * (*) aplicar formateo de salida
+ * (*) eliminar comentarios si commpress lo pide
  * (*) compilar var const y aplicar segComentarios solo al contenido del include
  * (*) agregar sistema captura errores en depuracion
  */
@@ -290,7 +292,7 @@ class Phtml
      * 
      * @param object $objFormat un objeto de tipo formatPhtml
      */
-    public function setUserFormat(formatPhtml $objFormat)
+    public function userFormat(formatPhtml $objFormat)
     {
         $this->_objFormat = $objFormat;
     }
@@ -301,7 +303,7 @@ class Phtml
      * 
      * @param object $objCond un objeto de tipo condPhtml
      */
-    public function setUserCond(condPhtml $objCond)
+    public function userCond(condPhtml $objCond)
     {
         $this->_objCond = $objCond;
     }
@@ -1142,9 +1144,12 @@ class Phtml
     private function _seguridadComentarios()
     {
         $objDom     = $this->_getObjDOM($this->_strContent);
+        //$objDom->preserveWhiteSpace = false;
+        //$objDom->formatOutput = true;
         $objXPath = new DOMXPath($objDom);
         $comments = $objXPath->query('//comment()');
         foreach ($comments as $comment) {
+            // (*) eliminar comentarios si commpress lo pide
             $pattern = '/<(if|elseif|else|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|elseif|else|switch|foreach|while|include|for)>/is';
             if (preg_match($pattern, $comment->textContent)) {
                 $comment->parentNode->removeChild($comment);
@@ -1203,9 +1208,9 @@ class Phtml
             $this->_strContent = $this->_arrContent[$this->_randID];
         }
         $this->_compile();
-        if ($this->_bolCompress) {
+        /* if ($this->_bolCompress) {
             $this->_strContent = preg_replace('/(\\n|\\t|\\r|\\s+)/', ' ', $this->_strContent);
-        }
+        } */
         return ($this->_strContent);
     }
 }

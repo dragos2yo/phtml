@@ -13,7 +13,7 @@ define('PHTML_PERMITTED_COOKIE',   true);
 define('PHTML_PERMITTED_SESSION',  true);
 define('PHTML_PERMITTED_REQUEST',  true);
 define('PHTML_PERMITTED_ENV',     false);
-define('PHTML_COMPRESS',          false);
+define('PHTML_COMPRESS',        false);
 define('PHTML_EXECUTE_PHP',        true);
 define('PHTML_EXECUTE_METHOD',     true);
 define('PHTML_CLEAR_COMMENT',      true);
