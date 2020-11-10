@@ -118,3 +118,5 @@ echo $objPhtml->obtenerContenido('var');
 // ejemplo de imprimir variables
 $objPhtml->addFile('plantillas/const.phtml', 'const');
 echo $objPhtml->obtenerContenido('const');
+
+

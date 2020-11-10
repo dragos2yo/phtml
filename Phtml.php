@@ -51,49 +51,49 @@ class Phtml
     private $_closeConst;
 
     /**
-     * @var boolean $_bolPermitir_GLOBALS
+     * @var boolean $_bolPermitted_GLOBALS
      */
-    private $_bolPermitir_GLOBALS;
+    private $_bolPermitted_GLOBALS;
 
     /**
-     * @var boolean $_bolPermitir_SERVER
+     * @var boolean $_bolPermitted_SERVER
      */
-    private $_bolPermitir_SERVER;
+    private $_bolPermitted_SERVER;
 
     /**
-     * @var boolean $_bolPermitir_GET
+     * @var boolean $_bolPermitted_GET
      */
-    private $_bolPermitir_GET;
+    private $_bolPermitted_GET;
 
     /**
-     * @var boolean $_bolPermitir_POST
+     * @var boolean $_bolPermitted_POST
      */
-    private $_bolPermitir_POST;
+    private $_bolPermitted_POST;
 
     /**
-     * @var boolean $_bolPermitir_FILES
+     * @var boolean $_bolPermitted_FILES
      */
-    private $_bolPermitir_FILES;
+    private $_bolPermitted_FILES;
 
     /**
-     * @var boolean $_bolPermitir_COOKIE
+     * @var boolean $_bolPermitted_COOKIE
      */
-    private $_bolPermitir_COOKIE;
+    private $_bolPermitted_COOKIE;
 
     /**
-     * @var boolean $_bolPermitir_SESSION
+     * @var boolean $_bolPermitted_SESSION
      */
-    private $_bolPermitir_SESSION;
+    private $_bolPermitted_SESSION;
 
     /**
-     * @var boolean $_bolPermitir_REQUEST
+     * @var boolean $_bolPermitted_REQUEST
      */
-    private $_bolPermitir_REQUEST;
+    private $_bolPermitted_REQUEST;
 
     /**
-     * @var boolean $_bolPermitir_ENV
+     * @var boolean $_bolPermitted_ENV
      */
-    private $_bolPermitir_ENV;
+    private $_bolPermitted_ENV;
 
     /**
      * @var boolean $_bolExecutePhp
@@ -106,9 +106,9 @@ class Phtml
     private $_bolCompress;
 
     /**
-     * @var array $_arrVariables
+     * @var array $_arrVar
      */
-    private $_arrVariables = array();
+    private $_arrVar = array();
 
     /**
      * @var boolean $_bolEjecutarMetodos
@@ -156,15 +156,15 @@ class Phtml
         $this->_openConst         = defined('PHTML_OPEN_CONST')      ? PHTML_OPEN_CONST      : '[[';
         $this->_closeConst       = defined('PHTML_CLOSE_CONST')    ? PHTML_CLOSE_CONST    : ']]';
         $this->_bolEjecutarMetodos    = defined('PHTML_EXECUTE_METHOD')     ? PHTML_EXECUTE_METHOD     : true;
-        $this->_bolPermitir_GLOBALS   = defined('PHTML_PERMITTED_GLOBALS')    ? PHTML_PERMITTED_GLOBALS    : true;
-        $this->_bolPermitir_SERVER    = defined('PHTML_PERMITTED_SERVER')     ? PHTML_PERMITTED_SERVER     : false;
-        $this->_bolPermitir_GET       = defined('PHTML_PERMITTED_GET')        ? PHTML_PERMITTED_GET        : true;
-        $this->_bolPermitir_POST      = defined('PHTML_PERMITTED_POST')       ? PHTML_PERMITTED_POST       : true;
-        $this->_bolPermitir_FILES     = defined('PHTML_PERMITTED_FILES')      ? PHTML_PERMITTED_FILES      : false;
-        $this->_bolPermitir_COOKIE    = defined('PHTML_PERMITTED_COOKIE')     ? PHTML_PERMITTED_COOKIE     : true;
-        $this->_bolPermitir_SESSION   = defined('PHTML_PERMITTED_SESSION')    ? PHTML_PERMITTED_SESSION    : true;
-        $this->_bolPermitir_REQUEST   = defined('PHTML_PERMITTED_REQUEST')    ? PHTML_PERMITTED_REQUEST    : true;
-        $this->_bolPermitir_ENV       = defined('PHTML_PERMITTED_ENV')        ? PHTML_PERMITTED_ENV        : false;
+        $this->_bolPermitted_GLOBALS   = defined('PHTML_PERMITTED_GLOBALS')    ? PHTML_PERMITTED_GLOBALS    : true;
+        $this->_bolPermitted_SERVER    = defined('PHTML_PERMITTED_SERVER')     ? PHTML_PERMITTED_SERVER     : false;
+        $this->_bolPermitted_GET       = defined('PHTML_PERMITTED_GET')        ? PHTML_PERMITTED_GET        : true;
+        $this->_bolPermitted_POST      = defined('PHTML_PERMITTED_POST')       ? PHTML_PERMITTED_POST       : true;
+        $this->_bolPermitted_FILES     = defined('PHTML_PERMITTED_FILES')      ? PHTML_PERMITTED_FILES      : false;
+        $this->_bolPermitted_COOKIE    = defined('PHTML_PERMITTED_COOKIE')     ? PHTML_PERMITTED_COOKIE     : true;
+        $this->_bolPermitted_SESSION   = defined('PHTML_PERMITTED_SESSION')    ? PHTML_PERMITTED_SESSION    : true;
+        $this->_bolPermitted_REQUEST   = defined('PHTML_PERMITTED_REQUEST')    ? PHTML_PERMITTED_REQUEST    : true;
+        $this->_bolPermitted_ENV       = defined('PHTML_PERMITTED_ENV')        ? PHTML_PERMITTED_ENV        : false;
         $this->_bolCompress          = defined('PHTML_COMPRESS')           ? PHTML_COMPRESS           : false;
         $this->_bolExecutePhp        = defined('PHTML_EXECUTE_PHP')        ? PHTML_EXECUTE_PHP        : true;
         $this->_bolClearComment = defined('PHTML_CLEAR_COMMENT') ? PHTML_CLEAR_COMMENT : true;
@@ -250,7 +250,7 @@ class Phtml
     public function setVar($index, $value = '')
     {
         if (isset($index)) {
-            $this->_arrVariables[$index] = $value;
+            $this->_arrVar[$index] = $value;
         }
     }
 
@@ -263,7 +263,7 @@ class Phtml
      */
     public function getVar($index)
     {
-        return (isset($index) && isset($this->_arrVariables[$index]) ? $this->_arrVariables[$index] : null);
+        return (isset($index) && isset($this->_arrVar[$index]) ? $this->_arrVar[$index] : null);
     }
 
 
@@ -384,75 +384,73 @@ class Phtml
      * 
      * @return mixed devuelve el valor que contiene la variable
      */
-    private function _importarVariable($cadVariable)
+    private function _importVar($cadVariable)
     {
-        $varTemporal = null;
         if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
-            $arrVar = explode('.', $cadVariable);
-            $numParametros    = sizeof($arrVar);
+            $arr = explode('.', $cadVariable);
+            $numParametros    = sizeof($arr);
             switch ($numParametros) {
                 case 1:
-                    if (isset($this->_arrVariables[$arrVar[0]])) {
-                        $varTemporal = $this->_arrVariables[$arrVar[0]];
+                    if (isset($this->_arrVar[$arr[0]])) {
+                        return($this->_arrVar[$arr[0]]);
                     }
-                    break;
                 case 2:
-                    switch ($arrVar[0]) { // obtener super globales
+                    switch ($arr[0]) { // obtener super globales
                         case 'GLOBALS':
-                            if ($this->_bolPermitir_GLOBALS && isset($_GLOBALS[$arrVar[1]])) {
-                                $varTemporal = $GLOBALS[$arrVar[1]];
+                            if ($this->_bolPermitted_GLOBALS && isset($_GLOBALS[$arr[1]])) {
+                                return($GLOBALS[$arr[1]]);
                             }
                             break;
                         case '_SERVER':
-                            if ($this->_bolPermitir_SERVER && isset($_SERVER[$arrVar[1]])) {
-                                $varTemporal = $_SERVER[$arrVar[1]];
+                            if ($this->_bolPermitted_SERVER && isset($_SERVER[$arr[1]])) {
+                                return($_SERVER[$arr[1]]);
                             }
                             break;
                         case '_GET':
-                            if ($this->_bolPermitir_GET && isset($_GET[$arrVar[1]])) {
-                                $varTemporal = $_GET[$arrVar[1]];
+                            if ($this->_bolPermitted_GET && isset($_GET[$arr[1]])) {
+                                return($_GET[$arr[1]]);
                             }
                             break;
                         case '_POST':
-                            if ($this->_bolPermitir_POST && isset($_POST[$arrVar[1]])) {
-                                $varTemporal = $_POST[$arrVar[1]];
+                            if ($this->_bolPermitted_POST && isset($_POST[$arr[1]])) {
+                                return($_POST[$arr[1]]);
                             }
                             break;
                         case '_FILES':
-                            if ($this->_bolPermitir_FILES && isset($_FILES[$arrVar[1]])) {
-                                $varTemporal = $_FILES[$arrVar[1]];
+                            if ($this->_bolPermitted_FILES && isset($_FILES[$arr[1]])) {
+                                return($_FILES[$arr[1]]);
                             }
                             break;
                         case '_COOKIE':
-                            if ($this->_bolPermitir_COOKIE && isset($_COOKIE[$arrVar[1]])) {
-                                $varTemporal = $_COOKIE[$arrVar[1]];
+                            if ($this->_bolPermitted_COOKIE && isset($_COOKIE[$arr[1]])) {
+                                return($_COOKIE[$arr[1]]);
                             }
                             break;
                         case '_SESSION':
-                            if ($this->_bolPermitir_SESSION && isset($_SESSION[$arrVar[1]])) {
-                                $varTemporal = $_SESSION[$arrVar[1]];
+                            if ($this->_bolPermitted_SESSION && isset($_SESSION[$arr[1]])) {
+                                return($_SESSION[$arr[1]]);
                             }
                             break;
                         case '_REQUEST':
-                            if ($this->_bolPermitir_REQUEST && isset($_REQUEST[$arrVar[1]])) {
-                                $varTemporal = $_REQUEST[$arrVar[1]];
+                            if ($this->_bolPermitted_REQUEST && isset($_REQUEST[$arr[1]])) {
+                                return($_REQUEST[$arr[1]]);
                             }
                             break;
                         case '_ENV':
-                            if ($this->_bolPermitir_ENV && isset($_ENV[$arrVar[1]])) {
-                                $varTemporal = $_ENV[$arrVar[1]];
+                            if ($this->_bolPermitted_ENV && isset($_ENV[$arr[1]])) {
+                                return($_ENV[$arr[1]]);
                             }
                             break;
                         default:
-                            if (isset($this->_arrVariables[$arrVar[0]]) && is_array($this->_arrVariables[$arrVar[0]])) {
-                                if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                                    $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]; // arreglo[]
+                            if (isset($this->_arrVar[$arr[0]]) && is_array($this->_arrVar[$arr[0]])) {
+                                if (isset($this->_arrVar[$arr[0]][$arr[1]])) {
+                                    return($this->_arrVar[$arr[0]][$arr[1]]); // arreglo[]
                                 }
-                            } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
-                                if (property_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                                    $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}; // objeto->propiedad
-                                } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                                    $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}(); // objeto->metodo()
+                            } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
+                                if (property_exists($this->_arrVar[$arr[0]], $arr[1])) {
+                                    return($this->_arrVar[$arr[0]]->{$arr[1]}); // objeto->propiedad
+                                } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
+                                    return($this->_arrVar[$arr[0]]->{$arr[1]}()); // objeto->metodo()
                                 }
                             }
                             break;
@@ -460,51 +458,51 @@ class Phtml
                     break;
                 case 3:
                     /** (*) agregar soporte variables globales multinivel */
-                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                        if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]; // arreglo[][]
+                    if (isset($this->_arrVar[$arr[0]][$arr[1]]) && is_array($this->_arrVar[$arr[0]][$arr[1]])) {
+                        if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]])) {
+                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]); // arreglo[][]
                         }
-                    } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
-                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2]); // objeto->metodo(param)
+                    } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
+                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
+                            return($this->_arrVar[$arr[0]]->{$arr[1]}($arr[2])); // objeto->metodo(param)
                         }
-                    } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                        if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}; // objeto->propiedad
-                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}(); // objeto->metodo()
+                    } else if (isset($this->_arrVar[$arr[0]][$arr[1]]) && is_object($this->_arrVar[$arr[0]][$arr[1]])) {
+                        if (property_exists($this->_arrVar[$arr[0]][$arr[1]], $arr[2])) {
+                            return($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}); // objeto->propiedad
+                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]][$arr[1]], $arr[2])) {
+                            return($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}()); // objeto->metodo()
                         }
                     }
                     break;
                 case 4:
                     /** (*) agregar soporte variables globales multinivel */
-                    if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_array($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
-                        if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]][$arrVar[3]]; // arreglo[][][]
+                    if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]) && is_array($this->_arrVar[$arr[0]][$arr[1]][$arr[2]])) {
+                        if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]][$arr[3]])) {
+                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]][$arr[3]]); // arreglo[][][]
                         }
-                    } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]])) {
-                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]], $arrVar[1])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]]->{$arrVar[1]}($arrVar[2], $arrVar[3]); // objeto->metodo(param, param)
+                    } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
+                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
+                            return($this->_arrVar[$arr[0]]->{$arr[1]}($arr[2], $arr[3])); // objeto->metodo(param, param)
                         }
-                    } else if (isset($this->_arrVariables[$arrVar[0]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]])) {
-                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]], $arrVar[2])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]]->{$arrVar[2]}($arrVar[3]); // objeto->metodo(param)
+                    } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]][$arr[1]])) {
+                        if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]][$arr[1]], $arr[2])) {
+                            return( $this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}($arr[3])); // objeto->metodo(param)
                         }
-                    } else if (isset($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]) && is_object($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]])) {
-                        if (property_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}; // objeto->propiedad
-                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]], $arrVar[3])) {
-                            $varTemporal = $this->_arrVariables[$arrVar[0]][$arrVar[1]][$arrVar[2]]->{$arrVar[3]}(); // objeto->metodo()
+                    } else if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]) && is_object($this->_arrVar[$arr[0]][$arr[1]][$arr[2]])) {
+                        if (property_exists($this->_arrVar[$arr[0]][$arr[1]][$arr[2]], $arr[3])) {
+                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]->{$arr[3]}); // objeto->propiedad
+                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]][$arr[1]][$arr[2]], $arr[3])) {
+                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]->{$arr[3]}()); // objeto->metodo()
                         }
                     }
                     break;
             }
         } else {
             if (is_numeric($cadVariable)) { // solo numeros
-                $varTemporal = $cadVariable;
+                return($cadVariable);
             }
         }
-        return ($varTemporal);
+        return (null);
     }
 
 
@@ -684,7 +682,7 @@ class Phtml
     {
         $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
         while (@preg_match($pattern, $subject, $arrResult)) {
-            $mixedVar = $this->_importarVariable($replacement . '.' . $arrResult[1]);
+            $mixedVar = $this->_importVar($replacement . '.' . $arrResult[1]);
             if (isset($mixedVar)) {
                 $replacement =  $this->_openVar . $mixedVar . $this->_closeVar;
             } else {
@@ -709,14 +707,14 @@ class Phtml
             for ($i = 0; $i < $size; $i++) {
                 $arrVar = explode('.', $arrResult[1][$i], 2);
                 if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
-                    $mixedVar = $this->_importarVariable($arrVar[1]);
+                    $mixedVar = $this->_importVar($arrVar[1]);
                     if (!empty($mixedVar) && isset($mixedVar)) {
                         $content = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
                     } else {
                         $content = $deleteVar ? '' : null;
                     }
                 } else {
-                    $mixedVar = $this->_importarVariable($arrResult[1][$i]);
+                    $mixedVar = $this->_importVar($arrResult[1][$i]);
                     if (!empty($mixedVar) && isset($mixedVar)) { // {{mixedVar}}
                         $content = $mixedVar;
                     } else {
@@ -812,7 +810,7 @@ class Phtml
     {
         $objDom     = $this->_getObjDOM($this->_strContent);
         $objIf      = $objDom->getElementsByTagName('if')->item(0);
-        $varIf      = $objIf->hasAttribute('var') && $objIf->getattribute('var') != '' ? $this->_importarVariable($objIf->getAttribute('var')) : null;
+        $varIf      = $objIf->hasAttribute('var') && $objIf->getattribute('var') != '' ? $this->_importVar($objIf->getAttribute('var')) : null;
         $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_checkCond($varIf, $objIf->getAttribute('cond')) : isset($varIf);
         $cadCompare = $objIf->hasAttribute('compare') ? strtolower(trim($objIf->getAttribute('compare'))) : 'and';
         $objFrag    = null;
@@ -837,7 +835,7 @@ class Phtml
                 if (strtolower(@$objIf->nextSibling->nodeName) == 'elseif') {
                     $objElseif = $objIf->nextSibling;
                     if (!$objFrag) {
-                        $varElseIf      = $objElseif->hasAttribute('var') && $objElseif->getattribute('var') != '' ? $this->_importarVariable($objElseif->getAttribute('var')) : null;
+                        $varElseIf      = $objElseif->hasAttribute('var') && $objElseif->getattribute('var') != '' ? $this->_importVar($objElseif->getAttribute('var')) : null;
                         $bolCondElseIf  = $objElseif->hasAttribute('cond') ? $this->_checkCond($varElseIf, $objElseif->getAttribute('cond')) : isset($varElseIf);
                         $cadCompareElseIf = $objElseif->hasAttribute('compare') ? strtolower(trim($objElseif->getAttribute('compare'))) : 'and';
                         if ($objElseif->hasAttribute('and') && !$objElseif->hasAttribute('or')) {
@@ -902,7 +900,7 @@ class Phtml
     {
         $objDom = $this->_getObjDOM($this->_strContent);
         $objSwitch = $objDom->getElementsByTagName('switch')->item(0);
-        $varSwitch      = $objSwitch->hasAttribute('var') && $objSwitch->getattribute('var') != '' ? $this->_importarVariable($objSwitch->getAttribute('var')) : null;
+        $varSwitch      = $objSwitch->hasAttribute('var') && $objSwitch->getattribute('var') != '' ? $this->_importVar($objSwitch->getAttribute('var')) : null;
         $objFrag = null;
         while (strtolower(@$objSwitch->firstChild->nodeName) == 'case' || @$objSwitch->firstChild->nodeType == XML_COMMENT_NODE || (@$objSwitch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$objSwitch->firstChild->textContent))) {
             if (strtolower(@$objSwitch->firstChild->nodeName) == 'case') {
@@ -966,7 +964,7 @@ class Phtml
         $cadValor       = $objForeach->hasAttribute('value') ? $objForeach->getAttribute('value') : 'value';
         $id             = $objForeach->hasAttribute('id') ? $objForeach->getAttribute('id') . '.' : '';
         $content   = $this->_getHTML($objForeach);
-        $mixedVar       = $this->_importarVariable($cadVariable);
+        $mixedVar       = $this->_importVar($cadVariable);
         $objFrag        = null;
         $cadProcesada   = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
@@ -1013,7 +1011,7 @@ class Phtml
         $objDom            = $this->_getObjDOM($this->_strContent);
         $objFor            = $objDom->getElementsByTagName('for')->item(0);
         $cadVariable       = $objFor->getAttribute('var');
-        $mixedVar          = $this->_importarVariable($cadVariable);
+        $mixedVar          = $this->_importVar($cadVariable);
         $id                = $objFor->hasAttribute('id') ? $objFor->getAttribute('id') . '.' : '';
         $offset            = $objFor->getAttribute('offset');
         $cadIndice         = $objFor->hasAttribute('index') ? $objFor->getAttribute('index')    : 'i';
