@@ -16,39 +16,39 @@ class Phtml
 {
 
     /**
-     * @var string $_strContent
+     * @var string $_cadContenido
      */
-    private $_strContent = '';
+    private $_cadContenido = '';
 
     /**
-     * @var array $_arrContent
+     * @var array $_arrContenido
      */
-    private $_arrContent;
+    private $_arrContenido;
 
     /**
-     * @var boolean $_bolCatch
+     * @var boolean $_bolCapturado
      */
-    private $_bolCatch = false;
+    private $_bolCapturado = false;
 
     /**
-     * @var string $_openVar
+     * @var string $_abreVariable
      */
-    private $_openVar;
+    private $_abreVariable;
 
     /**
-     * @var string $_closeVar
+     * @var string $_cierraVariable
      */
-    private $_closeVar;
+    private $_cierraVariable;
 
     /**
-     * @var string $_openConst
+     * @var string $_abreConstante
      */
-    private $_openConst;
+    private $_abreConstante;
 
     /**
-     * @var string $_closeConst
+     * @var string $_cierraConstante
      */
-    private $_closeConst;
+    private $_cierraConstante;
 
     /**
      * @var boolean $_bolPermitir_GLOBALS
@@ -96,14 +96,14 @@ class Phtml
     private $_bolPermitir_ENV;
 
     /**
-     * @var boolean $_bolExecutePhp
+     * @var boolean $_bolEjecutarPhp
      */
-    private $_bolExecutePhp;
+    private $_bolEjecutarPhp;
 
     /**
-     * @var boolean $_bolCompress
+     * @var boolean $_bolComprimir
      */
-    private $_bolCompress;
+    private $_bolComprimir;
 
     /**
      * @var array $_arrVariables
@@ -116,14 +116,14 @@ class Phtml
     private $_bolEjecutarMetodos;
 
     /**
-     * @var string $_randID
+     * @var string $_idAleatorio
      */
-    private $_randID;
+    private $_idAleatorio;
 
     /**
-     * @var boolean $_bolClearComment
+     * @var boolean $_bolEliminarComentario
      */
-    private $_bolClearComment;
+    private $_bolEliminarComentario;
 
     /**
      * @var string $_cadEncoding
@@ -151,49 +151,49 @@ class Phtml
      */
     public function __construct()
     {
-        $this->_openVar          = defined('PHTML_OPEN_VAR')       ? PHTML_OPEN_VAR       : '{{';
-        $this->_closeVar        = defined('PHTML_CLOSE_VAR')     ? PHTML_CLOSE_VAR     : '}}';
-        $this->_openConst         = defined('PHTML_OPEN_CONST')      ? PHTML_OPEN_CONST      : '[[';
-        $this->_closeConst       = defined('PHTML_CLOSE_CONST')    ? PHTML_CLOSE_CONST    : ']]';
-        $this->_bolEjecutarMetodos    = defined('PHTML_EXECUTE_METHOD')     ? PHTML_EXECUTE_METHOD     : true;
-        $this->_bolPermitir_GLOBALS   = defined('PHTML_PERMITTED_GLOBALS')    ? PHTML_PERMITTED_GLOBALS    : true;
-        $this->_bolPermitir_SERVER    = defined('PHTML_PERMITTED_SERVER')     ? PHTML_PERMITTED_SERVER     : false;
-        $this->_bolPermitir_GET       = defined('PHTML_PERMITTED_GET')        ? PHTML_PERMITTED_GET        : true;
-        $this->_bolPermitir_POST      = defined('PHTML_PERMITTED_POST')       ? PHTML_PERMITTED_POST       : true;
-        $this->_bolPermitir_FILES     = defined('PHTML_PERMITTED_FILES')      ? PHTML_PERMITTED_FILES      : false;
-        $this->_bolPermitir_COOKIE    = defined('PHTML_PERMITTED_COOKIE')     ? PHTML_PERMITTED_COOKIE     : true;
-        $this->_bolPermitir_SESSION   = defined('PHTML_PERMITTED_SESSION')    ? PHTML_PERMITTED_SESSION    : true;
-        $this->_bolPermitir_REQUEST   = defined('PHTML_PERMITTED_REQUEST')    ? PHTML_PERMITTED_REQUEST    : true;
-        $this->_bolPermitir_ENV       = defined('PHTML_PERMITTED_ENV')        ? PHTML_PERMITTED_ENV        : false;
-        $this->_bolCompress          = defined('PHTML_COMPRESS')           ? PHTML_COMPRESS           : false;
-        $this->_bolExecutePhp        = defined('PHTML_EXECUTE_PHP')        ? PHTML_EXECUTE_PHP        : true;
-        $this->_bolClearComment = defined('PHTML_CLEAR_COMMENT') ? PHTML_CLEAR_COMMENT : true;
+        $this->_abreVariable          = defined('PHTML_ABRE_VARIABLE')       ? PHTML_ABRE_VARIABLE       : '{{';
+        $this->_cierraVariable        = defined('PHTML_CIERRA_VARIABLE')     ? PHTML_CIERRA_VARIABLE     : '}}';
+        $this->_abreConstante         = defined('PHTML_ABRE_CONSTANTE')      ? PHTML_ABRE_CONSTANTE      : '[[';
+        $this->_cierraConstante       = defined('PHTML_CIERRA_CONSTANTE')    ? PHTML_CIERRA_CONSTANTE    : ']]';
+        $this->_bolEjecutarMetodos    = defined('PHTML_EJECUTAR_METODO')     ? PHTML_EJECUTAR_METODO     : true;
+        $this->_bolPermitir_GLOBALS   = defined('PHTML_PERMITIR_GLOBALS')    ? PHTML_PERMITIR_GLOBALS    : true;
+        $this->_bolPermitir_SERVER    = defined('PHTML_PERMITIR_SERVER')     ? PHTML_PERMITIR_SERVER     : false;
+        $this->_bolPermitir_GET       = defined('PHTML_PERMITIR_GET')        ? PHTML_PERMITIR_GET        : true;
+        $this->_bolPermitir_POST      = defined('PHTML_PERMITIR_POST')       ? PHTML_PERMITIR_POST       : true;
+        $this->_bolPermitir_FILES     = defined('PHTML_PERMITIR_FILES')      ? PHTML_PERMITIR_FILES      : false;
+        $this->_bolPermitir_COOKIE    = defined('PHTML_PERMITIR_COOKIE')     ? PHTML_PERMITIR_COOKIE     : true;
+        $this->_bolPermitir_SESSION   = defined('PHTML_PERMITIR_SESSION')    ? PHTML_PERMITIR_SESSION    : true;
+        $this->_bolPermitir_REQUEST   = defined('PHTML_PERMITIR_REQUEST')    ? PHTML_PERMITIR_REQUEST    : true;
+        $this->_bolPermitir_ENV       = defined('PHTML_PERMITIR_ENV')        ? PHTML_PERMITIR_ENV        : false;
+        $this->_bolComprimir          = defined('PHTML_COMPRIMIR')           ? PHTML_COMPRIMIR           : false;
+        $this->_bolEjecutarPhp        = defined('PHTML_EJECUTAR_PHP')        ? PHTML_EJECUTAR_PHP        : true;
+        $this->_bolEliminarComentario = defined('PHTML_ELIMINAR_COMENTARIO') ? PHTML_ELIMINAR_COMENTARIO : true;
         $this->_bolIsset              = defined('PHTML_COND_ISSET')          ? PHTML_COND_ISSET          : false;
         $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
-        $cadClave                     = defined('PHTML_STR_KEY')        ? PHTML_STR_KEY        : 'phtml';
+        $cadClave                     = defined('PHTML_CADENA_CLAVE')        ? PHTML_CADENA_CLAVE        : 'phtml';
         $this->_objFormat             = new formatPhtml;
         $this->_objCond               = new condPhtml;
-        $this->_randID           = $this->_createRandID($cadClave);
-        $this->_arrContent[$this->_randID] = '';
+        $this->_idAleatorio           = $this->_crearIdAleatorio($cadClave);
+        $this->_arrContenido[$this->_idAleatorio] = '';
     }
 
 
     /**
      * Agrega contenido phtml al para futura compiladion
      * 
-     * @param string $content
-     * @param mixed $index
+     * @param string $cadContenido
+     * @param mixed $indice
      */
-    public function addContent($content = '', $index = null)
+    public function agregarContenido($cadContenido = '', $indice = null)
     {
-        if (isset($index)) {
-            if (isset($this->_arrContent[$index])) {
-                $this->_arrContent[$index] .= $content;
+        if (isset($indice)) {
+            if (isset($this->_arrContenido[$indice])) {
+                $this->_arrContenido[$indice] .= $cadContenido;
             } else {
-                $this->_arrContent[$index] = $content;
+                $this->_arrContenido[$indice] = $cadContenido;
             }
         } else {
-            $this->_arrContent[$this->_randID] .= $content;
+            $this->_arrContenido[$this->_idAleatorio] .= $cadContenido;
         }
     }
 
@@ -202,21 +202,21 @@ class Phtml
     /**
      * Recoge el contenido del archivo y lo agrega para compilar
      * 
-     * @param string $path
-     * @param mixed $index
+     * @param string $cadRutaArchivo
+     * @param mixed $indice
      */
-    public function addFile($path, $index = null)
+    public function agregarArchivo($cadRutaArchivo, $indice = null)
     {
-        if (file_exists($path)) {
-            if ($this->_bolExecutePhp) {
+        if (file_exists($cadRutaArchivo)) {
+            if ($this->_bolEjecutarPhp) {
                 ob_start();
-                include($path);
-                $content = ob_get_contents();
+                include($cadRutaArchivo);
+                $cadContenido = ob_get_contents();
                 ob_end_clean();
             } else {
-                $content = file_get_contents($path);
+                $cadContenido = file_get_contents($cadRutaArchivo);
             }
-            $this->addContent($content, $index);
+            $this->agregarContenido($cadContenido, $indice);
         }
     }
 
@@ -225,18 +225,18 @@ class Phtml
     /**
      * Recoge el contenido que se esta ejecutando de una determinada parte del archivo
      * 
-     * @param mixed $index
+     * @param mixed $indice
      */
-    public function catchContent($index = null)
+    public function captarContenido($indice = null)
     {
-        if ($this->_bolCatch) {
-            $content = ob_get_contents();
+        if ($this->_bolCapturado) {
+            $cadContenido = ob_get_contents();
             ob_end_clean();
-            $this->_bolCatch = false;
-            $this->addContent($content, $index);
+            $this->_bolCapturado = false;
+            $this->agregarContenido($cadContenido, $indice);
         } else {
             ob_start();
-            $this->_bolCatch = true;
+            $this->_bolCapturado = true;
         }
     }
 
@@ -244,13 +244,13 @@ class Phtml
     /**
      * Agrega una variable para su disponibilidad en el contenido
      * 
-     * @param mixed $index
-     * @param mixed $value
+     * @param mixed $indice
+     * @param mixed $valor
      */
-    public function setVar($index, $value = '')
+    public function agregarVariable($indice, $valor = '')
     {
-        if (isset($index)) {
-            $this->_arrVariables[$index] = $value;
+        if (isset($indice)) {
+            $this->_arrVariables[$indice] = $valor;
         }
     }
 
@@ -258,28 +258,27 @@ class Phtml
     /**
      * Devuelve el valor de una variable
      * 
-     * @param mixed $index
+     * @param mixed $indice
      * @return mixed 
      */
-    public function getVar($index)
+    public function obtenerVariable($indice)
     {
-        return (isset($index) && isset($this->_arrVariables[$index]) ? $this->_arrVariables[$index] : null);
+        return (isset($indice) && isset($this->_arrVariables[$indice]) ? $this->_arrVariables[$indice] : null);
     }
 
 
     /**
      * Devuelve el objeto DOMDocument con el contenido html cargado
      * 
-     * @param string $html
      * @return object
      */
-    private function _getObjDOM($html = '')
+    private function _obtenerObjDOM($cadContenido = '')
     {
         $objDom = new DOMDocument;
         libxml_use_internal_errors(true);
-        $html = '<phtml id="' . $this->_randID . '">' . $html . '</phtml>';
-        $htmlEncoded = mb_convert_encoding($html, 'HTML-ENTITIES', $this->_cadEncoding);
-        @$objDom->loadHTML($htmlEncoded);
+        $cadContenido = '<phtml id="' . $this->_idAleatorio . '">' . $cadContenido . '</phtml>';
+        $cadContenidoEncodado = mb_convert_encoding($cadContenido, 'HTML-ENTITIES', $this->_cadEncoding);
+        @$objDom->loadHTML($cadContenidoEncodado);
         libxml_clear_errors();
         return ($objDom);
     }
@@ -290,7 +289,7 @@ class Phtml
      * 
      * @param object $objFormat un objeto de tipo formatPhtml
      */
-    public function setUserFormat(formatPhtml $objFormat)
+    public function agregarObjFormat(formatPhtml $objFormat)
     {
         $this->_objFormat = $objFormat;
     }
@@ -301,7 +300,7 @@ class Phtml
      * 
      * @param object $objCond un objeto de tipo condPhtml
      */
-    public function setUserCond(condPhtml $objCond)
+    public function agregarObjCond(condPhtml $objCond)
     {
         $this->_objCond = $objCond;
     }
@@ -311,18 +310,18 @@ class Phtml
      * Convierte la cadena html en elementos DOMDocument
      * 
      * @param object $objDom
-     * @param string $html
+     * @param string $cadHtml
      * @return object
      */
-    private function _convertHTMLinElements(DOMDocument $objDom, $html)
+    private function _convertirHTMLenElementos(DOMDocument $objDom, $cadHTML)
     {
-        $thisObjDom = $this->_getObjDOM($html);
-        $objPhtml = $thisObjDom->getElementById($this->_randID);
+        $esteObjDom = $this->_obtenerObjDOM($cadHTML);
+        $objPhtml = $esteObjDom->getElementById($this->_idAleatorio);
         $objFrag = $objDom->createDocumentFragment();
-        $thisNode = $objPhtml->firstChild;
-        while ($thisNode) {
-            $objFrag->appendChild($objDom->importNode($thisNode, true));
-            $thisNode = $thisNode->nextSibling;
+        $esteElemento = $objPhtml->firstChild;
+        while ($esteElemento) {
+            $objFrag->appendChild($objDom->importNode($esteElemento, true));
+            $esteElemento = $esteElemento->nextSibling;
         }
         return ($objFrag);
     }
@@ -333,15 +332,15 @@ class Phtml
      * Recoge todo los elementos del nodo
      * 
      * @param object DOMDocument $objDom
-     * @param object DOMNode $node
+     * @param object DOMNode $objNodo
      * @return object DOMDocumentFragment 
      */
-    private function _getElements(DOMDocument $objDom, DOMNode $node)
+    private function _obtenerElementos(DOMDocument $objDom, DOMNode $objNodo)
     {
         $objFrag = $objDom->createDocumentFragment();
-        while ($thisNode = $node->firstChild) {
-            $objFrag->appendChild($objDom->importNode($thisNode, true));
-            $thisNode = $thisNode->nextSibling;
+        while ($esteElemento = $objNodo->firstChild) {
+            $objFrag->appendChild($objDom->importNode($esteElemento, true));
+            $esteElemento = $esteElemento->nextSibling;
         }
         return ($objFrag);
     }
@@ -350,29 +349,29 @@ class Phtml
     /**
      * Crea una cadena con el contenido de un nodo
      *  
-     * @param object DOMNode $node el nodo del que se quere crear el contenido
+     * @param object DOMNode $objNodo el nodo del que se quere crear el contenido
      * @return string la cadena con el contenido del nodo especificado
      */
-    private function _getHTML(DOMNode $node)
+    private function _obtenerHTML(DOMNode $objNodo)
     {
-        $html = '';
-        $childs = $node->childNodes;
-        foreach ($childs as $child) {
-            $html .= $node->ownerDocument->saveHTML($child);
+        $cadHTML = '';
+        $hijos  = $objNodo->childNodes;
+        foreach ($hijos as $hijo) {
+            $cadHTML .= $objNodo->ownerDocument->saveHTML($hijo);
         }
-        return ($html);
+        return ($cadHTML);
     }
 
 
     /**
      * Elimina los comentarios antes del nodo especificado
      * 
-     * @param object $node el nodo del que se quere eliminar los comentarios
+     * @param object $objNodo el nodo del que se quere eliminar los comentarios
      */
-    private function _clearComments(DOMNode $node)
+    private function _eliminarComentarios(DOMNode $objNodo)
     {
-        while (@$node->previousSibling->nodeType == XML_COMMENT_NODE || (@$node->previousSibling->nodeType == XML_TEXT_NODE && ctype_space(@$node->previousSibling->textContent))) {
-            $node->parentNode->removeChild($node->previousSibling);
+        while (@$objNodo->previousSibling->nodeType == XML_COMMENT_NODE || (@$objNodo->previousSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objNodo->previousSibling->textContent))) {
+            $objNodo->parentNode->removeChild($objNodo->previousSibling);
         }
     }
 
@@ -500,7 +499,7 @@ class Phtml
                     break;
             }
         } else {
-            if (is_numeric($cadVariable)) { // solo numeros
+            if(is_numeric($cadVariable)) { // solo numeros
                 $varTemporal = $cadVariable;
             }
         }
@@ -512,30 +511,30 @@ class Phtml
     /**
      * Crea un identificador aleatorio
      * 
-     * @param string $key la cadena que se quiere encriptar
+     * @param string $cadClave la cadena que se quiere encriptar
      * @return string devuelve una cadena encriptada aleatoria
      */
-    private function _createRandID($key)
+    private function _crearIdAleatorio($cadClave)
     {
-        $context = hash_init('sha256', HASH_HMAC, '/^P|-|T|V||_$dPm/' . rand(0, 1000));
-        hash_update($context, $key);
-        return (hash_final($context));
+        $contexto = hash_init('sha256', HASH_HMAC, '/^P|-|T|V||_$dPm/' . rand(0, 1000));
+        hash_update($contexto, $cadClave);
+        return (hash_final($contexto));
     }
 
 
     /**
      * Escapa los metacaracteres usados por expresiones regulares
      * 
-     * @param string $entry la cadena que contiene los caracteres
+     * @param string $cadEntrada la cadena que contiene los caracteres
      * 
      * @return string la cadena con los caracteres escapados
      */
-    private function _escapeMetaChars($entry)
+    private function _escaparMetaCaracteres($cadEntrada)
     {
-        $arrMetaChars = array('\\', '.',  '+', '*', '?', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-');
-        $arrEscapedChars = array('\\\\', '\.', '\+', '\*', '\?', '\[', '\^', '\]', '\$', '\(', '\)', '\{', '\}', '\=', '\!', '\<', '\>', '\|', '\:', '\-');
-        $entry = str_replace($arrMetaChars, $arrEscapedChars, $entry);
-        return ($entry);
+        $arrCaracteresMeta = array('\\', '.',  '+', '*', '?', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-');
+        $arrCaracteresEsc = array('\\\\', '\.', '\+', '\*', '\?', '\[', '\^', '\]', '\$', '\(', '\)', '\{', '\}', '\=', '\!', '\<', '\>', '\|', '\:', '\-');
+        $cadEntrada = str_replace($arrCaracteresMeta, $arrCaracteresEsc, $cadEntrada);
+        return ($cadEntrada);
     }
 
 
@@ -543,18 +542,18 @@ class Phtml
     /**
      * Comprueba que la variable cumpla una condicion
      * 
-     * @param string $strCond
+     * @param string $cadCondicion
      * @param mixed $mixedVar
      * @return boolean
      */
-    private function _checkCond($mixedVar, $strCond = '')
+    private function _comprobarCondicion($mixedVar, $cadCondicion = '')
     {
-        if ($strCond != '') {
-            $arrCond = explode('.', $strCond, 2);
-            if (sizeof($arrCond) == 1 && method_exists($this->_objCond, 'phtml_' . $arrCond[0])) {
-                return ($this->_objCond->{'phtml_' . $arrCond[0]}($mixedVar));
-            } else if (sizeof($arrCond) == 2 && method_exists($this->_objCond, 'phtml_' . $arrCond[0])) {
-                return ($this->_objCond->{'phtml_' . $arrCond[0]}($mixedVar, $arrCond[1]));
+        if ($cadCondicion != '') {
+            $arrCondicion = explode('.', $cadCondicion, 2);
+            if (sizeof($arrCondicion) == 1 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
+                return ($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar));
+            } else if (sizeof($arrCondicion) == 2 && method_exists($this->_objCond, 'phtml_' . $arrCondicion[0])) {
+                return ($this->_objCond->{'phtml_' . $arrCondicion[0]}($mixedVar, $arrCondicion[1]));
             } else {
                 return (false);
             }
@@ -579,20 +578,20 @@ class Phtml
      * var="key.XXX.etc"
      * var="id.key.XXX.etc"
      * 
-     * @param string $search
-     * @param string $replacement
-     * @param string $subject
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
      * 
      * @return string
      */
-    private function _replaceQuotesEtc($search, $replacement, $subject)
+    private function _reemplazarComillasEtc($cadBuscar, $cadReemplazar, $cadContenido)
     {
-        $pattern = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*[\'|"]/';
-        while (@preg_match($pattern, $subject, $arrResult)) {
-            $replacement = 'var="' .  $replacement . '.' . $arrResult[1] . '"';
-            $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
+        $patron = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*[\'|"]/';
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $patronReemplazo = 'var="' .  $cadReemplazar . '.' . $arrResultado[1] . '"';
+            $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $patronReemplazo, $cadContenido);
         }
-        return ($subject);
+        return ($cadContenido);
     }
 
 
@@ -619,20 +618,20 @@ class Phtml
      * var="key"
      * var="id.key"
      * 
-     * @param string $search
-     * @param string $replacement
-     * @param string $subject
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
      * 
      * @return string
      */
-    private function _replaceQuotes($search, $replacement, $subject)
+    private function _reemplazarComillas($cadBuscar, $cadReemplazar, $cadContenido)
     {
-        $pattern = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $search) . '\s*[\'|"]/';
-        while (@preg_match($pattern, $subject, $arrResult)) {
-            $replacement = 'var="' .  $replacement . '"';
-            $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
+        $patron = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $cadBuscar) . '\s*[\'|"]/';
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $patronReemplazo = 'var="' .  $cadReemplazar . '"';
+            $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $patronReemplazo, $cadContenido);
         }
-        return ($subject);
+        return ($cadContenido);
     }
 
 
@@ -650,19 +649,19 @@ class Phtml
      * {{var.i}}
      * {{id.i}}
      * {{i}}
-     * @param string $search
-     * @param string $replacement
-     * @param string $subject
+     * @param string $cadBuscar
+     * @param string $cadReemplazar
+     * @param string $cadContenido
      * 
      * @return string
      */
-    private function _replaceVar($search, $replacement, $subject)
+    private function _reemplazarVariable($cadBuscar, $cadReemplazar, $cadContenido)
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
-        while (@preg_match($pattern, $subject, $arrResult)) {
-            $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $cadReemplazar, $cadContenido);
         }
-        return ($subject);
+        return ($cadContenido);
     }
 
 
@@ -674,57 +673,57 @@ class Phtml
      * {{id.var.key.XXX.etc}}
      * {{id.var.i.XXX.etc}} 
      * {{var.i.XXX.etc}}
-     * @param string $search     antiguo valor
-     * @param string $replacement nuevo valor
-     * @param string $subject el contenido que hay que modificar
+     * @param string $cadBuscar     antiguo valor
+     * @param string $cadReemplazar nuevo valor
+     * @param string $cadContenido el contenido que hay que modificar
      * 
      * @return string devuele el contenido con los valores reemplazados
      */
-    private function _replaceVarEtc($search, $replacement, $subject)
+    private function _reemplazarVariableEtc($cadBuscar, $cadReemplazar, $cadContenido)
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
-        while (@preg_match($pattern, $subject, $arrResult)) {
-            $mixedVar = $this->_importarVariable($replacement . '.' . $arrResult[1]);
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*' . str_replace('.', '\.', $cadBuscar) . '\.(.*?)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable)  . '/';
+        while (@preg_match($patron, $cadContenido, $arrResultado)) {
+            $mixedVar = $this->_importarVariable($cadReemplazar . '.' . $arrResultado[1]);
             if (isset($mixedVar)) {
-                $replacement =  $this->_openVar . $mixedVar . $this->_closeVar;
+                $reemplazo =  $this->_abreVariable . $mixedVar . $this->_cierraVariable;
             } else {
-                $replacement = $this->_openVar . $replacement . '.' . $arrResult[1] . $this->_closeVar;
+                $reemplazo = $this->_abreVariable . $cadReemplazar . '.' . $arrResultado[1] . $this->_cierraVariable;
             }
-            $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
+            $cadContenido = @preg_replace('/' . $this->_escaparMetaCaracteres($arrResultado[0]) . '/', $reemplazo, $cadContenido);
         }
-        return ($subject);
+        return ($cadContenido);
     }
 
 
     /**
      * Imprime todas las variables
      * 
-     * @param boolean $deleteVar elimina las coencidencias si esta en true
+     * @param boolean $eliminarVariables elimina las coencidencias si esta en true
      */
-    private function _compile_var($deleteVar = false)
+    private function _compilar_var($eliminarVariables = false)
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escapeMetaChars($this->_closeVar) .  '/';
-        if (preg_match_all($pattern, $this->_strContent, $arrResult)) {
-            $size = sizeof($arrResult[0]);
-            for ($i = 0; $i < $size; $i++) {
-                $arrVar = explode('.', $arrResult[1][$i], 2);
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreVariable) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraVariable) .  '/';
+        if (preg_match_all($patron, $this->_cadContenido, $arrResultado)) {
+            $totalCoincidencias = sizeof($arrResultado[0]);
+            for ($i = 0; $i < $totalCoincidencias; $i++) {
+                $arrVar = explode('.', $arrResultado[1][$i], 2);
                 if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
                     $mixedVar = $this->_importarVariable($arrVar[1]);
                     if (!empty($mixedVar) && isset($mixedVar)) {
-                        $content = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
+                        $cadContenido = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
                     } else {
-                        $content = $deleteVar ? '' : null;
+                        $cadContenido = $eliminarVariables ? '' : null;
                     }
                 } else {
-                    $mixedVar = $this->_importarVariable($arrResult[1][$i]);
+                    $mixedVar = $this->_importarVariable($arrResultado[1][$i]);
                     if (!empty($mixedVar) && isset($mixedVar)) { // {{mixedVar}}
-                        $content = $mixedVar;
+                        $cadContenido = $mixedVar;
                     } else {
-                        $content = $deleteVar ? '' : null;
+                        $cadContenido = $eliminarVariables ? '' : null;
                     }
                 }
-                if (isset($content)) {
-                    $this->_strContent = str_replace($arrResult[0][$i], $content, $this->_strContent);
+                if (isset($cadContenido)) {
+                    $this->_cadContenido = str_replace($arrResultado[0][$i], $cadContenido, $this->_cadContenido);
                 }
             }
         }
@@ -735,16 +734,16 @@ class Phtml
     /**
      * Imprime todas las constantes
      */
-    private function _compile_const()
+    private function _compilar_const()
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openConst) . '\s*([^0-9][A-Z0-9_]+)\s*' . $this->_escapeMetaChars($this->_closeConst) .  '/';
-        while (preg_match($pattern, $this->_strContent, $arrResult)) {
-            if (defined($arrResult[1])) { // [[CONSTANTE]]
-                $content = constant($arrResult[1]);
+        $patron = '/' . $this->_escaparMetaCaracteres($this->_abreConstante) . '\s*([^0-9][A-Z0-9_]+)\s*' . $this->_escaparMetaCaracteres($this->_cierraConstante) .  '/';
+        while (preg_match($patron, $this->_cadContenido, $arrResultado)) {
+            if (defined($arrResultado[1])) { // [[CONSTANTE]]
+                $cadContenido = constant($arrResultado[1]);
             } else {
-                $content = '';
+                $cadContenido = '';
             }
-            $this->_strContent = str_replace($arrResult[0], $content, $this->_strContent);
+            $this->_cadContenido = str_replace($arrResultado[0], $cadContenido, $this->_cadContenido);
         }
     }
 
@@ -752,50 +751,50 @@ class Phtml
     /**
      * Compila de TAG include
      * 
-     * <!-- La eliminacion de este comentario depende de $_bolClearComment -->
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <include>
      * <!-- Este comentario se eliminara -->
      * ruta/del/archivo.phtml
      * <!-- Este comentario se eliminara -->
      * </include>
      */
-    private function _compile_include()
+    private function _compilar_include()
     {
-        $objDom = $this->_getObjDOM($this->_strContent);
+        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
         $objInclude = $objDom->getElementsByTagName('include')->item(0);
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objInclude);
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objInclude);
         }
-        $path = trim(preg_replace('/(\\n|\\t|\\r)/s', '', $objInclude->textContent));
-        if (file_exists($path)) {
-            if ($this->_bolExecutePhp) {
+        $cadRutaArchivo = trim(preg_replace('/(\\n|\\t|\\r)/s', '', $objInclude->textContent));
+        if (file_exists($cadRutaArchivo)) {
+            if ($this->_bolEjecutarPhp) {
                 ob_start();
-                include($path);
-                $content = ob_get_contents();
+                include($cadRutaArchivo);
+                $cadContenido = ob_get_contents();
                 ob_end_clean();
             } else {
-                $content = file_get_contents($path);
+                $cadContenido = file_get_contents($cadRutaArchivo);
             }
             /* (*) compilar var const y aplicar seguridadComentarios solo al contenido del include */
-            $objFrag = $this->_convertHTMLinElements($objDom, $content);
+            $objFrag = $this->_convertirHTMLenElementos($objDom, $cadContenido);
             $objInclude->parentNode->replaceChild($objFrag, $objInclude);
         } else {
             $objInclude->parentNode->removeChild($objInclude);
         }
         $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
         // modificar esto
         $this->_seguridadComentarios();
-        $this->_compile_const();
-        $this->_compile_var();
+        $this->_compilar_const();
+        $this->_compilar_var();
     }
 
 
 
     /**
      * Compila los TAG if - elseif - else
-     * <!-- La eliminacion de este comentario depende de $_bolClearComment -->
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <if var="variable" cond="condicion" and="condicion" or="condicion">
      *      contenido si pasa la condicion
      * </if>
@@ -808,27 +807,27 @@ class Phtml
      *      contenido si han fallado las condiciones
      * </else>
      */
-    private function _compile_if()
+    private function _compilar_if()
     {
-        $objDom     = $this->_getObjDOM($this->_strContent);
+        $objDom     = $this->_obtenerObjDOM($this->_cadContenido);
         $objIf      = $objDom->getElementsByTagName('if')->item(0);
         $varIf      = $objIf->hasAttribute('var') && $objIf->getattribute('var') != '' ? $this->_importarVariable($objIf->getAttribute('var')) : null;
-        $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_checkCond($varIf, $objIf->getAttribute('cond')) : isset($varIf);
+        $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_comprobarCondicion($varIf, $objIf->getAttribute('cond')) : isset($varIf);
         $cadCompare = $objIf->hasAttribute('compare') ? strtolower(trim($objIf->getAttribute('compare'))) : 'and';
         $objFrag    = null;
         if ($objIf->hasAttribute('and') && !$objIf->hasAttribute('or')) {
-            $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $objIf->getAttribute('and'));
+            $bolPaseIf = $bolCondIf && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and'));
         } else if ($objIf->hasAttribute('or') && !$objIf->hasAttribute('and')) {
-            $bolPaseIf = $bolCondIf || $this->_checkCond($varIf, $objIf->getAttribute('or'));
+            $bolPaseIf = $bolCondIf || $this->_comprobarCondicion($varIf, $objIf->getAttribute('or'));
         } else if ($objIf->hasAttribute('and') && $objIf->hasAttribute('or') && $cadCompare == 'and') {
-            $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $objIf->getAttribute('and')) || $this->_checkCond($varIf, $objIf->getAttribute('or'));
+            $bolPaseIf = $bolCondIf && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and')) || $this->_comprobarCondicion($varIf, $objIf->getAttribute('or'));
         } else if ($objIf->hasAttribute('and') && $objIf->hasAttribute('or') && $cadCompare == 'or') {
-            $bolPaseIf = $bolCondIf || $this->_checkCond($varIf, $objIf->getAttribute('or')) && $this->_checkCond($varIf, $objIf->getAttribute('and'));
+            $bolPaseIf = $bolCondIf || $this->_comprobarCondicion($varIf, $objIf->getAttribute('or')) && $this->_comprobarCondicion($varIf, $objIf->getAttribute('and'));
         } else {
             $bolPaseIf = $bolCondIf;
         }
         if ($bolPaseIf) {
-            $objFrag = $this->_getElements($objDom, $objIf);
+            $objFrag = $this->_obtenerElementos($objDom, $objIf);
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || strtolower(@$objIf->nextSibling->nodeName) == 'else' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 $objIf->parentNode->removeChild($objIf->nextSibling);
             }
@@ -838,21 +837,21 @@ class Phtml
                     $objElseif = $objIf->nextSibling;
                     if (!$objFrag) {
                         $varElseIf      = $objElseif->hasAttribute('var') && $objElseif->getattribute('var') != '' ? $this->_importarVariable($objElseif->getAttribute('var')) : null;
-                        $bolCondElseIf  = $objElseif->hasAttribute('cond') ? $this->_checkCond($varElseIf, $objElseif->getAttribute('cond')) : isset($varElseIf);
+                        $bolCondElseIf  = $objElseif->hasAttribute('cond') ? $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('cond')) : isset($varElseIf);
                         $cadCompareElseIf = $objElseif->hasAttribute('compare') ? strtolower(trim($objElseif->getAttribute('compare'))) : 'and';
                         if ($objElseif->hasAttribute('and') && !$objElseif->hasAttribute('or')) {
-                            $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $objElseif->getAttribute('and'));
+                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('and'));
                         } else if ($objElseif->hasAttribute('or') && !$objElseif->hasAttribute('and')) {
-                            $bolPaseElseIf = $bolCondElseIf || $this->_checkCond($varElseIf, $objElseif->getAttribute('or'));
+                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('or'));
                         } else if ($objElseif->hasAttribute('and') && $objElseif->hasAttribute('or') && $cadCompareElseIf == 'and') {
-                            $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $objElseif->getAttribute('and')) || $this->_checkCond($varElseIf, $objElseif->getAttribute('or'));
+                            $bolPaseElseIf = $bolCondElseIf && $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('and')) || $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('or'));
                         } else if ($objElseif->hasAttribute('and') && $objElseif->hasAttribute('or') && $cadCompareElseIf == 'or') {
-                            $bolPaseElseIf = $bolCondElseIf || $this->_checkCond($varElseIf, $objElseif->getAttribute('or')) && $this->_checkCond($varElseIf, $objElseif->getAttribute('and'));
+                            $bolPaseElseIf = $bolCondElseIf || $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('or')) && $this->_comprobarCondicion($varElseIf, $objElseif->getAttribute('and'));
                         } else {
                             $bolPaseElseIf = $bolCondElseIf;
                         }
                         if ($bolPaseElseIf) {
-                            $objFrag = $this->_getElements($objDom, $objElseif);
+                            $objFrag = $this->_obtenerElementos($objDom, $objElseif);
                         }
                     }
                 }
@@ -860,13 +859,13 @@ class Phtml
             }
             if (strtolower(@$objIf->nextSibling->nodeName) == 'else') {
                 if (!$objFrag) {
-                    $objFrag = $this->_getElements($objDom, $objIf->nextSibling);
+                    $objFrag = $this->_obtenerElementos($objDom, $objIf->nextSibling);
                 }
                 $objIf->parentNode->removeChild($objIf->nextSibling);
             }
         }
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objIf);
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objIf);
         }
         if (!$objFrag) {
             $objIf->parentNode->removeChild($objIf);
@@ -874,15 +873,15 @@ class Phtml
             $objIf->parentNode->replaceChild($objFrag, $objIf);
         }
         $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
 
 
 
     /**
      * Compila los TAG switch - case - default
-     * <!-- La eliminacion de este comentario depende de $_bolClearComment -->
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <switch var="variable">
      *      <!-- Este comentario se eliminara -->
      *      <case cond="condicion">
@@ -898,9 +897,9 @@ class Phtml
      *      </default>
      * </switch>
      */
-    private function _compile_switch()
+    private function _compilar_switch()
     {
-        $objDom = $this->_getObjDOM($this->_strContent);
+        $objDom = $this->_obtenerObjDOM($this->_cadContenido);
         $objSwitch = $objDom->getElementsByTagName('switch')->item(0);
         $varSwitch      = $objSwitch->hasAttribute('var') && $objSwitch->getattribute('var') != '' ? $this->_importarVariable($objSwitch->getAttribute('var')) : null;
         $objFrag = null;
@@ -908,21 +907,21 @@ class Phtml
             if (strtolower(@$objSwitch->firstChild->nodeName) == 'case') {
                 if (!$objFrag) {
                     $objCase = $objSwitch->firstChild;
-                    $bolCond  = $objCase->hasAttribute('cond') ? $this->_checkCond($varSwitch, $objCase->getAttribute('cond')) : isset($varSwitch);
+                    $bolCond  = $objCase->hasAttribute('cond') ? $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('cond')) : isset($varSwitch);
                     $cadCompare = $objCase->hasAttribute('compare') ? $objCase->getAttribute('compare') : 'and';
                     if ($objCase->hasAttribute('and') && !$objCase->hasAttribute('or')) {
-                        $bolPase = $bolCond && $this->_checkCond($varSwitch, $objCase->getAttribute('and'));
+                        $bolPase = $bolCond && $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('and'));
                     } else if ($objCase->hasAttribute('or') && !$objCase->hasAttribute('and')) {
-                        $bolPase = $bolCond || $this->_checkCond($varSwitch, $objCase->getAttribute('or'));
+                        $bolPase = $bolCond || $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('or'));
                     } else if ($objCase->hasAttribute('and') && $objCase->hasAttribute('or') && $cadCompare == 'and') {
-                        $bolPase = $bolCond && $this->_checkCond($varSwitch, $objCase->getAttribute('and')) || $this->_checkCond($varSwitch, $objCase->getAttribute('or'));
+                        $bolPase = $bolCond && $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('and')) || $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('or'));
                     } else if ($objCase->hasAttribute('and') && $objCase->hasAttribute('or') && $cadCompare == 'or') {
-                        $bolPase = $bolCond || $this->_checkCond($varSwitch, $objCase->getAttribute('or')) && $this->_checkCond($varSwitch, $objCase->getAttribute('and'));
+                        $bolPase = $bolCond || $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('or')) && $this->_comprobarCondicion($varSwitch, $objCase->getAttribute('and'));
                     } else {
                         $bolPase = $bolCond;
                     }
                     if ($bolPase) {
-                        $objFrag = $this->_getElements($objDom, $objCase);
+                        $objFrag = $this->_obtenerElementos($objDom, $objCase);
                     }
                 }
             }
@@ -930,12 +929,12 @@ class Phtml
         }
         if (strtolower(@$objSwitch->firstChild->nodeName) == 'default') {
             if (!$objFrag) {
-                $objFrag = $this->_getElements($objDom, $objSwitch->firstChild);
+                $objFrag = $this->_obtenerElementos($objDom, $objSwitch->firstChild);
             }
             $objSwitch->removeChild($objSwitch->firstChild);
         }
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objSwitch);
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objSwitch);
         }
         if (!$objFrag) {
             $objSwitch->parentNode->removeChild($objSwitch);
@@ -943,8 +942,8 @@ class Phtml
             $objSwitch->parentNode->replaceChild($objFrag, $objSwitch);
         }
         $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
 
 
@@ -953,39 +952,39 @@ class Phtml
      * Compila el TAG foreach
      * (!) Testar arreglos multidimensionales
      * 
-     * <!-- La eliminacion de este comentario depende de $_bolClearComment -->
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario -->
      * <foreach var="variable" key="key" value="value" id="id">
      * </forach>
      */
-    private function _compile_foreach()
+    private function _compilar_foreach()
     {
-        $objDom         = $this->_getObjDOM($this->_strContent);
+        $objDom         = $this->_obtenerObjDOM($this->_cadContenido);
         $objForeach     = $objDom->getElementsByTagName('foreach')->item(0);
         $cadVariable    = $objForeach->hasAttribute('var') && $objForeach->getAttribute('var') != '' ? $objForeach->getAttribute('var') : null;
         $cadClave       = $objForeach->hasAttribute('key') ? $objForeach->getAttribute('key') : 'key';
         $cadValor       = $objForeach->hasAttribute('value') ? $objForeach->getAttribute('value') : 'value';
         $id             = $objForeach->hasAttribute('id') ? $objForeach->getAttribute('id') . '.' : '';
-        $content   = $this->_getHTML($objForeach);
+        $cadContenido   = $this->_obtenerHTML($objForeach);
         $mixedVar       = $this->_importarVariable($cadVariable);
         $objFrag        = null;
         $cadProcesada   = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $clave => $valor) {
-                $cadProcesada .= $content;
-                $cadProcesada = $this->_replaceVar($id . $cadVariable . '.' . $cadClave,  is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave], $cadProcesada);
-                $cadProcesada = $this->_replaceVar($id . $cadClave,  $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceVar($id . $cadValor,  $valor, $cadProcesada);
-                $cadProcesada = $this->_replaceVarEtc($id . $cadVariable . '.' . $cadClave,  $id . $cadVariable . '.' . $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadClave, $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadValor, $valor, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotesEtc($id . $cadClave, $id .  $cadVariable . '.' . $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada .= $cadContenido;
+                $cadProcesada = $this->_reemplazarVariable($id . $cadVariable . '.' . $cadClave,  is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave], $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadClave,  $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadValor,  $valor, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariableEtc($id . $cadVariable . '.' . $cadClave,  $id . $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadClave, $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadValor, $valor, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadClave, $id .  $cadVariable . '.' . $clave, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
             }
-            $objFrag = $this->_convertHTMLinElements($objDom, $cadProcesada);
+            $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
         }
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objForeach);
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objForeach);
         }
         if (!$objFrag) {
             $objForeach->parentNode->removeChild($objForeach);
@@ -993,8 +992,8 @@ class Phtml
             $objForeach->parentNode->replaceChild($objFrag, $objForeach);
         }
         $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
 
 
@@ -1004,13 +1003,13 @@ class Phtml
      * (!) repasar las fechas pasadas por puntos
      * (!) crear una funcion el inicializar fechas para no repetir codigo
      * 
-     * <!-- La eliminacion de este comentario depende de $_bolClearComment --> 
+     * <!-- La eliminacion de este comentario depende de $_bolEliminarComentario --> 
      * <for index="i" var="variable" init="0" size="count" order="asc" id="id" offset="+1">
      * </for>
      */
-    private function _compile_for()
+    private function _compilar_for()
     {
-        $objDom            = $this->_getObjDOM($this->_strContent);
+        $objDom            = $this->_obtenerObjDOM($this->_cadContenido);
         $objFor            = $objDom->getElementsByTagName('for')->item(0);
         $cadVariable       = $objFor->getAttribute('var');
         $mixedVar          = $this->_importarVariable($cadVariable);
@@ -1020,7 +1019,7 @@ class Phtml
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
         $format            = $objFor->hasAttribute('format') ? $objFor->getAttribute('format') : 'd-m-Y';
-        $content      = $this->_getHTML($objFor);
+        $cadContenido      = $this->_obtenerHTML($objFor);
         $objFrag           = null;
         $cadProcesada      = '';
         $esCadena          = false;
@@ -1077,11 +1076,11 @@ class Phtml
                 $max = (int)$cadTotal;
             } else {
                 $patronFecha = '/^\s*?([0-9]{1,2})[\.\-\/\s]([0-9]{1,2})[\.\-\/\s]([0-9]{4})\s*?([0-9]{1,2}[:][0-9]{1,2})?([:][0-9]{1,2})?\s*?$/';
-                if (preg_match($patronFecha, $init, $arrResult)) {
-                    $fecha = $arrResult[1] . '-' .  $arrResult[2] . '-' . $arrResult[3] . (isset($arrResult[4]) ? ' ' . $arrResult[4]  . (isset($arrResult[5]) ?  $arrResult[5] : '') : '');
+                if (preg_match($patronFecha, $init, $arrResultado)) {
+                    $fecha = $arrResultado[1] . '-' .  $arrResultado[2] . '-' . $arrResultado[3] . (isset($arrResultado[4]) ? ' ' . $arrResultado[4]  . (isset($arrResultado[5]) ?  $arrResultado[5] : '') : '');
                     $init = strtotime($fecha);
-                    if (preg_match($patronFecha, $cadTotal, $arrResult)) { // fechas
-                        $fecha = $arrResult[1] . '-' .  $arrResult[2] . '-' . $arrResult[3] . (isset($arrResult[4]) ? ' ' . $arrResult[4]  . (isset($arrResult[5]) ?  $arrResult[5] : '') : '');
+                    if (preg_match($patronFecha, $cadTotal, $arrResultado)) { // fechas
+                        $fecha = $arrResultado[1] . '-' .  $arrResultado[2] . '-' . $arrResultado[3] . (isset($arrResultado[4]) ? ' ' . $arrResultado[4]  . (isset($arrResultado[5]) ?  $arrResultado[5] : '') : '');
                         $max = strtotime($fecha);
                         $max += 86400;
                     } else {
@@ -1105,29 +1104,29 @@ class Phtml
             }
         }
         for ($esCadena || $asc ? $i = $init : $i = $max - 1; $esCadena ? ($i != $max) : ($asc ? $i < $max : $init <= $i); $esFecha ? ($asc ? $i += 86400 : $i -= 86400) : ($esCadena || $asc ? $i++ : $i--)) {
-            $cadProcesada .= $content;
+            $cadProcesada .= $cadContenido;
             if ($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
-                    $cadProcesada = @$this->_replaceVar($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
+                    $cadProcesada = @$this->_reemplazarVariable($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
                 }
-                $cadProcesada = $this->_replaceVarEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariableEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillasEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
             if ($esFecha) {
-                $cadProcesada = $this->_replaceVar($id . $cadIndice,  date($format, $i), $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadIndice, date($format, $i), $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  date($format, $i), $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, date($format, $i), $cadProcesada);
             } else {
                 if ($offset != '') {
                     eval('$o=' . $i . $offset . ';');
                 }
-                $cadProcesada = $this->_replaceVar($id . $cadIndice,  isset($o) ? $o : $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadIndice, $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarVariable($id . $cadIndice,  isset($o) ? $o : $i, $cadProcesada);
+                $cadProcesada = $this->_reemplazarComillas($id . $cadIndice, $i, $cadProcesada);
             }
         }
-        $objFrag = $this->_convertHTMLinElements($objDom, $cadProcesada);
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objFor);
+        $objFrag = $this->_convertirHTMLenElementos($objDom, $cadProcesada);
+        if ($this->_bolEliminarComentario) {
+            $this->_eliminarComentarios($objFor);
         }
         if (!$objFrag) {
             $objFor->parentNode->removeChild($objFor);
@@ -1135,26 +1134,25 @@ class Phtml
             $objFor->parentNode->replaceChild($objFrag, $objFor);
         }
         $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
 
 
 
-    private function _seguridadComentarios()
-    {
-        $objDom     = $this->_getObjDOM($this->_strContent);
+    private function _seguridadComentarios() {
+        $objDom     = $this->_obtenerObjDOM($this->_cadContenido);
         $objXPath = new DOMXPath($objDom);
-        $comments = $objXPath->query('//comment()');
-        foreach ($comments as $comment) {
-            $pattern = '/<(if|elseif|else|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|elseif|else|switch|foreach|while|include|for)>/is';
-            if (preg_match($pattern, $comment->textContent)) {
-                $comment->parentNode->removeChild($comment);
+        $objComentarios = $objXPath->query('//comment()');
+        foreach($objComentarios as $comentario) {
+            $cadPatron = '/<(if|elseif|else|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|elseif|else|switch|foreach|while|include|for)>/is';
+            if(preg_match($cadPatron, $comentario->textContent)) {
+                $comentario->parentNode->removeChild($comentario);
             }
         }
         $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $objPhtml = $objDom->getElementById($this->_idAleatorio);
+        $this->_cadContenido = $this->_obtenerHTML($objPhtml);
     }
 
 
@@ -1167,7 +1165,7 @@ class Phtml
      *      contenido del bloque while
      * </while>
      */
-    private function _compile_while()
+    private function _compilar_while()
     {
         return (true);
     }
@@ -1177,37 +1175,38 @@ class Phtml
     /**
      * Se encarga de compilar todo el contenido phtml
      */
-    private function _compile()
+    private function _compilar()
     {
         $this->_seguridadComentarios();
-        $this->_compile_const();
-        $this->_compile_var();
-        $pattern = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
-        while (preg_match($pattern, $this->_strContent, $arrResult)) {
-            $nombreTag = strtolower(trim($arrResult[1]));
-            $this->{'_compile_' . $nombreTag}();
+        $this->_compilar_const();
+        $this->_compilar_var();
+        $cadPatron = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
+        while (preg_match($cadPatron, $this->_cadContenido, $arrResultado)) {
+            $nombreTag = strtolower(trim($arrResultado[1]));
+            $this->{'_compilar_' . $nombreTag}();
         }
-        $this->_compile_var(true);
+        $this->_compilar_var(true);
     }
 
 
     /**
      * Devuelve el contenido compilado
      * 
-     * @param mixed $index
+     * @param mixed $indice
      * @return string
      */
-    public function obtenerContenido($index = null)
+    public function obtenerContenido($indice = null)
     {
-        if (isset($index)) {
-            $this->_strContent = $this->_arrContent[$index];
+        if (isset($indice)) {
+            $this->_cadContenido = $this->_arrContenido[$indice];
         } else {
-            $this->_strContent = $this->_arrContent[$this->_randID];
+            $this->_cadContenido = $this->_arrContenido[$this->_idAleatorio];
         }
-        $this->_compile();
-        if ($this->_bolCompress) {
-            $this->_strContent = preg_replace('/(\\n|\\t|\\r|\\s+)/', ' ', $this->_strContent);
+        $this->_compilar();
+        if ($this->_bolComprimir) {
+            $this->_cadContenido = preg_replace('/(\\n|\\t|\\r|\\s+)/', ' ', $this->_cadContenido);
         }
-        return ($this->_strContent);
+        return ($this->_cadContenido);
     }
 }
+
