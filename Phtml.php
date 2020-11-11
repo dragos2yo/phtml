@@ -249,23 +249,11 @@ class Phtml
      * @param mixed $index
      * @param mixed $value
      */
-    public function setVar($index, $value = '')
+    public function addVar($index, $value = '')
     {
         if (isset($index)) {
             $this->_arrVar[$index] = $value;
         }
-    }
-
-
-    /**
-     * Devuelve el valor de una variable
-     * 
-     * @param mixed $index
-     * @return mixed 
-     */
-    public function getVar($index)
-    {
-        return (isset($index) && isset($this->_arrVar[$index]) ? $this->_arrVar[$index] : null);
     }
 
 
@@ -294,7 +282,9 @@ class Phtml
      */
     public function userFormat(formatPhtml $objFormat)
     {
-        $this->_objFormat = $objFormat;
+        if($objFormat instanceof $objFormat) {
+            $this->_objFormat = $objFormat;
+        }
     }
 
 
@@ -305,7 +295,9 @@ class Phtml
      */
     public function userCond(condPhtml $objCond)
     {
-        $this->_objCond = $objCond;
+        if($objCond instanceof condPhtml) {
+            $this->_objCond = $objCond;
+        }
     }
 
 
@@ -1200,7 +1192,7 @@ class Phtml
      * @param mixed $index
      * @return string
      */
-    public function obtenerContenido($index = null)
+    public function output($index = null)
     {
         if (isset($index)) {
             $this->_strContent = $this->_arrContent[$index];

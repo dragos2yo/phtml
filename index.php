@@ -28,7 +28,7 @@ class myFormat extends formatPhtml
 
 
 $objPhtml->userFormat(new myFormat);
-$objPhtml->setVar('enlace', 'Categoria de Prueba');
+$objPhtml->addVar('enlace', 'Categoria de Prueba');
 
 // agregar contenido manual
 /* $objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>'); */
@@ -57,20 +57,20 @@ EOL;
 //echo $objPhtml->obtenerContenido('include') . '<br>';
 
 // variables standard
-$objPhtml->setVar('edad', 35);
-$objPhtml->setVar('nombre', 'Dragos');
+$objPhtml->addVar('edad', 35);
+$objPhtml->addVar('nombre', 'Dragos');
 
 // variable arreglo simple
 $arrUsuario[] = 'Dragos';
 $arrUsuario[] = 'Petrica';
 $arrUsuario[] = 'Macovei';
 //$arrUsuario[] = 35;
-$objPhtml->setVar('arrUsuario', $arrUsuario);
+$objPhtml->addVar('arrUsuario', $arrUsuario);
 
 // variable arreglo multidimensional 
 $arrDias[] = array('lunes', 'martes', 'miercoles', 'jueves', 'viernes');
 $arrDias[] = array('domingo', 'sabado');
-$objPhtml->setVar('arrDias', $arrDias);
+$objPhtml->addVar('arrDias', $arrDias);
 
 // variable objeto
 class usuario
@@ -87,40 +87,32 @@ class usuario
     }
 }
 $objUsuario = new usuario();
-$objPhtml->setVar('objUsuario', $objUsuario);
+$objPhtml->addVar('objUsuario', $objUsuario);
 
 
 // ejemplo de depurar un tag if-elseif-else
-/* $objPhtml->addFile('plantillas/if-elseif-else.phtml'); */
-//echo $objPhtml->obtenerContenido('if');
+$objPhtml->addFile('plantillas/if-elseif-else.phtml');
 
 // ejemplo de depurar un tag switch-case-default
-/* $objPhtml->addFile('plantillas/switch-case-default.phtml'); */
-//echo $objPhtml->obtenerContenido('switch');
+// $objPhtml->addFile('plantillas/switch-case-default.phtml');
 
 // ejemplo de depurar un tag foreach
-/* $objPhtml->addFile('plantillas/foreach.phtml'); */
-//echo $objPhtml->obtenerContenido('foreach');
+// $objPhtml->addFile('plantillas/foreach.phtml'); 
 
 // ejemplo de depurar un tag for
-/* $objPhtml->addFile('plantillas/for.phtml', 'for'); */
-//echo $objPhtml->obtenerContenido('for');
+//$objPhtml->addFile('plantillas/for.phtml');
 
-/* // ejemplo de depurar un tag while
-$objPhtml->addFile('plantillas/do-while.phtml', 'while');
-echo $objPhtml->obtenerContenido('while') . '<br>';
- */
+// ejemplo de depurar un tag while
+//$objPhtml->addFile('plantillas/do-while.phtml');
 
 // ejemplo de imprimir variables
-$objPhtml->addFile('plantillas/var.phtml');
-//echo $objPhtml->obtenerContenido('var');
-
+//$objPhtml->addFile('plantillas/var.phtml');
 
 // ejemplo de imprimir variables
-/* $objPhtml->addFile('plantillas/const.phtml'); */
+// $objPhtml->addFile('plantillas/const.phtml');
 
 
-echo $objPhtml->obtenerContenido();
+echo $objPhtml->output();
 
 $final = microtime(true);
 print_pre($final - $inicial);
