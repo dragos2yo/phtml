@@ -1177,8 +1177,9 @@ class Phtml
         $this->_seguridadComentarios();
         $this->_compile_const();
         $this->_compile_var();
-        $pattern = '/<(if|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|switch|foreach|while|include|for)>/is';
+        $pattern = '/<(if|switch|foreach|while|include|for(?!.)*)[\s]*.*?>(.*?)<\/\1>/is';
         while (preg_match($pattern, $this->_strContent, $arrResult)) {
+            print_pre($arrResult[1]);
             $nombreTag = strtolower(trim($arrResult[1]));
             $this->{'_compile_' . $nombreTag}();
         }

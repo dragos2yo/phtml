@@ -100,7 +100,7 @@ $objPhtml->addFile('plantillas/if-elseif-else.phtml');
 // $objPhtml->addFile('plantillas/foreach.phtml'); 
 
 // ejemplo de depurar un tag for
-//$objPhtml->addFile('plantillas/for.phtml');
+$objPhtml->addFile('plantillas/for.phtml');
 
 // ejemplo de depurar un tag while
 //$objPhtml->addFile('plantillas/do-while.phtml');
