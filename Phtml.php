@@ -1142,7 +1142,7 @@ class Phtml
         $comments = $objXPath->query('//comment()');
         foreach ($comments as $comment) {
             // (*) eliminar comentarios si commpress lo pide
-            $pattern = '/<(if|elseif|else|switch|foreach|while|include|for[\s])[\s]*.*?>(.*?)<\/(if|elseif|else|switch|foreach|while|include|for)>/is';
+            $pattern = '/<(if(?!.)*|elseif(?!.)*|else(?!.)*|switch(?!.)*|foreach(?!.)*|while(?!.)*|include(?!.)*|for(?!.)*)[\s]*.*?>(.*?)<\/\1>/is';
             if (preg_match($pattern, $comment->textContent)) {
                 $comment->parentNode->removeChild($comment);
             }
@@ -1177,9 +1177,8 @@ class Phtml
         $this->_seguridadComentarios();
         $this->_compile_const();
         $this->_compile_var();
-        $pattern = '/<(if|switch|foreach|while|include|for(?!.)*)[\s]*.*?>(.*?)<\/\1>/is';
+        $pattern = '/<(if(?!.)*|switch(?!.)*|foreach(?!.)*|while(?!.)*|include(?!.)*|for(?!.)*)[\s]*.*?>(.*?)<\/\1>/is';
         while (preg_match($pattern, $this->_strContent, $arrResult)) {
-            print_pre($arrResult[1]);
             $nombreTag = strtolower(trim($arrResult[1]));
             $this->{'_compile_' . $nombreTag}();
         }
