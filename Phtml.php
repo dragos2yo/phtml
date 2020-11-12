@@ -172,10 +172,10 @@ class Phtml
         $this->_bolClearComment      = defined('PHTML_CLEAR_COMMENT') ? PHTML_CLEAR_COMMENT : true;
         $this->_bolIsset              = defined('PHTML_COND_ISSET')          ? PHTML_COND_ISSET          : false;
         $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
-        $cadClave                     = defined('PHTML_STR_KEY')        ? PHTML_STR_KEY        : 'phtml';
+        $key                     = defined('PHTML_STR_KEY')        ? PHTML_STR_KEY        : 'phtml';
         $this->_objFormat             = new formatPhtml;
         $this->_objCond               = new condPhtml;
-        $this->_randID           = $this->_createRandID($cadClave);
+        $this->_randID           = $this->_createRandID($key);
         $this->_arrContent[$this->_randID] = '';
     }
 
@@ -311,14 +311,14 @@ class Phtml
     private function _convertHTMLinElements(DOMDocument $dom, $html)
     {
         $thisDom = $this->_getObjDOM($html);
-        $objPhtml = $thisDom->getElementById($this->_randID);
-        $objFrag = $dom->createDocumentFragment();
-        $thisNode = $objPhtml->firstChild;
+        $phtml = $thisDom->getElementById($this->_randID);
+        $frag = $dom->createDocumentFragment();
+        $thisNode = $phtml->firstChild;
         while ($thisNode) {
-            $objFrag->appendChild($dom->importNode($thisNode, true));
+            $frag->appendChild($dom->importNode($thisNode, true));
             $thisNode = $thisNode->nextSibling;
         }
-        return ($objFrag);
+        return ($frag);
     }
 
 
@@ -581,9 +581,9 @@ class Phtml
      */
     private function _replaceQuotesEtc($search, $replacement, $subject)
     {
-        $pattern = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*[\'|"]/';
+        $pattern = '/(?i)var(?-i)\s*=\s*([\'"])\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*\1/';
         while (@preg_match($pattern, $subject, $arrResult)) {
-            $replacement = 'var="' .  $replacement . '.' . $arrResult[1] . '"';
+            $replacement = 'var="' .  $replacement . '.' . $arrResult[2] . '"';
             $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
         }
         return ($subject);
@@ -621,7 +621,7 @@ class Phtml
      */
     private function _replaceQuotes($search, $replacement, $subject)
     {
-        $pattern = '/(?i)var(?-i)\s*=\s*[\'|"]\s*' . str_replace('.', '\.', $search) . '\s*[\'|"]/';
+        $pattern = '/(?i)var(?-i)\s*=\s*([\'"])\s*' . str_replace('.', '\.', $search) . '\s*\1/';
         while (@preg_match($pattern, $subject, $arrResult)) {
             $replacement = 'var="' .  $replacement . '"';
             $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
@@ -769,14 +769,14 @@ class Phtml
                 $content = file_get_contents($path);
             }
             /* (*) compilar var const y aplicar seguridadComentarios solo al contenido del include */
-            $objFrag = $this->_convertHTMLinElements($dom, $content);
-            $objInclude->parentNode->replaceChild($objFrag, $objInclude);
+            $frag = $this->_convertHTMLinElements($dom, $content);
+            $objInclude->parentNode->replaceChild($frag, $objInclude);
         } else {
             $objInclude->parentNode->removeChild($objInclude);
         }
         $dom->saveHTML();
-        $objPhtml = $dom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $phtml = $dom->getElementById($this->_randID);
+        $this->_strContent = $this->_getHTML($phtml);
         // modificar esto
         $this->_seguridadComentarios();
         $this->_compile_const();
@@ -803,69 +803,70 @@ class Phtml
     private function _compile_if()
     {
         $dom     = $this->_getObjDOM($this->_strContent);
-        $objIf      = $dom->getElementsByTagName('if')->item(0);
-        $varIf      = $objIf->hasAttribute('var') && $objIf->getattribute('var') != '' ? $this->_importVar($objIf->getAttribute('var')) : null;
-        $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_checkCond($varIf, $objIf->getAttribute('cond')) : isset($varIf);
-        $cadCompare = $objIf->hasAttribute('compare') ? strtolower(trim($objIf->getAttribute('compare'))) : 'and';
-        $objFrag    = null;
-        if ($objIf->hasAttribute('and') && !$objIf->hasAttribute('or')) {
-            $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $objIf->getAttribute('and'));
-        } else if ($objIf->hasAttribute('or') && !$objIf->hasAttribute('and')) {
-            $bolPaseIf = $bolCondIf || $this->_checkCond($varIf, $objIf->getAttribute('or'));
-        } else if ($objIf->hasAttribute('and') && $objIf->hasAttribute('or') && $cadCompare == 'and') {
-            $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $objIf->getAttribute('and')) || $this->_checkCond($varIf, $objIf->getAttribute('or'));
-        } else if ($objIf->hasAttribute('and') && $objIf->hasAttribute('or') && $cadCompare == 'or') {
-            $bolPaseIf = $bolCondIf || $this->_checkCond($varIf, $objIf->getAttribute('or')) && $this->_checkCond($varIf, $objIf->getAttribute('and'));
+        $if      = $dom->getElementsByTagName('if')->item(0);
+        $varIf      = $if->hasAttribute('var') && $if->getattribute('var') != '' ? $this->_importVar($if->getAttribute('var')) : null;
+        $bolCondIf  = $if->hasAttribute('cond') ? $this->_checkCond($varIf, $if->getAttribute('cond')) : ($this->_bolIsset ? isset($varIf) : false);// agregar cond por defecto
+        $compare = $if->hasAttribute('compare') ? strtolower(trim($if->getAttribute('compare'))) : 'and';
+        $frag    = null;
+        if ($if->hasAttribute('and') && !$if->hasAttribute('or')) {
+            $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $if->getAttribute('and'));
+        } else if ($if->hasAttribute('or') && !$if->hasAttribute('and')) {
+            $bolPaseIf = $bolCondIf || $this->_checkCond($varIf, $if->getAttribute('or'));
+        } else if ($if->hasAttribute('and') && $if->hasAttribute('or') && $compare == 'and') {
+            $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $if->getAttribute('and')) || $this->_checkCond($varIf, $if->getAttribute('or'));
+        } else if ($if->hasAttribute('and') && $if->hasAttribute('or') && $compare == 'or') {
+            $bolPaseIf = $bolCondIf || $this->_checkCond($varIf, $if->getAttribute('or')) && $this->_checkCond($varIf, $if->getAttribute('and'));
         } else {
             $bolPaseIf = $bolCondIf;
         }
         if ($bolPaseIf) {
-            $objFrag = $this->_getElements($dom, $objIf);
-            while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || strtolower(@$objIf->nextSibling->nodeName) == 'else' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
-                $objIf->parentNode->removeChild($objIf->nextSibling);
+            $frag = $this->_getElements($dom, $if);
+            while (strtolower(@$if->nextSibling->nodeName) == 'elseif' || strtolower(@$if->nextSibling->nodeName) == 'else' || @$if->nextSibling->nodeType == XML_COMMENT_NODE || (@$if->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$if->nextSibling->textContent))) {
+                $if->parentNode->removeChild($if->nextSibling);
             }
         } else {
-            while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
-                if (strtolower(@$objIf->nextSibling->nodeName) == 'elseif') {
-                    $objElseif = $objIf->nextSibling;
-                    if (!$objFrag) {
-                        $varElseIf      = $objElseif->hasAttribute('var') && $objElseif->getattribute('var') != '' ? $this->_importVar($objElseif->getAttribute('var')) : null;
-                        $bolCondElseIf  = $objElseif->hasAttribute('cond') ? $this->_checkCond($varElseIf, $objElseif->getAttribute('cond')) : isset($varElseIf);
-                        $cadCompareElseIf = $objElseif->hasAttribute('compare') ? strtolower(trim($objElseif->getAttribute('compare'))) : 'and';
-                        if ($objElseif->hasAttribute('and') && !$objElseif->hasAttribute('or')) {
-                            $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $objElseif->getAttribute('and'));
-                        } else if ($objElseif->hasAttribute('or') && !$objElseif->hasAttribute('and')) {
-                            $bolPaseElseIf = $bolCondElseIf || $this->_checkCond($varElseIf, $objElseif->getAttribute('or'));
-                        } else if ($objElseif->hasAttribute('and') && $objElseif->hasAttribute('or') && $cadCompareElseIf == 'and') {
-                            $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $objElseif->getAttribute('and')) || $this->_checkCond($varElseIf, $objElseif->getAttribute('or'));
-                        } else if ($objElseif->hasAttribute('and') && $objElseif->hasAttribute('or') && $cadCompareElseIf == 'or') {
-                            $bolPaseElseIf = $bolCondElseIf || $this->_checkCond($varElseIf, $objElseif->getAttribute('or')) && $this->_checkCond($varElseIf, $objElseif->getAttribute('and'));
+            while (strtolower(@$if->nextSibling->nodeName) == 'elseif' || @$if->nextSibling->nodeType == XML_COMMENT_NODE || (@$if->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$if->nextSibling->textContent))) {
+                if (strtolower(@$if->nextSibling->nodeName) == 'elseif') {
+                    $elseif = $if->nextSibling;
+                    if (!$frag) {
+                        $varElseIf      = $elseif->hasAttribute('var') && $elseif->getattribute('var') != '' ? $this->_importVar($elseif->getAttribute('var')) : null;
+                        $bolCondElseIf  = $elseif->hasAttribute('cond') ? $this->_checkCond($varElseIf, $elseif->getAttribute('cond')) : ($this->_bolIsset ? isset($varElseIf) : false);
+                        $compareElseif = $elseif->hasAttribute('compare') ? strtolower(trim($elseif->getAttribute('compare'))) : 'and';
+                        if ($elseif->hasAttribute('and') && !$elseif->hasAttribute('or')) {
+                            $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $elseif->getAttribute('and'));
+                        } else if ($elseif->hasAttribute('or') && !$elseif->hasAttribute('and')) {
+                            $bolPaseElseIf = $bolCondElseIf || $this->_checkCond($varElseIf, $elseif->getAttribute('or'));
+                        } else if ($elseif->hasAttribute('and') && $elseif->hasAttribute('or') && $compareElseif == 'and') {
+                            $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $elseif->getAttribute('and')) || $this->_checkCond($varElseIf, $elseif->getAttribute('or'));
+                        } else if ($elseif->hasAttribute('and') && $elseif->hasAttribute('or') && $compareElseif == 'or') {
+                            $bolPaseElseIf = $bolCondElseIf || $this->_checkCond($varElseIf, $elseif->getAttribute('or')) && $this->_checkCond($varElseIf, $elseif->getAttribute('and'));
                         } else {
                             $bolPaseElseIf = $bolCondElseIf;
                         }
                         if ($bolPaseElseIf) {
-                            $objFrag = $this->_getElements($dom, $objElseif);
+                            $frag = $this->_getElements($dom, $elseif);
                         }
                     }
                 }
-                $objIf->parentNode->removeChild($objIf->nextSibling);
+                $if->parentNode->removeChild($if->nextSibling);
             }
-            if (strtolower(@$objIf->nextSibling->nodeName) == 'else') {
-                if (!$objFrag) {
-                    $objFrag = $this->_getElements($dom, $objIf->nextSibling);
+            if (strtolower(@$if->nextSibling->nodeName) == 'else') {
+                $else = $if->nextSibling;
+                if (!$frag) {
+                    $frag = $this->_getElements($dom, $else);
                 }
-                $objIf->parentNode->removeChild($objIf->nextSibling);
+                $if->parentNode->removeChild($else);
             }
         }
-        $this->_clearComments($objIf);
-        if (!$objFrag) {
-            $objIf->parentNode->removeChild($objIf);
+        $this->_clearComments($if);
+        if (!$frag) {
+            $if->parentNode->removeChild($if);
         } else {
-            $objIf->parentNode->replaceChild($objFrag, $objIf);
+            $if->parentNode->replaceChild($frag, $if);
         }
         $dom->saveHTML();
-        $objPhtml = $dom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $phtml = $dom->getElementById($this->_randID);
+        $this->_strContent = $this->_getHTML($phtml);
     }
 
 
@@ -891,48 +892,48 @@ class Phtml
     private function _compile_switch()
     {
         $dom = $this->_getObjDOM($this->_strContent);
-        $objSwitch = $dom->getElementsByTagName('switch')->item(0);
-        $varSwitch      = $objSwitch->hasAttribute('var') && $objSwitch->getattribute('var') != '' ? $this->_importVar($objSwitch->getAttribute('var')) : null;
-        $objFrag = null;
-        while (strtolower(@$objSwitch->firstChild->nodeName) == 'case' || @$objSwitch->firstChild->nodeType == XML_COMMENT_NODE || (@$objSwitch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$objSwitch->firstChild->textContent))) {
-            if (strtolower(@$objSwitch->firstChild->nodeName) == 'case') {
-                if (!$objFrag) {
-                    $objCase = $objSwitch->firstChild;
-                    $bolCond  = $objCase->hasAttribute('cond') ? $this->_checkCond($varSwitch, $objCase->getAttribute('cond')) : isset($varSwitch);
-                    $cadCompare = $objCase->hasAttribute('compare') ? $objCase->getAttribute('compare') : 'and';
-                    if ($objCase->hasAttribute('and') && !$objCase->hasAttribute('or')) {
-                        $bolPase = $bolCond && $this->_checkCond($varSwitch, $objCase->getAttribute('and'));
-                    } else if ($objCase->hasAttribute('or') && !$objCase->hasAttribute('and')) {
-                        $bolPase = $bolCond || $this->_checkCond($varSwitch, $objCase->getAttribute('or'));
-                    } else if ($objCase->hasAttribute('and') && $objCase->hasAttribute('or') && $cadCompare == 'and') {
-                        $bolPase = $bolCond && $this->_checkCond($varSwitch, $objCase->getAttribute('and')) || $this->_checkCond($varSwitch, $objCase->getAttribute('or'));
-                    } else if ($objCase->hasAttribute('and') && $objCase->hasAttribute('or') && $cadCompare == 'or') {
-                        $bolPase = $bolCond || $this->_checkCond($varSwitch, $objCase->getAttribute('or')) && $this->_checkCond($varSwitch, $objCase->getAttribute('and'));
+        $switch = $dom->getElementsByTagName('switch')->item(0);
+        $var      = $switch->hasAttribute('var') && $switch->getattribute('var') != '' ? $this->_importVar($switch->getAttribute('var')) : null;
+        $frag = null;
+        while (strtolower(@$switch->firstChild->nodeName) == 'case' || @$switch->firstChild->nodeType == XML_COMMENT_NODE || (@$switch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$switch->firstChild->textContent))) {
+            if (strtolower(@$switch->firstChild->nodeName) == 'case') {
+                if (!$frag) {
+                    $case = $switch->firstChild;
+                    $bolCond  = $case->hasAttribute('cond') ? $this->_checkCond($var, $case->getAttribute('cond')) : isset($var);
+                    $compare = $case->hasAttribute('compare') ? $case->getAttribute('compare') : 'and';
+                    if ($case->hasAttribute('and') && !$case->hasAttribute('or')) {
+                        $bolPase = $bolCond && $this->_checkCond($var, $case->getAttribute('and'));
+                    } else if ($case->hasAttribute('or') && !$case->hasAttribute('and')) {
+                        $bolPase = $bolCond || $this->_checkCond($var, $case->getAttribute('or'));
+                    } else if ($case->hasAttribute('and') && $case->hasAttribute('or') && $compare == 'and') {
+                        $bolPase = $bolCond && $this->_checkCond($var, $case->getAttribute('and')) || $this->_checkCond($var, $case->getAttribute('or'));
+                    } else if ($case->hasAttribute('and') && $case->hasAttribute('or') && $compare == 'or') {
+                        $bolPase = $bolCond || $this->_checkCond($var, $case->getAttribute('or')) && $this->_checkCond($var, $case->getAttribute('and'));
                     } else {
                         $bolPase = $bolCond;
                     }
                     if ($bolPase) {
-                        $objFrag = $this->_getElements($dom, $objCase);
+                        $frag = $this->_getElements($dom, $case);
                     }
                 }
             }
-            $objSwitch->removeChild($objSwitch->firstChild);
+            $switch->removeChild($switch->firstChild);
         }
-        if (strtolower(@$objSwitch->firstChild->nodeName) == 'default') {
-            if (!$objFrag) {
-                $objFrag = $this->_getElements($dom, $objSwitch->firstChild);
+        if (strtolower(@$switch->firstChild->nodeName) == 'default') {
+            if (!$frag) {
+                $frag = $this->_getElements($dom, $switch->firstChild);
             }
-            $objSwitch->removeChild($objSwitch->firstChild);
+            $switch->removeChild($switch->firstChild);
         }
-        $this->_clearComments($objSwitch);
-        if (!$objFrag) {
-            $objSwitch->parentNode->removeChild($objSwitch);
+        $this->_clearComments($switch);
+        if (!$frag) {
+            $switch->parentNode->removeChild($switch);
         } else {
-            $objSwitch->parentNode->replaceChild($objFrag, $objSwitch);
+            $switch->parentNode->replaceChild($frag, $switch);
         }
         $dom->saveHTML();
-        $objPhtml = $dom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $phtml = $dom->getElementById($this->_randID);
+        $this->_strContent = $this->_getHTML($phtml);
     }
 
 
@@ -948,39 +949,39 @@ class Phtml
     private function _compile_foreach()
     {
         $dom         = $this->_getObjDOM($this->_strContent);
-        $objForeach     = $dom->getElementsByTagName('foreach')->item(0);
-        $cadVariable    = $objForeach->hasAttribute('var') && $objForeach->getAttribute('var') != '' ? $objForeach->getAttribute('var') : null;
-        $cadClave       = $objForeach->hasAttribute('key') ? $objForeach->getAttribute('key') : 'key';
-        $cadValor       = $objForeach->hasAttribute('value') ? $objForeach->getAttribute('value') : 'value';
-        $id             = $objForeach->hasAttribute('id') ? $objForeach->getAttribute('id') . '.' : '';
-        $content   = $this->_getHTML($objForeach);
+        $foreach     = $dom->getElementsByTagName('foreach')->item(0);
+        $cadVariable    = $foreach->hasAttribute('var') && $foreach->getAttribute('var') != '' ? $foreach->getAttribute('var') : null;
+        $strKey      = $foreach->hasAttribute('key') ? $foreach->getAttribute('key') : 'key';
+        $strValue       = $foreach->hasAttribute('value') ? $foreach->getAttribute('value') : 'value';
+        $id             = $foreach->hasAttribute('id') ? $foreach->getAttribute('id') . '.' : '';
+        $content   = $this->_getHTML($foreach);
         $mixedVar       = $this->_importVar($cadVariable);
-        $objFrag        = null;
-        $cadProcesada   = '';
+        $frag        = null;
+        $processed   = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
-            foreach ($mixedVar as $clave => $valor) {
-                $cadProcesada .= $content;
-                $cadProcesada = $this->_replaceVar($id . $cadVariable . '.' . $cadClave,  is_object($mixedVar) ? $mixedVar->$clave : $mixedVar[$clave], $cadProcesada);
-                $cadProcesada = $this->_replaceVar($id . $cadClave,  $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceVar($id . $cadValor,  $valor, $cadProcesada);
-                $cadProcesada = $this->_replaceVarEtc($id . $cadVariable . '.' . $cadClave,  $id . $cadVariable . '.' . $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadClave, $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadValor, $valor, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotesEtc($id . $cadClave, $id .  $cadVariable . '.' . $clave, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
+            foreach ($mixedVar as $key => $value) {
+                $processed .= $content;
+                $processed = $this->_replaceVar(      $id . $cadVariable . '.' . $strKey,  is_object($mixedVar) ? $mixedVar->$key : $mixedVar[$key], $processed);
+                $processed = $this->_replaceVar(      $id . $strKey,  $key, $processed);
+                $processed = $this->_replaceVar(      $id . $strValue,  $value, $processed);
+                $processed = $this->_replaceVarEtc(   $id . $cadVariable . '.' . $strKey,  $id . $cadVariable . '.' . $key, $processed);
+                $processed = $this->_replaceQuotes(   $id . $strKey, $key, $processed);
+                $processed = $this->_replaceQuotes(   $id . $strValue, $value, $processed);
+                $processed = $this->_replaceQuotes(   $id . $cadVariable . '.' . $strKey, $id . $cadVariable . '.' . $key, $processed);
+                $processed = $this->_replaceQuotesEtc($id . $strKey, $id .  $cadVariable . '.' . $key, $processed);
+                $processed = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $strKey, $id . $cadVariable . '.' . $key, $processed);
             }
-            $objFrag = $this->_convertHTMLinElements($dom, $cadProcesada);
+            $frag = $this->_convertHTMLinElements($dom, $processed);
         }
-        $this->_clearComments($objForeach);
-        if (!$objFrag) {
-            $objForeach->parentNode->removeChild($objForeach);
+        $this->_clearComments($foreach);
+        if (!$frag) {
+            $foreach->parentNode->removeChild($foreach);
         } else {
-            $objForeach->parentNode->replaceChild($objFrag, $objForeach);
+            $foreach->parentNode->replaceChild($frag, $foreach);
         }
         $dom->saveHTML();
-        $objPhtml = $dom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $phtml = $dom->getElementById($this->_randID);
+        $this->_strContent = $this->_getHTML($phtml);
     }
 
 
@@ -1006,8 +1007,8 @@ class Phtml
         $cadTotal          = $for->getAttribute('size');
         $init              = $for->getAttribute('init');
         $content           = $this->_getHTML($for);
-        $objFrag           = null;
-        $cadProcesada      = '';
+        $frag           = null;
+        $processed      = '';
 
         switch (strtolower(trim($for->getAttribute('order')))) {
             case 'desc':
@@ -1052,24 +1053,24 @@ class Phtml
             }
         }
         for ($asc ? $i = $init : $i = $max - 1; $asc ? $i < $max : $init <= $i; $asc ? $i++ : $i--) {
-            $cadProcesada .= $content;
+            $processed .= $content;
             if ($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
-                    $cadProcesada = @$this->_replaceVar($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
+                    $processed = @$this->_replaceVar($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $processed);
                 }
-                $cadProcesada = $this->_replaceVarEtc(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $processed = $this->_replaceVarEtc(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $processed);
+                $processed = $this->_replaceQuotes(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $processed);
+                $processed = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $processed);
             }
-            $cadProcesada = $this->_replaceVar($id . $cadIndice,  $offset != '' ? array_sum(array($i, $offset)) : $i, $cadProcesada);
-            $cadProcesada = $this->_replaceQuotes($id . $cadIndice, $i, $cadProcesada);
+            $processed = $this->_replaceVar($id . $cadIndice,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
+            $processed = $this->_replaceQuotes($id . $cadIndice, $i, $processed);
         }
-        $objFrag = $this->_convertHTMLinElements($dom, $cadProcesada);
+        $frag = $this->_convertHTMLinElements($dom, $processed);
         $this->_clearComments($for);
-        if (!$objFrag) {
+        if (!$frag) {
             $for->parentNode->removeChild($for);
         } else {
-            $for->parentNode->replaceChild($objFrag, $for);
+            $for->parentNode->replaceChild($frag, $for);
         }
         $dom->saveHTML();
         $phtml = $dom->getElementById($this->_randID);
@@ -1093,8 +1094,8 @@ class Phtml
             }
         }
         $dom->saveHTML();
-        $objPhtml = $dom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $phtml = $dom->getElementById($this->_randID);
+        $this->_strContent = $this->_getHTML($phtml);
     }
 
 
