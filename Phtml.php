@@ -169,7 +169,7 @@ class Phtml
         $this->_bolPermitted_ENV       = defined('PHTML_PERMITTED_ENV')        ? PHTML_PERMITTED_ENV        : false;
         $this->_bolCompress          = defined('PHTML_COMPRESS')           ? PHTML_COMPRESS           : false;
         $this->_bolExecutePhp        = defined('PHTML_EXECUTE_PHP')        ? PHTML_EXECUTE_PHP        : true;
-        $this->_bolClearComment = defined('PHTML_CLEAR_COMMENT') ? PHTML_CLEAR_COMMENT : true;
+        $this->_bolClearComment      = defined('PHTML_CLEAR_COMMENT') ? PHTML_CLEAR_COMMENT : true;
         $this->_bolIsset              = defined('PHTML_COND_ISSET')          ? PHTML_COND_ISSET          : false;
         $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
         $cadClave                     = defined('PHTML_STR_KEY')        ? PHTML_STR_KEY        : 'phtml';
@@ -282,7 +282,7 @@ class Phtml
      */
     public function userFormat(formatPhtml $objFormat)
     {
-        if($objFormat instanceof $objFormat) {
+        if ($objFormat instanceof $objFormat) {
             $this->_objFormat = $objFormat;
         }
     }
@@ -295,7 +295,7 @@ class Phtml
      */
     public function userCond(condPhtml $objCond)
     {
-        if($objCond instanceof condPhtml) {
+        if ($objCond instanceof condPhtml) {
             $this->_objCond = $objCond;
         }
     }
@@ -365,8 +365,10 @@ class Phtml
      */
     private function _clearComments(DOMNode $node)
     {
-        while (@$node->previousSibling->nodeType == XML_COMMENT_NODE || (@$node->previousSibling->nodeType == XML_TEXT_NODE && ctype_space(@$node->previousSibling->textContent))) {
-            $node->parentNode->removeChild($node->previousSibling);
+        if ($this->_bolClearComment) {
+            while (@$node->previousSibling->nodeType == XML_COMMENT_NODE || (@$node->previousSibling->nodeType == XML_TEXT_NODE && ctype_space(@$node->previousSibling->textContent))) {
+                $node->parentNode->removeChild($node->previousSibling);
+            }
         }
     }
 
@@ -386,65 +388,65 @@ class Phtml
             switch ($numParametros) {
                 case 1:
                     if (isset($this->_arrVar[$arr[0]])) {
-                        return($this->_arrVar[$arr[0]]);
+                        return ($this->_arrVar[$arr[0]]);
                     }
                 case 2:
                     switch ($arr[0]) { // obtener super globales
                         case 'GLOBALS':
                             if ($this->_bolPermitted_GLOBALS && isset($_GLOBALS[$arr[1]])) {
-                                return($GLOBALS[$arr[1]]);
+                                return ($GLOBALS[$arr[1]]);
                             }
                             break;
                         case '_SERVER':
                             if ($this->_bolPermitted_SERVER && isset($_SERVER[$arr[1]])) {
-                                return($_SERVER[$arr[1]]);
+                                return ($_SERVER[$arr[1]]);
                             }
                             break;
                         case '_GET':
                             if ($this->_bolPermitted_GET && isset($_GET[$arr[1]])) {
-                                return($_GET[$arr[1]]);
+                                return ($_GET[$arr[1]]);
                             }
                             break;
                         case '_POST':
                             if ($this->_bolPermitted_POST && isset($_POST[$arr[1]])) {
-                                return($_POST[$arr[1]]);
+                                return ($_POST[$arr[1]]);
                             }
                             break;
                         case '_FILES':
                             if ($this->_bolPermitted_FILES && isset($_FILES[$arr[1]])) {
-                                return($_FILES[$arr[1]]);
+                                return ($_FILES[$arr[1]]);
                             }
                             break;
                         case '_COOKIE':
                             if ($this->_bolPermitted_COOKIE && isset($_COOKIE[$arr[1]])) {
-                                return($_COOKIE[$arr[1]]);
+                                return ($_COOKIE[$arr[1]]);
                             }
                             break;
                         case '_SESSION':
                             if ($this->_bolPermitted_SESSION && isset($_SESSION[$arr[1]])) {
-                                return($_SESSION[$arr[1]]);
+                                return ($_SESSION[$arr[1]]);
                             }
                             break;
                         case '_REQUEST':
                             if ($this->_bolPermitted_REQUEST && isset($_REQUEST[$arr[1]])) {
-                                return($_REQUEST[$arr[1]]);
+                                return ($_REQUEST[$arr[1]]);
                             }
                             break;
                         case '_ENV':
                             if ($this->_bolPermitted_ENV && isset($_ENV[$arr[1]])) {
-                                return($_ENV[$arr[1]]);
+                                return ($_ENV[$arr[1]]);
                             }
                             break;
                         default:
                             if (isset($this->_arrVar[$arr[0]]) && is_array($this->_arrVar[$arr[0]])) {
                                 if (isset($this->_arrVar[$arr[0]][$arr[1]])) {
-                                    return($this->_arrVar[$arr[0]][$arr[1]]); // arreglo[]
+                                    return ($this->_arrVar[$arr[0]][$arr[1]]); // arreglo[]
                                 }
                             } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
                                 if (property_exists($this->_arrVar[$arr[0]], $arr[1])) {
-                                    return($this->_arrVar[$arr[0]]->{$arr[1]}); // objeto->propiedad
+                                    return ($this->_arrVar[$arr[0]]->{$arr[1]}); // objeto->propiedad
                                 } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
-                                    return($this->_arrVar[$arr[0]]->{$arr[1]}()); // objeto->metodo()
+                                    return ($this->_arrVar[$arr[0]]->{$arr[1]}()); // objeto->metodo()
                                 }
                             }
                             break;
@@ -454,17 +456,17 @@ class Phtml
                     /** (*) agregar soporte variables globales multinivel */
                     if (isset($this->_arrVar[$arr[0]][$arr[1]]) && is_array($this->_arrVar[$arr[0]][$arr[1]])) {
                         if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]])) {
-                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]); // arreglo[][]
+                            return ($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]); // arreglo[][]
                         }
                     } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
                         if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
-                            return($this->_arrVar[$arr[0]]->{$arr[1]}($arr[2])); // objeto->metodo(param)
+                            return ($this->_arrVar[$arr[0]]->{$arr[1]}($arr[2])); // objeto->metodo(param)
                         }
                     } else if (isset($this->_arrVar[$arr[0]][$arr[1]]) && is_object($this->_arrVar[$arr[0]][$arr[1]])) {
                         if (property_exists($this->_arrVar[$arr[0]][$arr[1]], $arr[2])) {
-                            return($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}); // objeto->propiedad
+                            return ($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}); // objeto->propiedad
                         } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]][$arr[1]], $arr[2])) {
-                            return($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}()); // objeto->metodo()
+                            return ($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}()); // objeto->metodo()
                         }
                     }
                     break;
@@ -472,28 +474,28 @@ class Phtml
                     /** (*) agregar soporte variables globales multinivel */
                     if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]) && is_array($this->_arrVar[$arr[0]][$arr[1]][$arr[2]])) {
                         if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]][$arr[3]])) {
-                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]][$arr[3]]); // arreglo[][][]
+                            return ($this->_arrVar[$arr[0]][$arr[1]][$arr[2]][$arr[3]]); // arreglo[][][]
                         }
                     } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
                         if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
-                            return($this->_arrVar[$arr[0]]->{$arr[1]}($arr[2], $arr[3])); // objeto->metodo(param, param)
+                            return ($this->_arrVar[$arr[0]]->{$arr[1]}($arr[2], $arr[3])); // objeto->metodo(param, param)
                         }
                     } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]][$arr[1]])) {
                         if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]][$arr[1]], $arr[2])) {
-                            return( $this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}($arr[3])); // objeto->metodo(param)
+                            return ($this->_arrVar[$arr[0]][$arr[1]]->{$arr[2]}($arr[3])); // objeto->metodo(param)
                         }
                     } else if (isset($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]) && is_object($this->_arrVar[$arr[0]][$arr[1]][$arr[2]])) {
                         if (property_exists($this->_arrVar[$arr[0]][$arr[1]][$arr[2]], $arr[3])) {
-                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]->{$arr[3]}); // objeto->propiedad
+                            return ($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]->{$arr[3]}); // objeto->propiedad
                         } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]][$arr[1]][$arr[2]], $arr[3])) {
-                            return($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]->{$arr[3]}()); // objeto->metodo()
+                            return ($this->_arrVar[$arr[0]][$arr[1]][$arr[2]]->{$arr[3]}()); // objeto->metodo()
                         }
                     }
                     break;
             }
         } else {
             if (is_numeric($cadVariable)) { // solo numeros
-                return($cadVariable);
+                return ($cadVariable);
             }
         }
         return (null);
@@ -755,9 +757,7 @@ class Phtml
     {
         $objDom = $this->_getObjDOM($this->_strContent);
         $objInclude = $objDom->getElementsByTagName('include')->item(0);
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objInclude);
-        }
+        $this->_clearComments($objInclude);
         $path = trim(preg_replace('/(\\n|\\t|\\r)/s', '', $objInclude->textContent));
         if (file_exists($path)) {
             if ($this->_bolExecutePhp) {
@@ -857,9 +857,7 @@ class Phtml
                 $objIf->parentNode->removeChild($objIf->nextSibling);
             }
         }
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objIf);
-        }
+        $this->_clearComments($objIf);
         if (!$objFrag) {
             $objIf->parentNode->removeChild($objIf);
         } else {
@@ -926,9 +924,7 @@ class Phtml
             }
             $objSwitch->removeChild($objSwitch->firstChild);
         }
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objSwitch);
-        }
+        $this->_clearComments($objSwitch);
         if (!$objFrag) {
             $objSwitch->parentNode->removeChild($objSwitch);
         } else {
@@ -976,9 +972,7 @@ class Phtml
             }
             $objFrag = $this->_convertHTMLinElements($objDom, $cadProcesada);
         }
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objForeach);
-        }
+        $this->_clearComments($objForeach);
         if (!$objFrag) {
             $objForeach->parentNode->removeChild($objForeach);
         } else {
@@ -1011,26 +1005,19 @@ class Phtml
         $cadIndice         = $objFor->hasAttribute('index') ? $objFor->getAttribute('index')    : 'i';
         $cadTotal          = $objFor->getAttribute('size');
         $init              = $objFor->getAttribute('init');
-        $format            = $objFor->hasAttribute('format') ? $objFor->getAttribute('format') : 'd-m-Y';
-        $content      = $this->_getHTML($objFor);
+        $content           = $this->_getHTML($objFor);
         $objFrag           = null;
         $cadProcesada      = '';
-        $esCadena          = false;
-        $esFecha           = false;
 
-        if ($objFor->hasAttribute('order')) {
-            switch (strtolower(trim($objFor->getAttribute('order')))) {
-                case 'desc':
-                    $asc = false;
-                    break;
-                case 'asc':
-                    $asc = true;
-                    break;
-            }
-        } else {
-            $asc = true;
+        switch (strtolower(trim($objFor->getAttribute('order')))) {
+            case 'desc':
+                $asc = false;
+                break;
+            case '':
+            case 'asc':
+                $asc = true;
+                break;
         }
-
         if ($init == '') {
             $arrIndice = explode('.', $cadIndice);
             $cadIndice = $arrIndice[0];
@@ -1064,39 +1051,8 @@ class Phtml
                         break;
                 }
             }
-        } else { // no variables solo index
-            if (is_numeric($cadTotal)) { // numeros
-                $max = (int)$cadTotal;
-            } else {
-                $patronFecha = '/^\s*?([0-9]{1,2})[\.\-\/\s]([0-9]{1,2})[\.\-\/\s]([0-9]{4})\s*?([0-9]{1,2}[:][0-9]{1,2})?([:][0-9]{1,2})?\s*?$/';
-                if (preg_match($patronFecha, $init, $arrResult)) {
-                    $fecha = $arrResult[1] . '-' .  $arrResult[2] . '-' . $arrResult[3] . (isset($arrResult[4]) ? ' ' . $arrResult[4]  . (isset($arrResult[5]) ?  $arrResult[5] : '') : '');
-                    $init = strtotime($fecha);
-                    if (preg_match($patronFecha, $cadTotal, $arrResult)) { // fechas
-                        $fecha = $arrResult[1] . '-' .  $arrResult[2] . '-' . $arrResult[3] . (isset($arrResult[4]) ? ' ' . $arrResult[4]  . (isset($arrResult[5]) ?  $arrResult[5] : '') : '');
-                        $max = strtotime($fecha);
-                        $max += 86400;
-                    } else {
-                        $max = strtotime('now');
-                    }
-                    $esFecha = true;
-                } else { // cadenas
-                    $max = $cadTotal;
-                    if (preg_match('/[a-zA-Z]/', $max) || preg_match('/[a-zA-Z]/', $init)) {
-                        if (preg_match('/[A-Z]/', $max) || preg_match('/[A-Z]/', $init)) {
-                            $max = strtoupper($max);
-                            $init = strtoupper($init);
-                        }
-                        // seguridad por tiempo limite de procesamiento
-                        $max = strlen($max) > 3 ? substr($max, 0, 3) : $max;
-                        $init = strlen($init) > 3 ? substr($init, 0, 3) : $init;
-                        $max++;
-                        $esCadena = true;
-                    }
-                }
-            }
         }
-        for ($esCadena || $asc ? $i = $init : $i = $max - 1; $esCadena ? ($i != $max) : ($asc ? $i < $max : $init <= $i); $esFecha ? ($asc ? $i += 86400 : $i -= 86400) : ($esCadena || $asc ? $i++ : $i--)) {
+        for ($asc ? $i = $init : $i = $max - 1; $asc ? $i < $max : $init <= $i; $asc ? $i++ : $i--) {
             $cadProcesada .= $content;
             if ($cadVariable != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
@@ -1106,21 +1062,15 @@ class Phtml
                 $cadProcesada = $this->_replaceQuotes($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
                 $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
-            if ($esFecha) {
-                $cadProcesada = $this->_replaceVar($id . $cadIndice,  date($format, $i), $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadIndice, date($format, $i), $cadProcesada);
-            } else {
-                if ($offset != '') {
-                    eval('$o=' . $i . $offset . ';');
-                }
-                $cadProcesada = $this->_replaceVar($id . $cadIndice,  isset($o) ? $o : $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadIndice, $i, $cadProcesada);
+            if ($offset != '') {
+                eval('$o=' . $i . $offset . ';');
             }
+            $cadProcesada = $this->_replaceVar($id . $cadIndice,  isset($o) ? $o : $i, $cadProcesada);
+            $cadProcesada = $this->_replaceQuotes($id . $cadIndice, $i, $cadProcesada);
+            //}
         }
         $objFrag = $this->_convertHTMLinElements($objDom, $cadProcesada);
-        if ($this->_bolClearComment) {
-            $this->_clearComments($objFor);
-        }
+        $this->_clearComments($objFor);
         if (!$objFrag) {
             $objFor->parentNode->removeChild($objFor);
         } else {
@@ -1194,11 +1144,7 @@ class Phtml
      */
     public function output($index = null)
     {
-        if (isset($index)) {
-            $this->_strContent = $this->_arrContent[$index];
-        } else {
-            $this->_strContent = $this->_arrContent[$this->_randID];
-        }
+        $this->_strContent = isset($index) ? $this->_arrContent[$index] :  $this->_arrContent[$this->_randID];
         $this->_compile();
         /* if ($this->_bolCompress) {
             $this->_strContent = preg_replace('/(\\n|\\t|\\r|\\s+)/', ' ', $this->_strContent);

@@ -1,31 +1,4 @@
 
-<p>
-    <!-- Escribir las fechas -->
-    <for index="i.20-10-2020" size="25-10-2020">
-        <p>{{i}}</p> 
-    </for>
-</p>
-<p>
-    <!-- Escribir las letras de A a Z -->
-    <for index="i" init="a" size="z">
-        {{i}} 
-    </for>
-</p>
-
-<p>
-    <!-- Escribir los numeros de 1 a 10-->
-    <for size="25" offset="+1">
-        {{i}} 
-    </for>
-</p>
-
-<p>
-    <!-- Escribir los numeros de 1 a 10 al reves -->
-    <for size="10" offset="+1" order="desc">
-        {{i}} 
-    </for>
-</p>
-
 <!-- Listar el arreglo arrUsuario -->
 <for var="arrUsuario" index="i">
     <h4>Iterrando la palabra <b>{{arrUsuario.i}}</b></h4>
@@ -42,18 +15,6 @@
             <li>{{arrDias.i.j}}</li>
         </for>
     </ul>
-</for>
-
-
-<!-- Usos que se compilan dentro del bucle for -->
-<for var="arrUsuario" index="i.0">
-    <p>var.i                 ___ <b>{{arrUsuario.i}}</b></p>
-    <p>var.i.xxx.etc         ___ <b>{{arrUsuario.i.otracosa}}</b></p>
-    <p>i                     ___ <b>{{i}}</b></p>
-    <p>var=var.i             ___ <b>var="arrUsuario.i"</b></p>
-    <p>var=var.i.xxx.etc     ___ <b>var="arrUsuario.i.otracosa"</b></p>
-    <p>var=i                 ___ <b>var="i"</b></p>
-    <hr>
 </for>
 
 

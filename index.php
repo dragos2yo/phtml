@@ -1,5 +1,5 @@
 <?php
-$inicial = microtime(true);
+
 
 define('URL', 'http://localhost/phtml');
 define('URL_DESCRIPCION', 'Phtml');
@@ -91,7 +91,7 @@ $objPhtml->addVar('objUsuario', $objUsuario);
 
 
 // ejemplo de depurar un tag if-elseif-else
-$objPhtml->addFile('plantillas/if-elseif-else.phtml');
+//$objPhtml->addFile('plantillas/if-elseif-else.phtml');
 
 // ejemplo de depurar un tag switch-case-default
 // $objPhtml->addFile('plantillas/switch-case-default.phtml');
@@ -111,7 +111,7 @@ $objPhtml->addFile('plantillas/for.phtml');
 // ejemplo de imprimir variables
 // $objPhtml->addFile('plantillas/const.phtml');
 
-
+$inicial = microtime(true);
 echo $objPhtml->output();
 
 $final = microtime(true);
