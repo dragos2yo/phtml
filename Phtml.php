@@ -265,13 +265,13 @@ class Phtml
      */
     private function _getObjDOM($html = '')
     {
-        $objDom = new DOMDocument;
+        $dom = new DOMDocument;
         libxml_use_internal_errors(true);
         $html = '<phtml id="' . $this->_randID . '">' . $html . '</phtml>';
         $htmlEncoded = mb_convert_encoding($html, 'HTML-ENTITIES', $this->_cadEncoding);
-        @$objDom->loadHTML($htmlEncoded);
+        @$dom->loadHTML($htmlEncoded);
         libxml_clear_errors();
-        return ($objDom);
+        return ($dom);
     }
 
 
@@ -304,18 +304,18 @@ class Phtml
     /**
      * Convierte la cadena html en elementos DOMDocument
      * 
-     * @param object $objDom
+     * @param object $dom
      * @param string $html
      * @return object
      */
-    private function _convertHTMLinElements(DOMDocument $objDom, $html)
+    private function _convertHTMLinElements(DOMDocument $dom, $html)
     {
-        $thisObjDom = $this->_getObjDOM($html);
-        $objPhtml = $thisObjDom->getElementById($this->_randID);
-        $objFrag = $objDom->createDocumentFragment();
+        $thisDom = $this->_getObjDOM($html);
+        $objPhtml = $thisDom->getElementById($this->_randID);
+        $objFrag = $dom->createDocumentFragment();
         $thisNode = $objPhtml->firstChild;
         while ($thisNode) {
-            $objFrag->appendChild($objDom->importNode($thisNode, true));
+            $objFrag->appendChild($dom->importNode($thisNode, true));
             $thisNode = $thisNode->nextSibling;
         }
         return ($objFrag);
@@ -326,18 +326,18 @@ class Phtml
     /**
      * Recoge todo los elementos del nodo
      * 
-     * @param object DOMDocument $objDom
+     * @param object DOMDocument $dom
      * @param object DOMNode $node
      * @return object DOMDocumentFragment 
      */
-    private function _getElements(DOMDocument $objDom, DOMNode $node)
+    private function _getElements(DOMDocument $dom, DOMNode $node)
     {
-        $objFrag = $objDom->createDocumentFragment();
+        $frag = $dom->createDocumentFragment();
         while ($thisNode = $node->firstChild) {
-            $objFrag->appendChild($objDom->importNode($thisNode, true));
+            $frag->appendChild($dom->importNode($thisNode, true));
             $thisNode = $thisNode->nextSibling;
         }
-        return ($objFrag);
+        return ($frag);
     }
 
 
@@ -755,8 +755,8 @@ class Phtml
      */
     private function _compile_include()
     {
-        $objDom = $this->_getObjDOM($this->_strContent);
-        $objInclude = $objDom->getElementsByTagName('include')->item(0);
+        $dom = $this->_getObjDOM($this->_strContent);
+        $objInclude = $dom->getElementsByTagName('include')->item(0);
         $this->_clearComments($objInclude);
         $path = trim(preg_replace('/(\\n|\\t|\\r)/s', '', $objInclude->textContent));
         if (file_exists($path)) {
@@ -769,13 +769,13 @@ class Phtml
                 $content = file_get_contents($path);
             }
             /* (*) compilar var const y aplicar seguridadComentarios solo al contenido del include */
-            $objFrag = $this->_convertHTMLinElements($objDom, $content);
+            $objFrag = $this->_convertHTMLinElements($dom, $content);
             $objInclude->parentNode->replaceChild($objFrag, $objInclude);
         } else {
             $objInclude->parentNode->removeChild($objInclude);
         }
-        $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
+        $dom->saveHTML();
+        $objPhtml = $dom->getElementById($this->_randID);
         $this->_strContent = $this->_getHTML($objPhtml);
         // modificar esto
         $this->_seguridadComentarios();
@@ -802,8 +802,8 @@ class Phtml
      */
     private function _compile_if()
     {
-        $objDom     = $this->_getObjDOM($this->_strContent);
-        $objIf      = $objDom->getElementsByTagName('if')->item(0);
+        $dom     = $this->_getObjDOM($this->_strContent);
+        $objIf      = $dom->getElementsByTagName('if')->item(0);
         $varIf      = $objIf->hasAttribute('var') && $objIf->getattribute('var') != '' ? $this->_importVar($objIf->getAttribute('var')) : null;
         $bolCondIf  = $objIf->hasAttribute('cond') ? $this->_checkCond($varIf, $objIf->getAttribute('cond')) : isset($varIf);
         $cadCompare = $objIf->hasAttribute('compare') ? strtolower(trim($objIf->getAttribute('compare'))) : 'and';
@@ -820,7 +820,7 @@ class Phtml
             $bolPaseIf = $bolCondIf;
         }
         if ($bolPaseIf) {
-            $objFrag = $this->_getElements($objDom, $objIf);
+            $objFrag = $this->_getElements($dom, $objIf);
             while (strtolower(@$objIf->nextSibling->nodeName) == 'elseif' || strtolower(@$objIf->nextSibling->nodeName) == 'else' || @$objIf->nextSibling->nodeType == XML_COMMENT_NODE || (@$objIf->nextSibling->nodeType == XML_TEXT_NODE && ctype_space(@$objIf->nextSibling->textContent))) {
                 $objIf->parentNode->removeChild($objIf->nextSibling);
             }
@@ -844,7 +844,7 @@ class Phtml
                             $bolPaseElseIf = $bolCondElseIf;
                         }
                         if ($bolPaseElseIf) {
-                            $objFrag = $this->_getElements($objDom, $objElseif);
+                            $objFrag = $this->_getElements($dom, $objElseif);
                         }
                     }
                 }
@@ -852,7 +852,7 @@ class Phtml
             }
             if (strtolower(@$objIf->nextSibling->nodeName) == 'else') {
                 if (!$objFrag) {
-                    $objFrag = $this->_getElements($objDom, $objIf->nextSibling);
+                    $objFrag = $this->_getElements($dom, $objIf->nextSibling);
                 }
                 $objIf->parentNode->removeChild($objIf->nextSibling);
             }
@@ -863,8 +863,8 @@ class Phtml
         } else {
             $objIf->parentNode->replaceChild($objFrag, $objIf);
         }
-        $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
+        $dom->saveHTML();
+        $objPhtml = $dom->getElementById($this->_randID);
         $this->_strContent = $this->_getHTML($objPhtml);
     }
 
@@ -890,8 +890,8 @@ class Phtml
      */
     private function _compile_switch()
     {
-        $objDom = $this->_getObjDOM($this->_strContent);
-        $objSwitch = $objDom->getElementsByTagName('switch')->item(0);
+        $dom = $this->_getObjDOM($this->_strContent);
+        $objSwitch = $dom->getElementsByTagName('switch')->item(0);
         $varSwitch      = $objSwitch->hasAttribute('var') && $objSwitch->getattribute('var') != '' ? $this->_importVar($objSwitch->getAttribute('var')) : null;
         $objFrag = null;
         while (strtolower(@$objSwitch->firstChild->nodeName) == 'case' || @$objSwitch->firstChild->nodeType == XML_COMMENT_NODE || (@$objSwitch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$objSwitch->firstChild->textContent))) {
@@ -912,7 +912,7 @@ class Phtml
                         $bolPase = $bolCond;
                     }
                     if ($bolPase) {
-                        $objFrag = $this->_getElements($objDom, $objCase);
+                        $objFrag = $this->_getElements($dom, $objCase);
                     }
                 }
             }
@@ -920,7 +920,7 @@ class Phtml
         }
         if (strtolower(@$objSwitch->firstChild->nodeName) == 'default') {
             if (!$objFrag) {
-                $objFrag = $this->_getElements($objDom, $objSwitch->firstChild);
+                $objFrag = $this->_getElements($dom, $objSwitch->firstChild);
             }
             $objSwitch->removeChild($objSwitch->firstChild);
         }
@@ -930,8 +930,8 @@ class Phtml
         } else {
             $objSwitch->parentNode->replaceChild($objFrag, $objSwitch);
         }
-        $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
+        $dom->saveHTML();
+        $objPhtml = $dom->getElementById($this->_randID);
         $this->_strContent = $this->_getHTML($objPhtml);
     }
 
@@ -947,8 +947,8 @@ class Phtml
      */
     private function _compile_foreach()
     {
-        $objDom         = $this->_getObjDOM($this->_strContent);
-        $objForeach     = $objDom->getElementsByTagName('foreach')->item(0);
+        $dom         = $this->_getObjDOM($this->_strContent);
+        $objForeach     = $dom->getElementsByTagName('foreach')->item(0);
         $cadVariable    = $objForeach->hasAttribute('var') && $objForeach->getAttribute('var') != '' ? $objForeach->getAttribute('var') : null;
         $cadClave       = $objForeach->hasAttribute('key') ? $objForeach->getAttribute('key') : 'key';
         $cadValor       = $objForeach->hasAttribute('value') ? $objForeach->getAttribute('value') : 'value';
@@ -970,7 +970,7 @@ class Phtml
                 $cadProcesada = $this->_replaceQuotesEtc($id . $cadClave, $id .  $cadVariable . '.' . $clave, $cadProcesada);
                 $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadClave, $id . $cadVariable . '.' . $clave, $cadProcesada);
             }
-            $objFrag = $this->_convertHTMLinElements($objDom, $cadProcesada);
+            $objFrag = $this->_convertHTMLinElements($dom, $cadProcesada);
         }
         $this->_clearComments($objForeach);
         if (!$objFrag) {
@@ -978,8 +978,8 @@ class Phtml
         } else {
             $objForeach->parentNode->replaceChild($objFrag, $objForeach);
         }
-        $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
+        $dom->saveHTML();
+        $objPhtml = $dom->getElementById($this->_randID);
         $this->_strContent = $this->_getHTML($objPhtml);
     }
 
@@ -996,20 +996,20 @@ class Phtml
      */
     private function _compile_for()
     {
-        $objDom            = $this->_getObjDOM($this->_strContent);
-        $objFor            = $objDom->getElementsByTagName('for')->item(0);
-        $cadVariable       = $objFor->getAttribute('var');
+        $dom            = $this->_getObjDOM($this->_strContent);
+        $for            = $dom->getElementsByTagName('for')->item(0);
+        $cadVariable       = $for->getAttribute('var');
         $mixedVar          = $this->_importVar($cadVariable);
-        $id                = $objFor->hasAttribute('id') ? $objFor->getAttribute('id') . '.' : '';
-        $offset            = $objFor->getAttribute('offset');
-        $cadIndice         = $objFor->hasAttribute('index') ? $objFor->getAttribute('index')    : 'i';
-        $cadTotal          = $objFor->getAttribute('size');
-        $init              = $objFor->getAttribute('init');
-        $content           = $this->_getHTML($objFor);
+        $id                = $for->hasAttribute('id') ? $for->getAttribute('id') . '.' : '';
+        $offset            = $for->getAttribute('offset');
+        $cadIndice         = $for->hasAttribute('index') ? $for->getAttribute('index')    : 'i';
+        $cadTotal          = $for->getAttribute('size');
+        $init              = $for->getAttribute('init');
+        $content           = $this->_getHTML($for);
         $objFrag           = null;
         $cadProcesada      = '';
 
-        switch (strtolower(trim($objFor->getAttribute('order')))) {
+        switch (strtolower(trim($for->getAttribute('order')))) {
             case 'desc':
                 $asc = false;
                 break;
@@ -1023,8 +1023,7 @@ class Phtml
             $cadIndice = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
-
-        if ($objFor->hasAttribute('var') && !empty($mixedVar)) { // solo variables
+        if ($for->hasAttribute('var') && !empty($mixedVar)) { // solo variables
             if (is_array($mixedVar)) { // arreglos
                 switch ($cadTotal) {
                     case '':
@@ -1058,37 +1057,33 @@ class Phtml
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
                     $cadProcesada = @$this->_replaceVar($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $cadProcesada);
                 }
-                $cadProcesada = $this->_replaceVarEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
-                $cadProcesada = $this->_replaceQuotes($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_replaceVarEtc(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
+                $cadProcesada = $this->_replaceQuotes(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
                 $cadProcesada = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $cadProcesada);
             }
-            if ($offset != '') {
-                eval('$o=' . $i . $offset . ';');
-            }
-            $cadProcesada = $this->_replaceVar($id . $cadIndice,  isset($o) ? $o : $i, $cadProcesada);
+            $cadProcesada = $this->_replaceVar($id . $cadIndice,  $offset != '' ? array_sum(array($i, $offset)) : $i, $cadProcesada);
             $cadProcesada = $this->_replaceQuotes($id . $cadIndice, $i, $cadProcesada);
-            //}
         }
-        $objFrag = $this->_convertHTMLinElements($objDom, $cadProcesada);
-        $this->_clearComments($objFor);
+        $objFrag = $this->_convertHTMLinElements($dom, $cadProcesada);
+        $this->_clearComments($for);
         if (!$objFrag) {
-            $objFor->parentNode->removeChild($objFor);
+            $for->parentNode->removeChild($for);
         } else {
-            $objFor->parentNode->replaceChild($objFrag, $objFor);
+            $for->parentNode->replaceChild($objFrag, $for);
         }
-        $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
-        $this->_strContent = $this->_getHTML($objPhtml);
+        $dom->saveHTML();
+        $phtml = $dom->getElementById($this->_randID);
+        $this->_strContent = $this->_getHTML($phtml);
     }
 
 
 
     private function _seguridadComentarios()
     {
-        $objDom     = $this->_getObjDOM($this->_strContent);
-        //$objDom->preserveWhiteSpace = false;
-        //$objDom->formatOutput = true;
-        $objXPath = new DOMXPath($objDom);
+        $dom     = $this->_getObjDOM($this->_strContent);
+        //$dom->preserveWhiteSpace = false;
+        //$dom->formatOutput = true;
+        $objXPath = new DOMXPath($dom);
         $comments = $objXPath->query('//comment()');
         foreach ($comments as $comment) {
             // (*) eliminar comentarios si commpress lo pide
@@ -1097,8 +1092,8 @@ class Phtml
                 $comment->parentNode->removeChild($comment);
             }
         }
-        $objDom->saveHTML();
-        $objPhtml = $objDom->getElementById($this->_randID);
+        $dom->saveHTML();
+        $objPhtml = $dom->getElementById($this->_randID);
         $this->_strContent = $this->_getHTML($objPhtml);
     }
 

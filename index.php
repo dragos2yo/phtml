@@ -48,10 +48,23 @@ $objPhtml->catchContent(); */
 
 // ejemplo de incluir un archivo con el tag include
 $cadInclude = <<<EOL
-<!-- Comentario antes del include -->        
-<include>plantillas/include.phtml</include>
-<!-- comentario despues del include -->
-<p>Contenido despues de <b>include</b></p>
+<!-- Listar el arreglo arrUsuario -->
+<for var="arrUsuario" index="i">
+    <h4>Iterrando la palabra <b>{{arrUsuario.i}}</b></h4>
+    <!-- Recorer la cadena del usuario -->
+    <for var="arrUsuario.i" index="j">
+        <p>La letra <b>{{arrUsuario.i.j}}</b> esta en la pozicion <b>{{j}}</b></p>
+    </for>
+</for>
+
+<!-- Recorer un arreglo multidimensional-->
+<for var="arrDias" index="i.0">
+    <ul>
+        <for var="arrDias.i" index="j.0">
+            <li>{{arrDias.i.j}}</li>
+        </for>
+    </ul>
+</for>
 EOL;
 /* $objPhtml->addContent($cadInclude); */
 //echo $objPhtml->obtenerContenido('include') . '<br>';
@@ -114,6 +127,27 @@ $objPhtml->addFile('plantillas/for.phtml');
 $inicial = microtime(true);
 echo $objPhtml->output();
 
+
+
+/* $size = sizeof($arrUsuario);
+for($i = 0; $i < $size; $i++) {
+    echo '<h4>Iterrando la palabra <b>' . $arrUsuario[$i] . '</b></h4>';
+    $len = strlen($arrUsuario[$i]);
+    for($j = 0; $j < $len; $j++) {
+        echo '<p>La letra <b>' . $arrUsuario[$i][$j] . '</b> esta en la pozicion <b>' . $j . '</b></p>';
+    }
+}
+
+$size = sizeof($arrDias);
+for($i = 0; $i < $size; $i++) {
+    echo '<ul>';
+        $count = sizeof($arrDias[$i]);
+        for($j = 0; $j < $count; $j++) {
+            echo '<li>' . $arrDias[$i][$j] . '</li>';
+        }
+    echo '</ul>';
+}  */
+
+
 $final = microtime(true);
 print_pre($final - $inicial);
-
