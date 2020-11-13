@@ -97,13 +97,13 @@ $objPhtml->addVar('_SERVER', $_SERVER);
 //$objPhtml->addFile('plantillas/foreach.phtml'); 
 
 // ejemplo de depurar un tag for
-$objPhtml->addFile('plantillas/for.phtml');
+//$objPhtml->addFile('plantillas/for.phtml');
 
 // ejemplo de depurar un tag while
 //$objPhtml->addFile('plantillas/do-while.phtml');
 
 // ejemplo de imprimir variables
-//$objPhtml->addFile('plantillas/var.phtml');
+$objPhtml->addFile('plantillas/var.phtml');
 
 // ejemplo de imprimir variables
 //$objPhtml->addFile('plantillas/const.phtml');

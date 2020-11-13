@@ -326,12 +326,12 @@ class Phtml
      * 
      * @return mixed devuelve el valor que contiene la variable
      */
-    private function _importVar($cadVariable)
+    private function _importVar($strVar)
     {
-        if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($cadVariable))) {
-            $arr = explode('.', $cadVariable);
-            $numParametros    = sizeof($arr);
-            switch ($numParametros) {
+        if (preg_match('/[^0-9][a-zA-Z0-9_\.]+/', trim($strVar))) {
+            $arr  = explode('.', $strVar);
+            $size = sizeof($arr);
+            switch ($size) {
                 case 1:
                     if (isset($this->_arrVar[$arr[0]])) {
                         return ($this->_arrVar[$arr[0]]);
@@ -391,8 +391,8 @@ class Phtml
                     break;
             }
         } else {
-            if (is_numeric($cadVariable)) { // solo numeros
-                return ($cadVariable);
+            if (is_numeric($strVar)) { // solo numeros
+                return ($strVar);
             }
         }
         return (null);
@@ -457,18 +457,12 @@ class Phtml
 
     /**
      * Reemplaza los las variables de los bucles for - foreach - while
-     * var="id.var.key.XXX.etc"
-     * var='id.var.key.XXX.etc'
      * var="var.key.XXX.etc"
      * var='var.key.XXX.etc'
-     * var="id.var.i.XXX.etc"
-     * var='id.var.i.XXX.etc'
      * var="var.i.XXX.etc"
      * var='var.i.XXX.etc'
      * var='key.XXX.etc'
-     * var='id.key.XXX.etc'
      * var="key.XXX.etc"
-     * var="id.key.XXX.etc"
      * 
      * @param string $search
      * @param string $replacement
@@ -489,26 +483,16 @@ class Phtml
 
     /**
      * Reemplaza los las variables de los bucles for - foreach - while
-     * var='id.i'
      * var='i'
-     * var="id.i"
      * var="i"
      * var="var.i"
-     * var="id.var.i"
      * var='var.i'
-     * var='id.var.i'
-     * var="id.var.key"
      * var="var.key"
-     * var='id.var.key'
      * var='var.key'
      * var='value'
-     * var='id.value'
      * var="value"
-     * var="id.value"
      * var='key'
-     * var='id.key'
      * var="key"
-     * var="id.key"
      * 
      * @param string $search
      * @param string $replacement
@@ -532,14 +516,9 @@ class Phtml
      * Reemplaza los las variables de los bucles for - foreach - while
      * 
      * {{var.key}}
-     * {{id.var.key}}
      * {{key}}
-     * {{id.key}}
      * {{value}}
-     * {{id.value}}
-     * {{id.var.i}}
      * {{var.i}}
-     * {{id.i}}
      * {{i}}
      * @param string $search
      * @param string $replacement
@@ -549,8 +528,9 @@ class Phtml
      */
     private function _replaceVar($search, $replacement, $subject)
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
-        while (@preg_match($pattern, $subject, $arrResult)) {
+        $pattern1 = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
+        $pattern2 = '/' . urlencode($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\s*' . urlencode($this->_closeVar)  . '/';
+        while (@preg_match($pattern1, $subject, $arrResult) || @preg_match($pattern2, $subject, $arrResult)) {
             $subject = @preg_replace('/' . $this->_escapeMetaChars($arrResult[0]) . '/', $replacement, $subject);
         }
         return ($subject);
@@ -562,8 +542,6 @@ class Phtml
      * Reemplaza las variables de los bucles for - foreach - while
      * 
      * {{var.key.XXX.etc}}
-     * {{id.var.key.XXX.etc}}
-     * {{id.var.i.XXX.etc}} 
      * {{var.i.XXX.etc}}
      * @param string $search     antiguo valor
      * @param string $replacement nuevo valor
@@ -573,8 +551,10 @@ class Phtml
      */
     private function _replaceVarEtc($search, $replacement, $subject)
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
-        while (@preg_match($pattern, $subject, $arrResult)) {
+        $pattern1 = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
+        $pattern2 = '/' . urlencode($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*' . urlencode($this->_closeVar)  . '/';
+
+        while (@preg_match($pattern1, $subject, $arrResult) || @preg_match($pattern2, $subject, $arrResult)) {
             $var = $this->_importVar($replacement . '.' . $arrResult[1]);
             if (isset($var)) {
                 $replacement =  $this->_openVar . $var . $this->_closeVar;
@@ -594,8 +574,18 @@ class Phtml
      */
     private function _compile_var($deleteVar = false)
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escapeMetaChars($this->_closeVar) .  '/';
-        if (preg_match_all($pattern, $this->_strContent, $arrResult)) {
+        $arrResult = array();
+        $pattern1 = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escapeMetaChars($this->_closeVar) .  '/';
+        $pattern2 = '/' . urlencode($this->_openVar) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . urlencode($this->_closeVar) .  '/';
+        if(preg_match_all($pattern1, $this->_strContent, $arrResult1)) {
+            array_push($arrResult, $arrResult1);
+        }
+        if(preg_match_all($pattern2, $this->_strContent, $arrResult2)) {
+            array_push($arrResult, $arrResult2);
+        }
+        print_pre($arrResult);
+
+        if (isset($arrResult)) {
             $size = sizeof($arrResult[0]);
             for ($i = 0; $i < $size; $i++) {
                 $arrVar = explode('.', $arrResult[1][$i], 2);
