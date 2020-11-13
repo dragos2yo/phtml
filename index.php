@@ -31,43 +31,23 @@ $objPhtml->userFormat(new myFormat);
 $objPhtml->addVar('enlace', 'Categoria de Prueba');
 
 // agregar contenido manual
-/* $objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>'); */
-//echo $objPhtml->obtenerContenido('manual') . '<br>';
+$objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>');
 
 // agregar contenido desde un archivo 
-/* $objPhtml->addFile('plantillas/hola.phtml'); */
-//echo $objPhtml->obtenerContenido('archivo') . '<br>';
+$objPhtml->addFile('plantillas/hola.phtml');
 
 
 // agregar contenido en ejecucion
-/* $objPhtml->catchContent();
+$objPhtml->catchContent();
  echo "<p>Hola Mundo desde <b>catchContent</b></p>";
-$objPhtml->catchContent(); */
-//echo $objPhtml->obtenerContenido('captar') . '<br>';
+$objPhtml->catchContent();
 
 
 // ejemplo de incluir un archivo con el tag include
 $cadInclude = <<<EOL
-<!-- Listar el arreglo arrUsuario -->
-<for var="arrUsuario" index="i">
-    <h4>Iterrando la palabra <b>{{arrUsuario.i}}</b></h4>
-    <!-- Recorer la cadena del usuario -->
-    <for var="arrUsuario.i" index="j">
-        <p>La letra <b>{{arrUsuario.i.j}}</b> esta en la pozicion <b>{{j}}</b></p>
-    </for>
-</for>
-
-<!-- Recorer un arreglo multidimensional-->
-<for var="arrDias" index="i.0">
-    <ul>
-        <for var="arrDias.i" index="j.0">
-            <li>{{arrDias.i.j}}</li>
-        </for>
-    </ul>
-</for>
+<include>plantillas/include.phtml</include>
 EOL;
-/* $objPhtml->addContent($cadInclude); */
-//echo $objPhtml->obtenerContenido('include') . '<br>';
+$objPhtml->addContent($cadInclude);
 
 // variables standard
 $objPhtml->addVar('edad', 35);
@@ -104,13 +84,13 @@ $objPhtml->addVar('objUsuario', $objUsuario);
 
 
 // ejemplo de depurar un tag if-elseif-else
-//$objPhtml->addFile('plantillas/if-elseif-else.phtml');
+$objPhtml->addFile('plantillas/if-elseif-else.phtml');
 
 // ejemplo de depurar un tag switch-case-default
-// $objPhtml->addFile('plantillas/switch-case-default.phtml');
+$objPhtml->addFile('plantillas/switch-case-default.phtml');
 
 // ejemplo de depurar un tag foreach
-// $objPhtml->addFile('plantillas/foreach.phtml'); 
+$objPhtml->addFile('plantillas/foreach.phtml'); 
 
 // ejemplo de depurar un tag for
 $objPhtml->addFile('plantillas/for.phtml');
@@ -119,35 +99,15 @@ $objPhtml->addFile('plantillas/for.phtml');
 //$objPhtml->addFile('plantillas/do-while.phtml');
 
 // ejemplo de imprimir variables
-//$objPhtml->addFile('plantillas/var.phtml');
+$objPhtml->addFile('plantillas/var.phtml');
 
 // ejemplo de imprimir variables
-// $objPhtml->addFile('plantillas/const.phtml');
+$objPhtml->addFile('plantillas/const.phtml');
 
 $inicial = microtime(true);
 echo $objPhtml->output();
-
-
-
-/* $size = sizeof($arrUsuario);
-for($i = 0; $i < $size; $i++) {
-    echo '<h4>Iterrando la palabra <b>' . $arrUsuario[$i] . '</b></h4>';
-    $len = strlen($arrUsuario[$i]);
-    for($j = 0; $j < $len; $j++) {
-        echo '<p>La letra <b>' . $arrUsuario[$i][$j] . '</b> esta en la pozicion <b>' . $j . '</b></p>';
-    }
-}
-
-$size = sizeof($arrDias);
-for($i = 0; $i < $size; $i++) {
-    echo '<ul>';
-        $count = sizeof($arrDias[$i]);
-        for($j = 0; $j < $count; $j++) {
-            echo '<li>' . $arrDias[$i][$j] . '</li>';
-        }
-    echo '</ul>';
-}  */
-
-
 $final = microtime(true);
+
+
+
 print_pre($final - $inicial);

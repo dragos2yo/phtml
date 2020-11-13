@@ -133,14 +133,14 @@ class Phtml
     private $_cadEncoding;
 
     /**
-     * @var object formatPhtml $_objFormat 
+     * @var object formatPhtml $_format 
      */
-    private $_objFormat;
+    private $_format;
 
     /**
-     * @var object condPhtml $_objCond 
+     * @var object condPhtml $_cond 
      */
-    private $_objCond;
+    private $_cond;
 
     /**
      * @var boolean $_bolIsset
@@ -153,29 +153,29 @@ class Phtml
      */
     public function __construct()
     {
-        $this->_openVar          = defined('PHTML_OPEN_VAR')       ? PHTML_OPEN_VAR       : '{{';
-        $this->_closeVar        = defined('PHTML_CLOSE_VAR')     ? PHTML_CLOSE_VAR     : '}}';
-        $this->_openConst         = defined('PHTML_OPEN_CONST')      ? PHTML_OPEN_CONST      : '[[';
-        $this->_closeConst       = defined('PHTML_CLOSE_CONST')    ? PHTML_CLOSE_CONST    : ']]';
-        $this->_bolEjecutarMetodos    = defined('PHTML_EXECUTE_METHOD')     ? PHTML_EXECUTE_METHOD     : true;
-        $this->_bolPermitted_GLOBALS   = defined('PHTML_PERMITTED_GLOBALS')    ? PHTML_PERMITTED_GLOBALS    : true;
-        $this->_bolPermitted_SERVER    = defined('PHTML_PERMITTED_SERVER')     ? PHTML_PERMITTED_SERVER     : false;
-        $this->_bolPermitted_GET       = defined('PHTML_PERMITTED_GET')        ? PHTML_PERMITTED_GET        : true;
-        $this->_bolPermitted_POST      = defined('PHTML_PERMITTED_POST')       ? PHTML_PERMITTED_POST       : true;
-        $this->_bolPermitted_FILES     = defined('PHTML_PERMITTED_FILES')      ? PHTML_PERMITTED_FILES      : false;
-        $this->_bolPermitted_COOKIE    = defined('PHTML_PERMITTED_COOKIE')     ? PHTML_PERMITTED_COOKIE     : true;
-        $this->_bolPermitted_SESSION   = defined('PHTML_PERMITTED_SESSION')    ? PHTML_PERMITTED_SESSION    : true;
-        $this->_bolPermitted_REQUEST   = defined('PHTML_PERMITTED_REQUEST')    ? PHTML_PERMITTED_REQUEST    : true;
-        $this->_bolPermitted_ENV       = defined('PHTML_PERMITTED_ENV')        ? PHTML_PERMITTED_ENV        : false;
-        $this->_bolCompress          = defined('PHTML_COMPRESS')           ? PHTML_COMPRESS           : false;
-        $this->_bolExecutePhp        = defined('PHTML_EXECUTE_PHP')        ? PHTML_EXECUTE_PHP        : true;
-        $this->_bolClearComment      = defined('PHTML_CLEAR_COMMENT') ? PHTML_CLEAR_COMMENT : true;
-        $this->_bolIsset              = defined('PHTML_COND_ISSET')          ? PHTML_COND_ISSET          : false;
-        $this->_cadEncoding           = defined('PHTML_ENCODING')            ? PHTML_ENCODING            : 'UTF-8';
-        $key                     = defined('PHTML_STR_KEY')        ? PHTML_STR_KEY        : 'phtml';
-        $this->_objFormat             = new formatPhtml;
-        $this->_objCond               = new condPhtml;
-        $this->_randID           = $this->_createRandID($key);
+        $this->_openVar                    = defined('PHTML_OPEN_VAR')          ? PHTML_OPEN_VAR          : '{{';
+        $this->_closeVar                   = defined('PHTML_CLOSE_VAR')         ? PHTML_CLOSE_VAR         : '}}';
+        $this->_openConst                  = defined('PHTML_OPEN_CONST')        ? PHTML_OPEN_CONST        : '[[';
+        $this->_closeConst                 = defined('PHTML_CLOSE_CONST')       ? PHTML_CLOSE_CONST       : ']]';
+        $this->_bolEjecutarMetodos         = defined('PHTML_EXECUTE_METHOD')    ? PHTML_EXECUTE_METHOD    : true;
+        $this->_bolPermitted_GLOBALS       = defined('PHTML_PERMITTED_GLOBALS') ? PHTML_PERMITTED_GLOBALS : true;
+        $this->_bolPermitted_SERVER        = defined('PHTML_PERMITTED_SERVER')  ? PHTML_PERMITTED_SERVER  : false;
+        $this->_bolPermitted_GET           = defined('PHTML_PERMITTED_GET')     ? PHTML_PERMITTED_GET     : true;
+        $this->_bolPermitted_POST          = defined('PHTML_PERMITTED_POST')    ? PHTML_PERMITTED_POST    : true;
+        $this->_bolPermitted_FILES         = defined('PHTML_PERMITTED_FILES')   ? PHTML_PERMITTED_FILES   : false;
+        $this->_bolPermitted_COOKIE        = defined('PHTML_PERMITTED_COOKIE')  ? PHTML_PERMITTED_COOKIE  : true;
+        $this->_bolPermitted_SESSION       = defined('PHTML_PERMITTED_SESSION') ? PHTML_PERMITTED_SESSION : true;
+        $this->_bolPermitted_REQUEST       = defined('PHTML_PERMITTED_REQUEST') ? PHTML_PERMITTED_REQUEST : true;
+        $this->_bolPermitted_ENV           = defined('PHTML_PERMITTED_ENV')     ? PHTML_PERMITTED_ENV     : false;
+        $this->_bolCompress                = defined('PHTML_COMPRESS')          ? PHTML_COMPRESS          : false;
+        $this->_bolExecutePhp              = defined('PHTML_EXECUTE_PHP')       ? PHTML_EXECUTE_PHP       : true;
+        $this->_bolClearComment            = defined('PHTML_CLEAR_COMMENT')     ? PHTML_CLEAR_COMMENT     : true;
+        $this->_bolIsset                   = defined('PHTML_COND_ISSET')        ? PHTML_COND_ISSET        : false;
+        $this->_cadEncoding                = defined('PHTML_ENCODING')          ? PHTML_ENCODING          : 'UTF-8';
+        $key                               = defined('PHTML_STR_KEY')           ? PHTML_STR_KEY           : 'phtml';
+        $this->_format                     = new formatPhtml;
+        $this->_cond                       = new condPhtml;
+        $this->_randID                     = $this->_createRandID($key);
         $this->_arrContent[$this->_randID] = '';
     }
 
@@ -280,10 +280,10 @@ class Phtml
      * 
      * @param object $objFormat un objeto de tipo formatPhtml
      */
-    public function userFormat(formatPhtml $objFormat)
+    public function userFormat(formatPhtml $format)
     {
-        if ($objFormat instanceof $objFormat) {
-            $this->_objFormat = $objFormat;
+        if ($format instanceof $format) {
+            $this->_format = $format;
         }
     }
 
@@ -291,12 +291,12 @@ class Phtml
     /**
      * Agrega un objeto de condiciones personalizado
      * 
-     * @param object $objCond un objeto de tipo condPhtml
+     * @param object $cond un objeto de tipo condPhtml
      */
-    public function userCond(condPhtml $objCond)
+    public function userCond(condPhtml $cond)
     {
-        if ($objCond instanceof condPhtml) {
-            $this->_objCond = $objCond;
+        if ($cond instanceof condPhtml) {
+            $this->_cond = $cond;
         }
     }
 
@@ -545,10 +545,10 @@ class Phtml
     {
         if ($strCond != '') {
             $arrCond = explode('.', $strCond, 2);
-            if (sizeof($arrCond) == 1 && method_exists($this->_objCond, 'phtml_' . $arrCond[0])) {
-                return ($this->_objCond->{'phtml_' . $arrCond[0]}($mixedVar));
-            } else if (sizeof($arrCond) == 2 && method_exists($this->_objCond, 'phtml_' . $arrCond[0])) {
-                return ($this->_objCond->{'phtml_' . $arrCond[0]}($mixedVar, $arrCond[1]));
+            if (sizeof($arrCond) == 1 && method_exists($this->_cond, 'phtml_' . $arrCond[0])) {
+                return ($this->_cond->{'phtml_' . $arrCond[0]}($mixedVar));
+            } else if (sizeof($arrCond) == 2 && method_exists($this->_cond, 'phtml_' . $arrCond[0])) {
+                return ($this->_cond->{'phtml_' . $arrCond[0]}($mixedVar, $arrCond[1]));
             } else {
                 return (false);
             }
@@ -702,10 +702,10 @@ class Phtml
             $size = sizeof($arrResult[0]);
             for ($i = 0; $i < $size; $i++) {
                 $arrVar = explode('.', $arrResult[1][$i], 2);
-                if (sizeof($arrVar) == 2 && method_exists($this->_objFormat, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
+                if (sizeof($arrVar) == 2 && method_exists($this->_format, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
                     $mixedVar = $this->_importVar($arrVar[1]);
                     if (!empty($mixedVar) && isset($mixedVar)) {
-                        $content = $this->_objFormat->{'phtml_' . $arrVar[0]}($mixedVar);
+                        $content = $this->_format->{'phtml_' . $arrVar[0]}($mixedVar);
                     } else {
                         $content = $deleteVar ? '' : null;
                     }
@@ -778,7 +778,7 @@ class Phtml
         $phtml = $dom->getElementById($this->_randID);
         $this->_strContent = $this->_getHTML($phtml);
         // modificar esto
-        $this->_seguridadComentarios();
+        $this->_compileCommentedPhtml();
         $this->_compile_const();
         $this->_compile_var();
     }
@@ -802,12 +802,12 @@ class Phtml
      */
     private function _compile_if()
     {
-        $dom     = $this->_getObjDOM($this->_strContent);
-        $if      = $dom->getElementsByTagName('if')->item(0);
-        $varIf      = $if->hasAttribute('var') && $if->getattribute('var') != '' ? $this->_importVar($if->getAttribute('var')) : null;
-        $bolCondIf  = $if->hasAttribute('cond') ? $this->_checkCond($varIf, $if->getAttribute('cond')) : ($this->_bolIsset ? isset($varIf) : false);// agregar cond por defecto
-        $compare = $if->hasAttribute('compare') ? strtolower(trim($if->getAttribute('compare'))) : 'and';
-        $frag    = null;
+        $dom       = $this->_getObjDOM($this->_strContent);
+        $if        = $dom->getElementsByTagName('if')->item(0);
+        $varIf     = $if->hasAttribute('var') && $if->getattribute('var') != '' ? $this->_importVar($if->getAttribute('var')) : null;
+        $bolCondIf = $if->hasAttribute('cond') ? $this->_checkCond($varIf, $if->getAttribute('cond')) : ($this->_bolIsset ? isset($varIf) : false); // agregar cond por defecto
+        $compare   = $if->hasAttribute('compare') ? strtolower(trim($if->getAttribute('compare'))) : 'and';
+        $frag      = null;
         if ($if->hasAttribute('and') && !$if->hasAttribute('or')) {
             $bolPaseIf = $bolCondIf && $this->_checkCond($varIf, $if->getAttribute('and'));
         } else if ($if->hasAttribute('or') && !$if->hasAttribute('and')) {
@@ -829,8 +829,8 @@ class Phtml
                 if (strtolower(@$if->nextSibling->nodeName) == 'elseif') {
                     $elseif = $if->nextSibling;
                     if (!$frag) {
-                        $varElseIf      = $elseif->hasAttribute('var') && $elseif->getattribute('var') != '' ? $this->_importVar($elseif->getAttribute('var')) : null;
-                        $bolCondElseIf  = $elseif->hasAttribute('cond') ? $this->_checkCond($varElseIf, $elseif->getAttribute('cond')) : ($this->_bolIsset ? isset($varElseIf) : false);
+                        $varElseIf     = $elseif->hasAttribute('var') && $elseif->getattribute('var') != '' ? $this->_importVar($elseif->getAttribute('var')) : null;
+                        $bolCondElseIf = $elseif->hasAttribute('cond') ? $this->_checkCond($varElseIf, $elseif->getAttribute('cond')) : ($this->_bolIsset ? isset($varElseIf) : false);
                         $compareElseif = $elseif->hasAttribute('compare') ? strtolower(trim($elseif->getAttribute('compare'))) : 'and';
                         if ($elseif->hasAttribute('and') && !$elseif->hasAttribute('or')) {
                             $bolPaseElseIf = $bolCondElseIf && $this->_checkCond($varElseIf, $elseif->getAttribute('and'));
@@ -891,10 +891,10 @@ class Phtml
      */
     private function _compile_switch()
     {
-        $dom = $this->_getObjDOM($this->_strContent);
+        $dom    = $this->_getObjDOM($this->_strContent);
         $switch = $dom->getElementsByTagName('switch')->item(0);
-        $var      = $switch->hasAttribute('var') && $switch->getattribute('var') != '' ? $this->_importVar($switch->getAttribute('var')) : null;
-        $frag = null;
+        $var    = $switch->hasAttribute('var') && $switch->getattribute('var') != '' ? $this->_importVar($switch->getAttribute('var')) : null;
+        $frag   = null;
         while (strtolower(@$switch->firstChild->nodeName) == 'case' || @$switch->firstChild->nodeType == XML_COMMENT_NODE || (@$switch->firstChild->nodeType == XML_TEXT_NODE && ctype_space(@$switch->firstChild->textContent))) {
             if (strtolower(@$switch->firstChild->nodeName) == 'case') {
                 if (!$frag) {
@@ -948,28 +948,28 @@ class Phtml
      */
     private function _compile_foreach()
     {
-        $dom         = $this->_getObjDOM($this->_strContent);
-        $foreach     = $dom->getElementsByTagName('foreach')->item(0);
-        $cadVariable    = $foreach->hasAttribute('var') && $foreach->getAttribute('var') != '' ? $foreach->getAttribute('var') : null;
-        $strKey      = $foreach->hasAttribute('key') ? $foreach->getAttribute('key') : 'key';
-        $strValue       = $foreach->hasAttribute('value') ? $foreach->getAttribute('value') : 'value';
-        $id             = $foreach->hasAttribute('id') ? $foreach->getAttribute('id') . '.' : '';
+        $dom       = $this->_getObjDOM($this->_strContent);
+        $foreach   = $dom->getElementsByTagName('foreach')->item(0);
+        $strVar    = $foreach->hasAttribute('var') && $foreach->getAttribute('var') != '' ? $foreach->getAttribute('var') : null;
+        $strKey    = $foreach->hasAttribute('key') ? $foreach->getAttribute('key') : 'key';
+        $strValue  = $foreach->hasAttribute('value') ? $foreach->getAttribute('value') : 'value';
+        $id        = $foreach->hasAttribute('id') ? $foreach->getAttribute('id') . '.' : '';
         $content   = $this->_getHTML($foreach);
-        $mixedVar       = $this->_importVar($cadVariable);
-        $frag        = null;
-        $processed   = '';
+        $mixedVar  = $this->_importVar($strVar);
+        $frag      = null;
+        $processed = '';
         if (is_array($mixedVar) || is_object($mixedVar)) {
             foreach ($mixedVar as $key => $value) {
                 $processed .= $content;
-                $processed = $this->_replaceVar(      $id . $cadVariable . '.' . $strKey,  is_object($mixedVar) ? $mixedVar->$key : $mixedVar[$key], $processed);
-                $processed = $this->_replaceVar(      $id . $strKey,  $key, $processed);
-                $processed = $this->_replaceVar(      $id . $strValue,  $value, $processed);
-                $processed = $this->_replaceVarEtc(   $id . $cadVariable . '.' . $strKey,  $id . $cadVariable . '.' . $key, $processed);
-                $processed = $this->_replaceQuotes(   $id . $strKey, $key, $processed);
-                $processed = $this->_replaceQuotes(   $id . $strValue, $value, $processed);
-                $processed = $this->_replaceQuotes(   $id . $cadVariable . '.' . $strKey, $id . $cadVariable . '.' . $key, $processed);
-                $processed = $this->_replaceQuotesEtc($id . $strKey, $id .  $cadVariable . '.' . $key, $processed);
-                $processed = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $strKey, $id . $cadVariable . '.' . $key, $processed);
+                $processed = $this->_replaceVar($id . $strVar . '.' . $strKey,  is_object($mixedVar) ? $mixedVar->$key : $mixedVar[$key], $processed);
+                $processed = $this->_replaceVar($id . $strKey,  $key, $processed);
+                $processed = $this->_replaceVar($id . $strValue,  $value, $processed);
+                $processed = $this->_replaceVarEtc($id . $strVar . '.' . $strKey,  $id . $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceQuotes($id . $strKey, $key, $processed);
+                $processed = $this->_replaceQuotes($id . $strValue, $value, $processed);
+                $processed = $this->_replaceQuotes($id . $strVar . '.' . $strKey, $id . $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceQuotesEtc($id . $strKey, $id .  $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceQuotesEtc($id . $strVar . '.' . $strKey, $id . $strVar . '.' . $key, $processed);
             }
             $frag = $this->_convertHTMLinElements($dom, $processed);
         }
@@ -997,19 +997,18 @@ class Phtml
      */
     private function _compile_for()
     {
-        $dom            = $this->_getObjDOM($this->_strContent);
-        $for            = $dom->getElementsByTagName('for')->item(0);
-        $cadVariable       = $for->getAttribute('var');
-        $mixedVar          = $this->_importVar($cadVariable);
-        $id                = $for->hasAttribute('id') ? $for->getAttribute('id') . '.' : '';
-        $offset            = $for->getAttribute('offset');
-        $cadIndice         = $for->hasAttribute('index') ? $for->getAttribute('index')    : 'i';
-        $cadTotal          = $for->getAttribute('size');
-        $init              = $for->getAttribute('init');
-        $content           = $this->_getHTML($for);
-        $frag           = null;
-        $processed      = '';
-
+        $dom       = $this->_getObjDOM($this->_strContent);
+        $for       = $dom->getElementsByTagName('for')->item(0);
+        $strVar    = $for->getAttribute('var');
+        $mixedVar  = $this->_importVar($strVar);
+        $id        = $for->hasAttribute('id') ? $for->getAttribute('id') . '.' : '';
+        $offset    = $for->getAttribute('offset');
+        $index     = $for->hasAttribute('index') ? $for->getAttribute('index')    : 'i';
+        $size      = $for->getAttribute('size');
+        $init      = $for->getAttribute('init');
+        $content   = $this->_getHTML($for);
+        $frag      = null;
+        $processed = '';
         switch (strtolower(trim($for->getAttribute('order')))) {
             case 'desc':
                 $asc = false;
@@ -1020,13 +1019,13 @@ class Phtml
                 break;
         }
         if ($init == '') {
-            $arrIndice = explode('.', $cadIndice);
-            $cadIndice = $arrIndice[0];
+            $arrIndice = explode('.', $index);
+            $index = $arrIndice[0];
             $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
         }
         if ($for->hasAttribute('var') && !empty($mixedVar)) { // solo variables
             if (is_array($mixedVar)) { // arreglos
-                switch ($cadTotal) {
+                switch ($size) {
                     case '':
                     case 'size':
                     case 'sizeof':
@@ -1035,11 +1034,11 @@ class Phtml
                         $max = sizeof($mixedVar);
                         break;
                     default:
-                        $max = $cadTotal;
+                        $max = $size;
                         break;
                 }
             } else if (is_string($mixedVar)) { // cadenas
-                switch ($cadTotal) {
+                switch ($size) {
                     case '':
                     case 'size':
                     case 'strlen':
@@ -1047,23 +1046,23 @@ class Phtml
                         $max = strlen($mixedVar);
                         break;
                     default:
-                        $max = $cadTotal;
+                        $max = $size;
                         break;
                 }
             }
         }
         for ($asc ? $i = $init : $i = $max - 1; $asc ? $i < $max : $init <= $i; $asc ? $i++ : $i--) {
             $processed .= $content;
-            if ($cadVariable != '') {
+            if ($strVar != '') {
                 if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
-                    $processed = @$this->_replaceVar($id . $cadVariable . '.' . $cadIndice,  $mixedVar[$i], $processed);
+                    $processed = @$this->_replaceVar($id . $strVar . '.' . $index,  $mixedVar[$i], $processed);
                 }
-                $processed = $this->_replaceVarEtc(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $processed);
-                $processed = $this->_replaceQuotes(   $id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $processed);
-                $processed = $this->_replaceQuotesEtc($id . $cadVariable . '.' . $cadIndice, $id . $cadVariable . '.' . $i, $processed);
+                $processed = $this->_replaceVarEtc($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
+                $processed = $this->_replaceQuotes($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
+                $processed = $this->_replaceQuotesEtc($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
             }
-            $processed = $this->_replaceVar($id . $cadIndice,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
-            $processed = $this->_replaceQuotes($id . $cadIndice, $i, $processed);
+            $processed = $this->_replaceVar($id . $index,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
+            $processed = $this->_replaceQuotes($id . $index, $i, $processed);
         }
         $frag = $this->_convertHTMLinElements($dom, $processed);
         $this->_clearComments($for);
@@ -1079,7 +1078,7 @@ class Phtml
 
 
 
-    private function _seguridadComentarios()
+    private function _compileCommentedPhtml()
     {
         $dom     = $this->_getObjDOM($this->_strContent);
         //$dom->preserveWhiteSpace = false;
@@ -1120,7 +1119,7 @@ class Phtml
      */
     private function _compile()
     {
-        $this->_seguridadComentarios();
+        $this->_compileCommentedPhtml();
         $this->_compile_const();
         $this->_compile_var();
         $pattern = '/<(if(?!.)*|switch(?!.)*|foreach(?!.)*|while(?!.)*|include(?!.)*|for(?!.)*)[\s]*.*?>(.*?)<\/\1>/is';
