@@ -1,98 +1,98 @@
 <?php
 class formatPhtml
 {
-    public function phtml_strtolower($mixedVar)
+    public function phtml_strtolower($var)
     {
-        return (strtolower($mixedVar));
+        return (strtolower($var));
     }
 
-    public function phtml_lower($mixedVar)
+    public function phtml_lower($var)
     {
-        return (strtolower($mixedVar));
+        return (strtolower($var));
     }
 
-    public function phtml_lowercase($mixedVar)
+    public function phtml_lowercase($var)
     {
-        return (strtolower($mixedVar));
+        return (strtolower($var));
     }
 
-    public function phtml_strtoupper($mixedVar)
+    public function phtml_strtoupper($var)
     {
-        return (strtoupper($mixedVar));
+        return (strtoupper($var));
     }
 
-    public function phtml_upper($mixedVar)
+    public function phtml_upper($var)
     {
-        return (strtoupper($mixedVar));
+        return (strtoupper($var));
     }
 
-    public function phtml_uppercase($mixedVar)
+    public function phtml_uppercase($var)
     {
-        return (strtoupper($mixedVar));
+        return (strtoupper($var));
     }
 
-    public function phtml_camelcase($mixedVar)
+    public function phtml_camelcase($var)
     {
-        return (ucwords($mixedVar));
+        return (ucwords($var));
     }
 
-    public function phtml_ucfirst($mixedVar)
+    public function phtml_ucfirst($var)
     {
-        return (ucfirst($mixedVar));
+        return (ucfirst($var));
     }
 
-    public function phtml_urlencode($mixedVar)
+    public function phtml_urlencode($var)
     {
-        return (urlencode($mixedVar));
+        return (urlencode($var));
     }
 
-    public function phtml_urldecode($mixedVar)
+    public function phtml_urldecode($var)
     {
-        return (urldecode($mixedVar));
+        return (urldecode($var));
     }
 
-    public function phtml_trim($mixedVar)
+    public function phtml_trim($var)
     {
-        return (trim($mixedVar));
+        return (trim($var));
     }
 
-    public function phtml_ltrim($mixedVar)
+    public function phtml_ltrim($var)
     {
-        return (ltrim($mixedVar));
+        return (ltrim($var));
     }
 
-    public function phtml_rtrim($mixedVar)
+    public function phtml_rtrim($var)
     {
-        return (rtrim($mixedVar));
+        return (rtrim($var));
     }
 
-    public function phtml_htmlentities($mixedVar)
+    public function phtml_htmlentities($var)
     {
-        return (htmlentities($mixedVar));
+        return (htmlentities($var));
     }
 
-    public function phtml_html_entity_decode($mixedVar)
+    public function phtml_html_entity_decode($var)
     {
-        return (html_entity_decode($mixedVar));
+        return (html_entity_decode($var));
     }
 
-    public function phtml_addslashes($mixedVar)
+    public function phtml_addslashes($var)
     {
-        return (addslashes($mixedVar));
+        return (addslashes($var));
     }
 
-    public function phtml_stripslashes($mixedVar)
+    public function phtml_stripslashes($var)
     {
-        return (stripslashes($mixedVar));
+        return (stripslashes($var));
     }
 
-    public function phtml_htmlespecialschars($mixedVar)
+    public function phtml_htmlespecialschars($var)
     {
-        return (htmlspecialchars($mixedVar));
+        return (htmlspecialchars($var));
     }
 
-    public function phtml_strlen($mixedVar)
+    public function phtml_strlen($var)
     {
-        return (strlen($mixedVar));
+        return (strlen($var));
     }
 }

@@ -2,168 +2,168 @@
 
 class condPhtml
 {
-    public function phtml_true($mixedVar)
+    public function phtml_true($var)
     {
-        return ($mixedVar == true);
+        return ($var == true);
     }
 
-    public function phtml_false($mixedVar)
+    public function phtml_false($var)
     {
-        return ($mixedVar == false);
+        return ($var == false);
     }
 
-    public function phtml_is_null($mixedVar)
+    public function phtml_is_null($var)
     {
-        return (is_null($mixedVar));
+        return (is_null($var));
     }
 
-    public function phtml_not_null($mixedVar)
+    public function phtml_not_null($var)
     {
-        return (!is_null($mixedVar));
+        return (!is_null($var));
     }
 
-    public function phtml_is_array($mixedVar)
+    public function phtml_is_array($var)
     {
-        return (is_array($mixedVar));
+        return (is_array($var));
     }
 
-    public function phtml_not_array($mixedVar)
+    public function phtml_not_array($var)
     {
-        return (!is_array($mixedVar));
+        return (!is_array($var));
     }
 
-    public function phtml_is_object($mixedVar)
+    public function phtml_is_object($var)
     {
-        return (is_object($mixedVar));
+        return (is_object($var));
     }
 
-    public function phtml_not_object($mixedVar)
+    public function phtml_not_object($var)
     {
-        return (!is_object($mixedVar));
+        return (!is_object($var));
     }
 
-    public function phtml_is_numeric($mixedVar)
+    public function phtml_is_numeric($var)
     {
-        return (is_numeric($mixedVar));
+        return (is_numeric($var));
     }
 
-    public function phtml_is_int($mixedVar)
+    public function phtml_is_int($var)
     {
-        return (is_int($mixedVar));
+        return (is_int($var));
     }
 
-    public function phtml_not_numeric($mixedVar)
+    public function phtml_not_numeric($var)
     {
-        return (!is_numeric($mixedVar));
+        return (!is_numeric($var));
     }
 
-    public function phtml_is_string($mixedVar)
+    public function phtml_is_string($var)
     {
-        return (is_string($mixedVar));
+        return (is_string($var));
     }
 
-    public function phtml_not_string($mixedVar)
+    public function phtml_not_string($var)
     {
-        return (!is_string($mixedVar));
+        return (!is_string($var));
     }
 
-    public function phtml_empty($mixedVar)
+    public function phtml_empty($var)
     {
-        return (empty($mixedVar));
+        return (empty($var));
     }
 
-    public function phtml_not_empty($mixedVar)
+    public function phtml_not_empty($var)
     {
-        return (!empty($mixedVar));
+        return (!empty($var));
     }
 
-    public function phtml_isset($mixedVar)
+    public function phtml_isset($var)
     {
-        return (isset($mixedVar));
+        return (isset($var));
     }
 
-    public function phtml_notset($mixedVar)
+    public function phtml_notset($var)
     {
-        return (!isset($mixedVar));
+        return (!isset($var));
     }
 
-    public function phtml_preg_match($mixedVar, $strOperand)
+    public function phtml_preg_match($var, $strOperand)
     {
-        return (preg_match($strOperand, $mixedVar));
+        return (preg_match($strOperand, $var));
     }
 
-    public function phtml_not_preg_match($mixedVar, $strOperand)
+    public function phtml_not_preg_match($var, $strOperand)
     {
-        return (!preg_match($strOperand, $mixedVar));
+        return (!preg_match($strOperand, $var));
     }
 
-    public function phtml_is_email($mixedVar)
+    public function phtml_is_email($var)
     {
-        return (!filter_var($mixedVar, FILTER_VALIDATE_EMAIL) ? false : true);
+        return (!filter_var($var, FILTER_VALIDATE_EMAIL) ? false : true);
     }
 
-    public function phtml_equalto($mixedVar, $strOperand)
+    public function phtml_equalto($var, $strOperand)
     {
-        return ($mixedVar == $strOperand);
+        return ($var == $strOperand);
     }
 
-    public function phtml_not_equalto($mixedVar, $strOperand)
+    public function phtml_not_equalto($var, $strOperand)
     {
-        return ($mixedVar != $strOperand);
+        return ($var != $strOperand);
     }
 
-    public function phtml_morethan($mixedVar, $strOperand)
+    public function phtml_morethan($var, $strOperand)
     {
-        return ($mixedVar > $strOperand);
+        return ($var > $strOperand);
     }
 
-    public function phtml_morethan_equalto($mixedVar, $strOperand)
+    public function phtml_morethan_equalto($var, $strOperand)
     {
-        return ($mixedVar >= $strOperand);
+        return ($var >= $strOperand);
     }
 
-    public function phtml_lessthan($mixedVar, $strOperand)
+    public function phtml_lessthan($var, $strOperand)
     {
-        return ($mixedVar < $strOperand);
+        return ($var < $strOperand);
     }
 
-    public function phtml_lessthan_equalto($mixedVar, $strOperand)
+    public function phtml_lessthan_equalto($var, $strOperand)
     {
-        return ($mixedVar <= $strOperand);
+        return ($var <= $strOperand);
     }
 
-    public function phtml_length($mixedVar, $strOperand)
+    public function phtml_length($var, $strOperand)
     {
-        if (is_array($mixedVar)) {
-            return (sizeof($mixedVar) == (int)$strOperand);
+        if (is_array($var)) {
+            return (sizeof($var) == (int)$strOperand);
         } else {
-            return (strlen($mixedVar) == (int)($strOperand));
+            return (strlen($var) == (int)($strOperand));
         }
     }
 
-    public function phtml_maxlength($mixedVar, $strOperand)
+    public function phtml_maxlength($var, $strOperand)
     {
-        if (is_array($mixedVar)) {
-            return (sizeof($mixedVar) <= (int)$strOperand);
+        if (is_array($var)) {
+            return (sizeof($var) <= (int)$strOperand);
         } else {
-            return (strlen($mixedVar) <= (int)($strOperand));
+            return (strlen($var) <= (int)($strOperand));
         }
     }
 
-    public function phtml_minlength($mixedVar, $strOperand)
+    public function phtml_minlength($var, $strOperand)
     {
-        if (is_array($mixedVar)) {
-            return (sizeof($mixedVar) >= (int)$strOperand);
+        if (is_array($var)) {
+            return (sizeof($var) >= (int)$strOperand);
         } else {
-            return (strlen($mixedVar) >= (int)($strOperand));
+            return (strlen($var) >= (int)($strOperand));
         }
     }
 
-    public function phtml_premitted_characters($mixedVar, $strOperand)
+    public function phtml_premitted_characters($var, $strOperand)
     {
-        $size = strlen($mixedVar);
+        $size = strlen($var);
         for ($i = 0; $i < $size; $i++) {
-            $thisCharacter = substr($mixedVar, $i, 1);
+            $thisCharacter = substr($var, $i, 1);
             if (strpos($strOperand, $thisCharacter) === false) {
                 return (false);
             }
@@ -171,11 +171,11 @@ class condPhtml
         return (true);
     }
 
-    public function phtml_not_premitted_characters($mixedVar, $strOperand)
+    public function phtml_not_premitted_characters($var, $strOperand)
     {
-        $size = strlen($mixedVar);
+        $size = strlen($var);
         for ($i = 0; $i < $size; $i++) {
-            $thisCharacter = substr($mixedVar, $i, 1);
+            $thisCharacter = substr($var, $i, 1);
             if (strpos($strOperand, $thisCharacter) !== false) {
                 return (false);
             }

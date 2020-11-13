@@ -53,51 +53,6 @@ class Phtml
     private $_closeConst;
 
     /**
-     * @var boolean $_bolPermitted_GLOBALS
-     */
-    private $_bolPermitted_GLOBALS;
-
-    /**
-     * @var boolean $_bolPermitted_SERVER
-     */
-    private $_bolPermitted_SERVER;
-
-    /**
-     * @var boolean $_bolPermitted_GET
-     */
-    private $_bolPermitted_GET;
-
-    /**
-     * @var boolean $_bolPermitted_POST
-     */
-    private $_bolPermitted_POST;
-
-    /**
-     * @var boolean $_bolPermitted_FILES
-     */
-    private $_bolPermitted_FILES;
-
-    /**
-     * @var boolean $_bolPermitted_COOKIE
-     */
-    private $_bolPermitted_COOKIE;
-
-    /**
-     * @var boolean $_bolPermitted_SESSION
-     */
-    private $_bolPermitted_SESSION;
-
-    /**
-     * @var boolean $_bolPermitted_REQUEST
-     */
-    private $_bolPermitted_REQUEST;
-
-    /**
-     * @var boolean $_bolPermitted_ENV
-     */
-    private $_bolPermitted_ENV;
-
-    /**
      * @var boolean $_bolExecutePhp
      */
     private $_bolExecutePhp;
@@ -158,15 +113,6 @@ class Phtml
         $this->_openConst                  = defined('PHTML_OPEN_CONST')        ? PHTML_OPEN_CONST        : '[[';
         $this->_closeConst                 = defined('PHTML_CLOSE_CONST')       ? PHTML_CLOSE_CONST       : ']]';
         $this->_bolEjecutarMetodos         = defined('PHTML_EXECUTE_METHOD')    ? PHTML_EXECUTE_METHOD    : true;
-        $this->_bolPermitted_GLOBALS       = defined('PHTML_PERMITTED_GLOBALS') ? PHTML_PERMITTED_GLOBALS : true;
-        $this->_bolPermitted_SERVER        = defined('PHTML_PERMITTED_SERVER')  ? PHTML_PERMITTED_SERVER  : false;
-        $this->_bolPermitted_GET           = defined('PHTML_PERMITTED_GET')     ? PHTML_PERMITTED_GET     : true;
-        $this->_bolPermitted_POST          = defined('PHTML_PERMITTED_POST')    ? PHTML_PERMITTED_POST    : true;
-        $this->_bolPermitted_FILES         = defined('PHTML_PERMITTED_FILES')   ? PHTML_PERMITTED_FILES   : false;
-        $this->_bolPermitted_COOKIE        = defined('PHTML_PERMITTED_COOKIE')  ? PHTML_PERMITTED_COOKIE  : true;
-        $this->_bolPermitted_SESSION       = defined('PHTML_PERMITTED_SESSION') ? PHTML_PERMITTED_SESSION : true;
-        $this->_bolPermitted_REQUEST       = defined('PHTML_PERMITTED_REQUEST') ? PHTML_PERMITTED_REQUEST : true;
-        $this->_bolPermitted_ENV           = defined('PHTML_PERMITTED_ENV')     ? PHTML_PERMITTED_ENV     : false;
         $this->_bolCompress                = defined('PHTML_COMPRESS')          ? PHTML_COMPRESS          : false;
         $this->_bolExecutePhp              = defined('PHTML_EXECUTE_PHP')       ? PHTML_EXECUTE_PHP       : true;
         $this->_bolClearComment            = defined('PHTML_CLEAR_COMMENT')     ? PHTML_CLEAR_COMMENT     : true;
@@ -391,65 +337,16 @@ class Phtml
                         return ($this->_arrVar[$arr[0]]);
                     }
                 case 2:
-                    switch ($arr[0]) { // obtener super globales
-                        case 'GLOBALS':
-                            if ($this->_bolPermitted_GLOBALS && isset($_GLOBALS[$arr[1]])) {
-                                return ($GLOBALS[$arr[1]]);
-                            }
-                            break;
-                        case '_SERVER':
-                            if ($this->_bolPermitted_SERVER && isset($_SERVER[$arr[1]])) {
-                                return ($_SERVER[$arr[1]]);
-                            }
-                            break;
-                        case '_GET':
-                            if ($this->_bolPermitted_GET && isset($_GET[$arr[1]])) {
-                                return ($_GET[$arr[1]]);
-                            }
-                            break;
-                        case '_POST':
-                            if ($this->_bolPermitted_POST && isset($_POST[$arr[1]])) {
-                                return ($_POST[$arr[1]]);
-                            }
-                            break;
-                        case '_FILES':
-                            if ($this->_bolPermitted_FILES && isset($_FILES[$arr[1]])) {
-                                return ($_FILES[$arr[1]]);
-                            }
-                            break;
-                        case '_COOKIE':
-                            if ($this->_bolPermitted_COOKIE && isset($_COOKIE[$arr[1]])) {
-                                return ($_COOKIE[$arr[1]]);
-                            }
-                            break;
-                        case '_SESSION':
-                            if ($this->_bolPermitted_SESSION && isset($_SESSION[$arr[1]])) {
-                                return ($_SESSION[$arr[1]]);
-                            }
-                            break;
-                        case '_REQUEST':
-                            if ($this->_bolPermitted_REQUEST && isset($_REQUEST[$arr[1]])) {
-                                return ($_REQUEST[$arr[1]]);
-                            }
-                            break;
-                        case '_ENV':
-                            if ($this->_bolPermitted_ENV && isset($_ENV[$arr[1]])) {
-                                return ($_ENV[$arr[1]]);
-                            }
-                            break;
-                        default:
-                            if (isset($this->_arrVar[$arr[0]]) && is_array($this->_arrVar[$arr[0]])) {
-                                if (isset($this->_arrVar[$arr[0]][$arr[1]])) {
-                                    return ($this->_arrVar[$arr[0]][$arr[1]]); // arreglo[]
-                                }
-                            } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
-                                if (property_exists($this->_arrVar[$arr[0]], $arr[1])) {
-                                    return ($this->_arrVar[$arr[0]]->{$arr[1]}); // objeto->propiedad
-                                } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
-                                    return ($this->_arrVar[$arr[0]]->{$arr[1]}()); // objeto->metodo()
-                                }
-                            }
-                            break;
+                    if (isset($this->_arrVar[$arr[0]]) && is_array($this->_arrVar[$arr[0]])) {
+                        if (isset($this->_arrVar[$arr[0]][$arr[1]])) {
+                            return ($this->_arrVar[$arr[0]][$arr[1]]); // arreglo[]
+                        }
+                    } else if (isset($this->_arrVar[$arr[0]]) && is_object($this->_arrVar[$arr[0]])) {
+                        if (property_exists($this->_arrVar[$arr[0]], $arr[1])) {
+                            return ($this->_arrVar[$arr[0]]->{$arr[1]}); // objeto->propiedad
+                        } else if ($this->_bolEjecutarMetodos && method_exists($this->_arrVar[$arr[0]], $arr[1])) {
+                            return ($this->_arrVar[$arr[0]]->{$arr[1]}()); // objeto->metodo()
+                        }
                     }
                     break;
                 case 3:

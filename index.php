@@ -17,18 +17,19 @@ $objPhtml = new Phtml();
 class myFormat extends formatPhtml
 {
 
-    public function phtml_crear_enlace($mixedVar)
+    public function phtml_crear_enlace($var)
     {
-        $mixedVar = strtolower($mixedVar);
-        $mixedVar = str_replace(' ', '-', $mixedVar);
-        $mixedVar = urlencode($mixedVar);
-        return ($mixedVar);
+        $var = strtolower($var);
+        $var = str_replace(' ', '-', $var);
+        $var = urlencode($var);
+        return ($var);
     }
 }
 
 
 $objPhtml->userFormat(new myFormat);
 $objPhtml->addVar('enlace', 'Categoria de Prueba');
+$objPhtml->addVar('_SERVER', $_SERVER);
 
 // agregar contenido manual
 $objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>');
