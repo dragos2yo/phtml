@@ -28,27 +28,25 @@ class myFormat extends formatPhtml
 
 
 $objPhtml->userFormat(new myFormat);
-$objPhtml->addVar('enlace', 'Categoria de Prueba');
-$objPhtml->addVar('_SERVER', $_SERVER);
 
 // agregar contenido manual
-$objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>');
+//$objPhtml->addContent('<p>Hola Mundo desde <b>addContent</b></p>');
 
 // agregar contenido desde un archivo 
-$objPhtml->addFile('plantillas/hola.phtml');
+//$objPhtml->addFile('plantillas/hola.phtml');
 
 
 // agregar contenido en ejecucion
-$objPhtml->catchContent();
- echo "<p>Hola Mundo desde <b>catchContent</b></p>";
-$objPhtml->catchContent();
+//$objPhtml->catchContent();
+//echo "<p>Hola Mundo desde <b>catchContent</b></p>";
+//$objPhtml->catchContent();
 
 
 // ejemplo de incluir un archivo con el tag include
-$cadInclude = <<<EOL
-<include>plantillas/include.phtml</include>
-EOL;
-$objPhtml->addContent($cadInclude);
+//$cadInclude = <<<EOL
+//<include>plantillas/include.phtml</include>
+//EOL;
+//$objPhtml->addContent($cadInclude);
 
 // variables standard
 $objPhtml->addVar('edad', 35);
@@ -83,15 +81,20 @@ class usuario
 $objUsuario = new usuario();
 $objPhtml->addVar('objUsuario', $objUsuario);
 
+$objPhtml->addVar('enlace', 'Categoria de Prueba');
+
+// variable superglobales
+$objPhtml->addVar('_SERVER', $_SERVER);
+
 
 // ejemplo de depurar un tag if-elseif-else
-$objPhtml->addFile('plantillas/if-elseif-else.phtml');
+//$objPhtml->addFile('plantillas/if-elseif-else.phtml');
 
 // ejemplo de depurar un tag switch-case-default
-$objPhtml->addFile('plantillas/switch-case-default.phtml');
+//$objPhtml->addFile('plantillas/switch-case-default.phtml');
 
 // ejemplo de depurar un tag foreach
-$objPhtml->addFile('plantillas/foreach.phtml'); 
+//$objPhtml->addFile('plantillas/foreach.phtml'); 
 
 // ejemplo de depurar un tag for
 $objPhtml->addFile('plantillas/for.phtml');
@@ -100,10 +103,10 @@ $objPhtml->addFile('plantillas/for.phtml');
 //$objPhtml->addFile('plantillas/do-while.phtml');
 
 // ejemplo de imprimir variables
-$objPhtml->addFile('plantillas/var.phtml');
+//$objPhtml->addFile('plantillas/var.phtml');
 
 // ejemplo de imprimir variables
-$objPhtml->addFile('plantillas/const.phtml');
+//$objPhtml->addFile('plantillas/const.phtml');
 
 $inicial = microtime(true);
 echo $objPhtml->output();
