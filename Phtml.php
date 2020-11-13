@@ -1004,67 +1004,36 @@ class Phtml
         $id        = $for->hasAttribute('id') ? $for->getAttribute('id') . '.' : '';
         $offset    = $for->getAttribute('offset');
         $index     = $for->hasAttribute('index') ? $for->getAttribute('index')    : 'i';
-        $size      = $for->getAttribute('size');
         $init      = $for->getAttribute('init');
         $content   = $this->_getHTML($for);
         $frag      = null;
         $processed = '';
-        switch (strtolower(trim($for->getAttribute('order')))) {
-            case 'desc':
-                $asc = false;
-                break;
-            case '':
-            case 'asc':
-                $asc = true;
-                break;
-        }
+        $asc = $for->hasAttribute('order') && strtolower(trim($for->getAttribute('order'))) == 'desc' ? false : true;
+
         if ($init == '') {
-            $arrIndice = explode('.', $index);
-            $index = $arrIndice[0];
-            $init = isset($arrIndice[1]) ? $arrIndice[1] : 0;
+            $arrIndex = explode('.', $index, 2);
+            $index = $arrIndex[0];
+            $init = isset($arrIndex[1]) ? $arrIndex[1] : 0;
         }
-        if ($for->hasAttribute('var') && !empty($mixedVar)) { // solo variables
-            if (is_array($mixedVar)) { // arreglos
-                switch ($size) {
-                    case '':
-                    case 'size':
-                    case 'sizeof':
-                    case 'count':
-                    case 'length':
-                        $max = sizeof($mixedVar);
-                        break;
-                    default:
-                        $max = $size;
-                        break;
-                }
-            } else if (is_string($mixedVar)) { // cadenas
-                switch ($size) {
-                    case '':
-                    case 'size':
-                    case 'strlen':
-                    case 'length':
-                        $max = strlen($mixedVar);
-                        break;
-                    default:
-                        $max = $size;
-                        break;
-                }
-            }
+
+        if(is_array($mixedVar)) {
+            $max = sizeof($mixedVar);
         }
+        if(is_string($mixedVar)) {
+            $max = strlen($mixedVar);
+        }
+
         for ($asc ? $i = $init : $i = $max - 1; $asc ? $i < $max : $init <= $i; $asc ? $i++ : $i--) {
             $processed .= $content;
-            if ($strVar != '') {
-                if (@is_array($mixedVar) || @is_scalar($mixedVar[$i])) {
-                    $processed = @$this->_replaceVar($id . $strVar . '.' . $index,  $mixedVar[$i], $processed);
-                }
-                $processed = $this->_replaceVarEtc($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
-                $processed = $this->_replaceQuotes($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
-                $processed = $this->_replaceQuotesEtc($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
-            }
-            $processed = $this->_replaceVar($id . $index,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
-            $processed = $this->_replaceQuotes($id . $index, $i, $processed);
+            $processed = @$this->_replaceVar(     $id . $strVar . '.' . $index,  $mixedVar[$i], $processed);
+            $processed = $this->_replaceVarEtc(   $id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
+            $processed = $this->_replaceQuotes(   $id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
+            $processed = $this->_replaceQuotesEtc($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
+            $processed = $this->_replaceVar(      $id . $index,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
+            $processed = $this->_replaceQuotes(   $id . $index, $i, $processed);
         }
         $frag = $this->_convertHTMLinElements($dom, $processed);
+
         $this->_clearComments($for);
         if (!$frag) {
             $for->parentNode->removeChild($for);
