@@ -2,7 +2,7 @@
 
 
 define('URL', 'http://localhost/phtml');
-define('URL_DESCRIPCION', 'Phtml');
+define('URL_DESCRIPCION', 'Framework Phtml');
 
 function print_pre($cadContenido)
 {
@@ -106,7 +106,7 @@ $objPhtml->addVar('_SERVER', $_SERVER);
 $objPhtml->addFile('plantillas/var.phtml');
 
 // ejemplo de imprimir variables
-//$objPhtml->addFile('plantillas/const.phtml');
+$objPhtml->addFile('plantillas/const.phtml');
 
 $inicial = microtime(true);
 echo $objPhtml->output();

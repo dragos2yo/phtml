@@ -574,17 +574,12 @@ class Phtml
      */
     private function _compile_var($deleteVar = false)
     {
-        $arrResult = array();
         $pattern1 = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . $this->_escapeMetaChars($this->_closeVar) .  '/';
         $pattern2 = '/' . urlencode($this->_openVar) . '\s*([^0-9][a-zA-Z0-9_\.]+)\s*' . urlencode($this->_closeVar) .  '/';
-        if(preg_match_all($pattern1, $this->_strContent, $arrResult1)) {
-            array_push($arrResult, $arrResult1);
-        }
-        if(preg_match_all($pattern2, $this->_strContent, $arrResult2)) {
-            array_push($arrResult, $arrResult2);
-        }
-        print_pre($arrResult);
-
+        preg_match_all($pattern1, $this->_strContent, $arrResult1);
+        preg_match_all($pattern2, $this->_strContent, $arrResult2);
+        $arrResult[0] = array_merge($arrResult1[0], $arrResult2[0]);
+        $arrResult[1] = array_merge($arrResult1[1], $arrResult2[1]);
         if (isset($arrResult)) {
             $size = sizeof($arrResult[0]);
             for ($i = 0; $i < $size; $i++) {
@@ -618,8 +613,9 @@ class Phtml
      */
     private function _compile_const()
     {
-        $pattern = '/' . $this->_escapeMetaChars($this->_openConst) . '\s*([^0-9][A-Z0-9_]+)\s*' . $this->_escapeMetaChars($this->_closeConst) .  '/';
-        while (preg_match($pattern, $this->_strContent, $arrResult)) {
+        $pattern1 = '/' . $this->_escapeMetaChars($this->_openConst) . '\s*([^0-9][A-Z0-9_]+)\s*' . $this->_escapeMetaChars($this->_closeConst) .  '/';
+        $pattern2 = '/' . urlencode($this->_openConst) . '\s*([^0-9][A-Z0-9_]+)\s*' . urlencode($this->_closeConst) .  '/';
+        while (preg_match($pattern1, $this->_strContent, $arrResult) || preg_match($pattern2, $this->_strContent, $arrResult)) {
             if (defined($arrResult[1])) { // [[CONSTANTE]]
                 $content = constant($arrResult[1]);
             } else {
