@@ -538,22 +538,22 @@ class Phtml
      * Comprueba que la variable cumpla una condicion
      * 
      * @param string $strCond
-     * @param mixed $mixedVar
+     * @param mixed $var
      * @return boolean
      */
-    private function _checkCond($mixedVar, $strCond = '')
+    private function _checkCond($var, $strCond = '')
     {
         if ($strCond != '') {
             $arrCond = explode('.', $strCond, 2);
             if (sizeof($arrCond) == 1 && method_exists($this->_cond, 'phtml_' . $arrCond[0])) {
-                return ($this->_cond->{'phtml_' . $arrCond[0]}($mixedVar));
+                return ($this->_cond->{'phtml_' . $arrCond[0]}($var));
             } else if (sizeof($arrCond) == 2 && method_exists($this->_cond, 'phtml_' . $arrCond[0])) {
-                return ($this->_cond->{'phtml_' . $arrCond[0]}($mixedVar, $arrCond[1]));
+                return ($this->_cond->{'phtml_' . $arrCond[0]}($var, $arrCond[1]));
             } else {
                 return (false);
             }
         } else {
-            return ($this->_bolIsset ? isset($mixedVar) : false);
+            return ($this->_bolIsset ? isset($var) : false);
         }
     }
 
@@ -678,9 +678,9 @@ class Phtml
     {
         $pattern = '/' . $this->_escapeMetaChars($this->_openVar) . '\s*' . str_replace('.', '\.', $search) . '\.(.*?)\s*' . $this->_escapeMetaChars($this->_closeVar)  . '/';
         while (@preg_match($pattern, $subject, $arrResult)) {
-            $mixedVar = $this->_importVar($replacement . '.' . $arrResult[1]);
-            if (isset($mixedVar)) {
-                $replacement =  $this->_openVar . $mixedVar . $this->_closeVar;
+            $var = $this->_importVar($replacement . '.' . $arrResult[1]);
+            if (isset($var)) {
+                $replacement =  $this->_openVar . $var . $this->_closeVar;
             } else {
                 $replacement = $this->_openVar . $replacement . '.' . $arrResult[1] . $this->_closeVar;
             }
@@ -702,17 +702,17 @@ class Phtml
             $size = sizeof($arrResult[0]);
             for ($i = 0; $i < $size; $i++) {
                 $arrVar = explode('.', $arrResult[1][$i], 2);
-                if (sizeof($arrVar) == 2 && method_exists($this->_format, 'phtml_' . $arrVar[0])) { // {{func_format.mixedVar}}
-                    $mixedVar = $this->_importVar($arrVar[1]);
-                    if (!empty($mixedVar) && isset($mixedVar)) {
-                        $content = $this->_format->{'phtml_' . $arrVar[0]}($mixedVar);
+                if (sizeof($arrVar) == 2 && method_exists($this->_format, 'phtml_' . $arrVar[0])) { // {{func_format.var}}
+                    $var = $this->_importVar($arrVar[1]);
+                    if (!empty($var) && isset($var)) {
+                        $content = $this->_format->{'phtml_' . $arrVar[0]}($var);
                     } else {
                         $content = $deleteVar ? '' : null;
                     }
                 } else {
-                    $mixedVar = $this->_importVar($arrResult[1][$i]);
-                    if (!empty($mixedVar) && isset($mixedVar)) { // {{mixedVar}}
-                        $content = $mixedVar;
+                    $var = $this->_importVar($arrResult[1][$i]);
+                    if (!empty($var) && isset($var)) { // {{var}}
+                        $content = $var;
                     } else {
                         $content = $deleteVar ? '' : null;
                     }
@@ -756,9 +756,9 @@ class Phtml
     private function _compile_include()
     {
         $dom = $this->_getObjDOM($this->_strContent);
-        $objInclude = $dom->getElementsByTagName('include')->item(0);
-        $this->_clearComments($objInclude);
-        $path = trim(preg_replace('/(\\n|\\t|\\r)/s', '', $objInclude->textContent));
+        $include = $dom->getElementsByTagName('include')->item(0);
+        $this->_clearComments($include);
+        $path = trim(preg_replace('/(\\n|\\t|\\r)/s', '', $include->textContent));
         if (file_exists($path)) {
             if ($this->_bolExecutePhp) {
                 ob_start();
@@ -770,9 +770,9 @@ class Phtml
             }
             /* (*) compilar var const y aplicar seguridadComentarios solo al contenido del include */
             $frag = $this->_convertHTMLinElements($dom, $content);
-            $objInclude->parentNode->replaceChild($frag, $objInclude);
+            $include->parentNode->replaceChild($frag, $include);
         } else {
-            $objInclude->parentNode->removeChild($objInclude);
+            $include->parentNode->removeChild($include);
         }
         $dom->saveHTML();
         $phtml = $dom->getElementById($this->_randID);
@@ -943,7 +943,7 @@ class Phtml
      * (!) Testar arreglos multidimensionales
      * 
      * <!-- La eliminacion de este comentario depende de $_bolClearComment -->
-     * <foreach var="variable" key="key" value="value" id="id">
+     * <foreach var="variable" key="key" value="value">
      * </forach>
      */
     private function _compile_foreach()
@@ -953,23 +953,22 @@ class Phtml
         $strVar    = $foreach->hasAttribute('var') && $foreach->getAttribute('var') != '' ? $foreach->getAttribute('var') : null;
         $strKey    = $foreach->hasAttribute('key') ? $foreach->getAttribute('key') : 'key';
         $strValue  = $foreach->hasAttribute('value') ? $foreach->getAttribute('value') : 'value';
-        $id        = $foreach->hasAttribute('id') ? $foreach->getAttribute('id') . '.' : '';
         $content   = $this->_getHTML($foreach);
-        $mixedVar  = $this->_importVar($strVar);
+        $var  = $this->_importVar($strVar);
         $frag      = null;
         $processed = '';
-        if (is_array($mixedVar) || is_object($mixedVar)) {
-            foreach ($mixedVar as $key => $value) {
+        if (is_array($var) || is_object($var)) {
+            foreach ($var as $key => $value) {
                 $processed .= $content;
-                $processed = $this->_replaceVar($id . $strVar . '.' . $strKey,  is_object($mixedVar) ? $mixedVar->$key : $mixedVar[$key], $processed);
-                $processed = $this->_replaceVar($id . $strKey,  $key, $processed);
-                $processed = $this->_replaceVar($id . $strValue,  $value, $processed);
-                $processed = $this->_replaceVarEtc($id . $strVar . '.' . $strKey,  $id . $strVar . '.' . $key, $processed);
-                $processed = $this->_replaceQuotes($id . $strKey, $key, $processed);
-                $processed = $this->_replaceQuotes($id . $strValue, $value, $processed);
-                $processed = $this->_replaceQuotes($id . $strVar . '.' . $strKey, $id . $strVar . '.' . $key, $processed);
-                $processed = $this->_replaceQuotesEtc($id . $strKey, $id .  $strVar . '.' . $key, $processed);
-                $processed = $this->_replaceQuotesEtc($id . $strVar . '.' . $strKey, $id . $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceVar($strVar . '.' . $strKey,  is_object($var) ? $var->$key : $var[$key], $processed);
+                $processed = $this->_replaceVar($strKey,  $key, $processed);
+                $processed = $this->_replaceVar($strValue,  $value, $processed);
+                $processed = $this->_replaceVarEtc($strVar . '.' . $strKey, $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceQuotes($strKey, $key, $processed);
+                $processed = $this->_replaceQuotes($strValue, $value, $processed);
+                $processed = $this->_replaceQuotes($strVar . '.' . $strKey, $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceQuotesEtc($strKey, $strVar . '.' . $key, $processed);
+                $processed = $this->_replaceQuotesEtc($strVar . '.' . $strKey, $strVar . '.' . $key, $processed);
             }
             $frag = $this->_convertHTMLinElements($dom, $processed);
         }
@@ -992,7 +991,7 @@ class Phtml
      * (!) crear una funcion el inicializar fechas para no repetir codigo
      * 
      * <!-- La eliminacion de este comentario depende de $_bolClearComment --> 
-     * <for index="i" var="variable" init="0" size="count" order="asc" id="id" offset="+1">
+     * <for index="i.0" var="variable" order="asc" offset="+1">
      * </for>
      */
     private function _compile_for()
@@ -1000,40 +999,38 @@ class Phtml
         $dom       = $this->_getObjDOM($this->_strContent);
         $for       = $dom->getElementsByTagName('for')->item(0);
         $strVar    = $for->getAttribute('var');
-        $mixedVar  = $this->_importVar($strVar);
-        $id        = $for->hasAttribute('id') ? $for->getAttribute('id') . '.' : '';
+        $var       = $this->_importVar($strVar);
         $offset    = $for->getAttribute('offset');
-        $index     = $for->hasAttribute('index') ? $for->getAttribute('index')    : 'i';
-        $init      = $for->getAttribute('init');
         $content   = $this->_getHTML($for);
         $frag      = null;
         $processed = '';
         $asc = $for->hasAttribute('order') && strtolower(trim($for->getAttribute('order'))) == 'desc' ? false : true;
-
-        if ($init == '') {
-            $arrIndex = explode('.', $index, 2);
+        if ($for->hasAttribute('index')) {
+            $arrIndex = explode('.', $for->getAttribute('index'), 2);
             $index = $arrIndex[0];
             $init = isset($arrIndex[1]) ? $arrIndex[1] : 0;
+        } else {
+            $index = 'i';
+            $init  = 0;
         }
-
-        if(is_array($mixedVar)) {
-            $max = sizeof($mixedVar);
+        if (is_array($var) || is_string($var)) {
+            if (is_array($var)) {
+                $max = sizeof($var);
+            }
+            if (is_string($var)) {
+                $max = strlen($var);
+            }
+            for ($asc ? $i = $init : $i = $max - 1; $asc ? $i < $max : $init <= $i; $asc ? $i++ : $i--) {
+                $processed .= $content;
+                $processed = @$this->_replaceVar($strVar . '.' . $index,  $var[$i], $processed);
+                $processed = $this->_replaceVarEtc($strVar . '.' . $index, $strVar . '.' . $i, $processed);
+                $processed = $this->_replaceQuotes($strVar . '.' . $index, $strVar . '.' . $i, $processed);
+                $processed = $this->_replaceQuotesEtc($strVar . '.' . $index, $strVar . '.' . $i, $processed);
+                $processed = $this->_replaceVar($index,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
+                $processed = $this->_replaceQuotes($index, $i, $processed);
+            }
+            $frag = $this->_convertHTMLinElements($dom, $processed);
         }
-        if(is_string($mixedVar)) {
-            $max = strlen($mixedVar);
-        }
-
-        for ($asc ? $i = $init : $i = $max - 1; $asc ? $i < $max : $init <= $i; $asc ? $i++ : $i--) {
-            $processed .= $content;
-            $processed = @$this->_replaceVar(     $id . $strVar . '.' . $index,  $mixedVar[$i], $processed);
-            $processed = $this->_replaceVarEtc(   $id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
-            $processed = $this->_replaceQuotes(   $id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
-            $processed = $this->_replaceQuotesEtc($id . $strVar . '.' . $index, $id . $strVar . '.' . $i, $processed);
-            $processed = $this->_replaceVar(      $id . $index,  $offset != '' ? array_sum(array($i, $offset)) : $i, $processed);
-            $processed = $this->_replaceQuotes(   $id . $index, $i, $processed);
-        }
-        $frag = $this->_convertHTMLinElements($dom, $processed);
-
         $this->_clearComments($for);
         if (!$frag) {
             $for->parentNode->removeChild($for);
